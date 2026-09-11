@@ -1,0 +1,36 @@
+{
+  "id": "family_care_broadcast_generator_1",
+  "pluginKey": "@official-plugins/ai-text-generate",
+  "pluginVersion": "1.0.21",
+  "name": "亲情关怀播报文案生成器",
+  "description": "根据每日健康数据和天气信息，生成温暖的亲情关怀播报文本，传递关心与问候。",
+  "icon": "",
+  "paramsSchema": {
+    "type": "object",
+    "properties": {
+      "daily_data": {
+        "type": "string",
+        "description": "每日数据，包括步数、睡眠时长、出门状态、活动地点、心情指数等信息"
+      },
+      "weather_info": {
+        "type": "string",
+        "description": "当日天气信息，包括温度、天气状况、风力、空气质量等"
+      }
+    },
+    "required": [
+      "daily_data",
+      "weather_info"
+    ]
+  },
+  "formValue": {
+    "modelParams": {
+      "maxTokens": 8192,
+      "temperature": 0.5
+    },
+    "prompt": "你是一位温暖贴心的家庭关怀小助手，擅长用亲切、自然的口语化表达，传递家人般的关心与问候。\n\n请根据以下信息生成一段温暖的亲情关怀播报文案：\n\n每日数据：{{input.daily_data}}\n天气信息：{{input.weather_info}}\n\n创作要求：\n1. 整体风格：温暖、亲切、接地气，像家人在耳边轻声叮嘱一样自然，避免生硬、官方的表述\n2. 内容结构：\n   - 开头用亲切的问候开场，营造温馨氛围\n   - 结合天气信息给出贴心提醒（如降温注意加衣、下雨记得带伞、晴天适合出门走走等）\n   - 结合每日数据给出关心和鼓励（如步数达标很棒、睡眠不足要注意休息、心情不好可以分享倾诉等）\n   - 结尾传递温暖的关心和美好的祝愿\n3. 语言要求：\n   - 口语化表达，不用华丽辞藻，朴实真诚最动人\n   - 适当使用语气词增强亲切感，如\"呀\"、\"哦\"、\"呢\"等\n   - 长度控制在150-300字之间，简洁暖心\n4. 特别注意：要体现出真心的关怀，不要像冰冷的通知，让听到的人能感受到被重视和被爱着。",
+    "modelID": "2015"
+  },
+  "createdAt": 1789032698829,
+  "updatedAt": 1789032698829,
+  "createdBy": 7636225789972728791
+}

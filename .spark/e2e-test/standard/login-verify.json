@@ -1,0 +1,1 @@
+{"cases":[{"id":1,"priority":"p0","description":"访问/login，验证页面正常渲染，非白屏非纯JSON"},{"id":2,"priority":"p1","description":"切换到注册模式，验证表单变化"},{"id":3,"priority":"p1","description":"访问/未登录时重定向到/login"}]}

@@ -1,0 +1,20 @@
+{
+  "name": "心系 - 让陪伴不缺席",
+  "short_name": "心系",
+  "description": "用AI把每天的生活变成温暖的语音，让不在身边的家人也能感受到彼此的陪伴",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#FFF8F3",
+  "theme_color": "#FF8C69",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "lang": "zh-CN",
+  "categories": ["lifestyle", "social", "health"]
+}

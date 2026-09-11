@@ -1,0 +1,1 @@
+{"cases":[{"id":1,"priority":"p0","description":"打开我的页面，点击头像或昵称进入编辑资料页，返回正常"},{"id":2,"priority":"p0","description":"编辑资料页：修改昵称后保存，返回我的页面昵称同步更新"},{"id":3,"priority":"p1","description":"编辑资料页：性别切换、称呼预设选择、个性签名输入可正常操作并保存"},{"id":4,"priority":"p1","description":"首页顶部昵称和头像与我的页面保持一致（全局状态同步）"}]}

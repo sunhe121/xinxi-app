@@ -1,0 +1,1 @@
+{"cases":[{"id":1,"priority":"p0","description":"打开登录页，验证页面正常渲染（无白屏、有标题和表单）"},{"id":2,"priority":"p1","description":"打开首页（未登录时应重定向到登录页）"},{"id":3,"priority":"p2","description":"检查登录页无控制台错误"}]}
