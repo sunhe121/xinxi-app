@@ -14,6 +14,8 @@ import {
   Moon,
   Smile,
   Calendar,
+  Pencil,
+  MessageCircleHeart,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import ReactECharts from 'echarts-for-react';
@@ -60,6 +62,12 @@ export default function FamilyPage() {
   // 删除确认
   const [removeId, setRemoveId] = useState<string | null>(null);
   const [removing, setRemoving] = useState(false);
+
+  // 修改备注名
+  const [showRemarkDialog, setShowRemarkDialog] = useState(false);
+  const [remarkMember, setRemarkMember] = useState<FamilyMember | null>(null);
+  const [remarkInput, setRemarkInput] = useState('');
+  const [remarkSaving, setRemarkSaving] = useState(false);
 
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
@@ -149,6 +157,33 @@ export default function FamilyPage() {
     } finally {
       setRedeeming(false);
     }
+  };
+
+  const handleOpenRemark = (member: FamilyMember) => {
+    setRemarkMember(member);
+    setRemarkInput(member.remarkName || '');
+    setShowRemarkDialog(true);
+  };
+
+  const handleSaveRemark = async () => {
+    if (!remarkMember) return;
+    setRemarkSaving(true);
+    try {
+      await familyApi.updateRemarkName(remarkMember.bindingId, remarkInput.trim());
+      toast.success(remarkInput.trim() ? '备注名已更新' : '已清除备注名');
+      await refreshFamily();
+      setShowRemarkDialog(false);
+    } catch (error) {
+      const msg =
+        error instanceof Error ? error.message : '保存失败，请重试';
+      toast.error(msg);
+    } finally {
+      setRemarkSaving(false);
+    }
+  };
+
+  const getDisplayName = (member: FamilyMember): string => {
+    return member.remarkName || member.nickname;
   };
 
   const handleRemove = async (bindingId: string) => {
@@ -329,15 +364,20 @@ export default function FamilyPage() {
                         <User size={26} className="text-primary" />
                       )}
                     </div>
-                    {member.hasUnread && (
+                    {(member.unreadReportCount ?? 0) > 0 && (
                       <span className="absolute top-0 right-0 w-3 h-3 bg-destructive rounded-full ring-2 ring-card" />
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                       <p className="font-semibold text-foreground truncate text-lg">
-                        {member.nickname}
+                        {getDisplayName(member)}
                       </p>
+                      {member.remarkName && (
+                        <span className="text-xs text-muted-foreground flex-shrink-0">
+                          ({member.nickname})
+                        </span>
+                      )}
                       <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-xs font-medium flex-shrink-0">
                         {RELATION_LABELS[member.relation]}
                       </span>
@@ -432,6 +472,27 @@ export default function FamilyPage() {
                             </div>
                           </div>
                         )}
+
+                        {/* 发消息按钮 */}
+                        <button
+                          onClick={() => navigate(`/chat/${member.id}`)}
+                          className="w-full py-3 bg-gradient-to-r from-primary to-secondary text-white rounded-xl font-medium text-sm active:scale-[0.98] transition-transform flex items-center justify-center gap-1.5 shadow-md shadow-primary/20"
+                        >
+                          <MessageCircleHeart size={16} />
+                          发消息
+                        </button>
+
+                        {/* 修改备注名按钮 */}
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleOpenRemark(member);
+                          }}
+                          className="w-full py-3 bg-secondary text-foreground rounded-xl font-medium text-sm active:scale-[0.98] transition-transform flex items-center justify-center gap-1.5"
+                        >
+                          <Pencil size={16} />
+                          修改备注名
+                        </button>
 
                         {/* 查看历史播报按钮 */}
                         <button
@@ -642,6 +703,53 @@ export default function FamilyPage() {
                   </button>
                 </div>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 修改备注名弹窗 */}
+      {showRemarkDialog && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center px-6">
+          <div
+            className="absolute inset-0 bg-black/40 animate-fadeIn"
+            onClick={() => setShowRemarkDialog(false)}
+          />
+          <div className="relative bg-card rounded-2xl p-6 w-full max-w-sm animate-scaleIn">
+            <h3 className="text-lg font-semibold mb-2">修改备注名</h3>
+            <p className="text-sm text-muted-foreground mb-4">
+              备注名只在你的设备上显示
+            </p>
+            <input
+              type="text"
+              value={remarkInput}
+              onChange={(e) => setRemarkInput(e.target.value)}
+              placeholder={remarkMember?.nickname || '请输入备注名'}
+              maxLength={20}
+              className="w-full h-12 px-4 rounded-xl bg-secondary text-foreground text-base focus:outline-none focus:ring-2 focus:ring-primary/30 mb-6"
+              autoFocus
+            />
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowRemarkDialog(false)}
+                className="flex-1 h-12 rounded-xl bg-secondary text-foreground font-medium active:scale-95 transition-transform"
+              >
+                取消
+              </button>
+              <button
+                onClick={handleSaveRemark}
+                disabled={remarkSaving}
+                className="flex-1 h-12 rounded-xl bg-primary text-white font-medium active:scale-95 transition-transform disabled:opacity-50 flex items-center justify-center gap-2"
+              >
+                {remarkSaving ? (
+                  <>
+                    <Loader2 size={18} className="animate-spin" />
+                    保存中
+                  </>
+                ) : (
+                  '保存'
+                )}
+              </button>
             </div>
           </div>
         </div>

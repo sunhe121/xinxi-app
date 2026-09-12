@@ -16,6 +16,8 @@ import { XinyuWeatherModule } from './modules/xinyu-weather/xinyu-weather.module
 import { XinyuRecordingsModule } from './modules/xinyu-recordings/xinyu-recordings.module';
 import { XinyuPrivacyModule } from './modules/xinyu-privacy/xinyu-privacy.module';
 import { XinyuMessagesModule } from './modules/xinyu-messages/xinyu-messages.module';
+import { XinyuUploadModule } from './modules/xinyu-upload/xinyu-upload.module';
+import { XinyuReportModule } from './modules/xinyu-report/xinyu-report.module';
 
 @Module({
   imports: [
@@ -34,6 +36,8 @@ import { XinyuMessagesModule } from './modules/xinyu-messages/xinyu-messages.mod
     XinyuBroadcastsModule,
     XinyuPrivacyModule,
     XinyuMessagesModule,
+    XinyuUploadModule,
+    XinyuReportModule,
     // ====== @route-section: business-modules END ======
 
     // ⚠️ @route-order: last

@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useUser } from '@client/src/hooks/useUser';
+import { useUser, getDisplayName, RELATION_LABELS } from '@client/src/hooks/useUser';
 import { broadcastsApi, messagesApi } from '@client/src/api';
 import { useSpeech } from '@client/src/hooks/useSpeech';
 import { getGreeting, formatDate } from '@client/src/utils/date';
@@ -150,7 +150,7 @@ export default function HomePage() {
     setThinkSending(true);
     try {
       await messagesApi.sendThinkOfYou(currentFamily.userId, content, type);
-      toast.success(`已发送给${currentFamily.nickname}`);
+      toast.success(`已发送给${getDisplayName(currentFamily)}`);
       setShowThinkSheet(false);
       setThinkContent('');
     } catch {
@@ -243,7 +243,7 @@ export default function HomePage() {
                   <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-destructive rounded-full ring-2 ring-card" />
                 )}
               </div>
-              <span className="text-sm font-medium">{f.nickname}</span>
+              <span className="text-sm font-medium">{getDisplayName(f)}</span>
             </button>
           ))}
         </div>
@@ -303,7 +303,10 @@ export default function HomePage() {
           ) : latestBroadcast ? (
             <div className="bg-gradient-to-br from-primary/5 via-secondary/20 to-accent/10 rounded-3xl p-6 shadow-sm">
               {/* 卡片头 */}
-              <div className="flex items-start gap-3 mb-5">
+              <button
+                onClick={() => navigate(`/chat/${currentFamily.id}`)}
+                className="w-full flex items-start gap-3 mb-5 text-left active:opacity-70 transition-opacity"
+              >
                 <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden flex-shrink-0">
                   {currentFamily.avatarUrl ? (
                     <Image
@@ -318,7 +321,7 @@ export default function HomePage() {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
                     <span className="font-semibold text-foreground text-base">
-                      {currentFamily.nickname}
+                      {getDisplayName(currentFamily)}
                     </span>
                     <span className="text-xs text-muted-foreground">
                       给你的今日关心
@@ -336,7 +339,8 @@ export default function HomePage() {
                     )}
                   </div>
                 </div>
-              </div>
+                <ChevronRight size={18} className="text-muted-foreground mt-2 flex-shrink-0" />
+              </button>
 
               {/* 播报内容 */}
               <div className="bg-white/70 backdrop-blur rounded-2xl p-5 mb-6 shadow-sm">
@@ -454,7 +458,7 @@ export default function HomePage() {
               {/* 卡片底部来源 */}
               <div className="mt-5 pt-4 border-t border-primary/10">
                 <p className="text-xs text-muted-foreground">
-                  来自：{currentFamily.nickname} · {formatDate(latestBroadcast.broadcastDate)}
+                  来自：{getDisplayName(currentFamily)} · {formatDate(latestBroadcast.broadcastDate)}
                 </p>
               </div>
             </div>
@@ -467,7 +471,7 @@ export default function HomePage() {
                 今天的播报还没到
               </h3>
               <p className="text-sm text-muted-foreground leading-relaxed mb-6">
-                {currentFamily.nickname}每天会定时生成播报，
+                {getDisplayName(currentFamily)}每天会定时生成播报，
                 <br />
                 耐心等待一下吧~
               </p>
@@ -497,7 +501,7 @@ export default function HomePage() {
             )} />
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium text-foreground">
-                {currentFamily.nickname}
+                {getDisplayName(currentFamily)}
                 {latestBroadcast ? '今天已生成播报' : '今天还没有播报'}
               </p>
               <p className="text-xs text-muted-foreground mt-0.5">
@@ -544,7 +548,7 @@ export default function HomePage() {
             </div>
 
             <p className="text-sm text-muted-foreground mb-4">
-              选一句发给 {currentFamily?.nickname || '家人'}：
+              选一句发给 {getDisplayName(currentFamily) || '家人'}：
             </p>
 
             {/* 模板按钮 */}

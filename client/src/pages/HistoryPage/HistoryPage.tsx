@@ -13,7 +13,7 @@ import {
 import { AnimatePresence, motion } from 'framer-motion';
 import { broadcastsApi } from '@client/src/api';
 import { useSpeech } from '@client/src/hooks/useSpeech';
-import { useUser } from '@client/src/hooks/useUser';
+import { useUser, getDisplayName } from '@client/src/hooks/useUser';
 import { cn } from '@client/src/utils/cn';
 import { formatDate } from '@client/src/utils/date';
 import type { Broadcast, FamilyMember } from '@shared/api.interface';
@@ -129,7 +129,7 @@ export default function HistoryPage() {
                   : 'bg-secondary text-muted-foreground'
               )}
             >
-              <span>{f.nickname}</span>
+              <span>{getDisplayName(f)}</span>
               {f.hasUnread && (
                 <span className="w-2 h-2 rounded-full bg-destructive" />
               )}

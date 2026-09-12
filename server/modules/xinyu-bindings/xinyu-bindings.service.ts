@@ -48,10 +48,12 @@ export class XinyuBindingsService {
       city: member.city,
       relation: member.relation,
       relationLabel: member.relationLabel,
+      remarkName: member.remarkName,
       boundAt: member.boundAt,
       hasUnread: member.hasUnread,
       lastActiveAt: member.lastActiveAt,
       lastBroadcastAt: member.lastBroadcastAt,
+      unreadReportCount: member.unreadReportCount,
       dailyData: todayDailyData,
       weekSteps,
       weekSleep,
@@ -70,10 +72,40 @@ export class XinyuBindingsService {
       )
       .orderBy(desc(xinyuBindings.boundAt));
 
-    const members: FamilyMember[] = [];
+    const partnerIds: string[] = [];
+    const partnerInfos: Array<{ partnerId: string; binding: typeof rows[0]; isA: boolean }> = [];
+
     for (const binding of rows) {
       const isA = binding.userIdA === userId;
       const partnerId = isA ? binding.userIdB : binding.userIdA;
+      partnerIds.push(partnerId);
+      partnerInfos.push({ partnerId, binding, isA });
+    }
+
+    // 批量查未读报告数：targetUserId = userId, userId = partner, direction = to_partner, isRead = false
+    const reportCounts = new Map<string, number>();
+    if (partnerIds.length > 0) {
+      const reportRows = await this.db
+        .select({
+          senderId: xinyuBroadcasts.userId,
+          count: sql<number>`count(*)`,
+        })
+        .from(xinyuBroadcasts)
+        .where(
+          and(
+            eq(xinyuBroadcasts.targetUserId, userId),
+            eq(xinyuBroadcasts.direction, 'to_partner'),
+            eq(xinyuBroadcasts.isRead, false),
+          ),
+        )
+        .groupBy(xinyuBroadcasts.userId);
+      for (const row of reportRows) {
+        reportCounts.set(row.senderId, Number(row.count));
+      }
+    }
+
+    const members: FamilyMember[] = [];
+    for (const { partnerId, binding, isA } of partnerInfos) {
       const myRelation = isA ? binding.relationAToB : binding.relationBToA;
       const partner = await this.usersService.findByUserId(partnerId);
       if (!partner) continue;
@@ -111,6 +143,8 @@ export class XinyuBindingsService {
       ]);
 
       const relation = (myRelation as FamilyRelation) || 'other';
+      const myRemark = isA ? binding.remarkNameA : binding.remarkNameB;
+      const unreadReport = reportCounts.get(partnerId) ?? 0;
       members.push({
         id: partner.id,
         bindingId: binding.id,
@@ -121,6 +155,7 @@ export class XinyuBindingsService {
         city: partner.city,
         relation,
         relationLabel: RELATION_LABELS[relation],
+        remarkName: myRemark ?? '',
         boundAt: binding.boundAt ? binding.boundAt.toISOString() : '',
         hasUnread: Number(unreadCount[0]?.count ?? 0) > 0,
         lastActiveAt: lastDailyRow[0]?.dataDate
@@ -129,6 +164,7 @@ export class XinyuBindingsService {
         lastBroadcastAt: lastBroadcastRow[0]?.createdAt
           ? lastBroadcastRow[0].createdAt.toISOString()
           : '',
+        unreadReportCount: unreadReport,
       });
     }
     return members;
@@ -215,6 +251,16 @@ export class XinyuBindingsService {
       throw new BadRequestException('你们已经是家人啦');
     }
 
+    // 检查当前用户已绑定家人数量
+    const myBoundCount = await this.countBindings(userId);
+    if (myBoundCount >= 10) {
+      throw new BadRequestException('最多只能配对10位家人');
+    }
+    const creatorBoundCount = await this.countBindings(creatorId);
+    if (creatorBoundCount >= 10) {
+      throw new BadRequestException('对方已达到家人数量上限');
+    }
+
     const creatorRelation = (invite.relation as FamilyRelation) || 'other';
     const inserted = await this.db
       .insert(xinyuBindings)
@@ -245,11 +291,38 @@ export class XinyuBindingsService {
       city: creator.city,
       relation: myRelation,
       relationLabel: RELATION_LABELS[myRelation],
+      remarkName: '',
       boundAt: inserted[0].boundAt ? inserted[0].boundAt.toISOString() : '',
       hasUnread: false,
       lastActiveAt: '',
       lastBroadcastAt: '',
+      unreadReportCount: 0,
     };
+  }
+
+  async updateRemarkName(
+    userId: string,
+    bindingId: string,
+    remarkName: string,
+  ): Promise<void> {
+    const rows = await this.db
+      .select()
+      .from(xinyuBindings)
+      .where(eq(xinyuBindings.id, bindingId))
+      .limit(1);
+    if (rows.length === 0) throw new NotFoundException('绑定关系不存在');
+    const binding = rows[0];
+    if (binding.userIdA !== userId && binding.userIdB !== userId) {
+      throw new NotFoundException('绑定关系不存在');
+    }
+    const isA = binding.userIdA === userId;
+    const patch = isA
+      ? { remarkNameA: remarkName || null }
+      : { remarkNameB: remarkName || null };
+    await this.db
+      .update(xinyuBindings)
+      .set(patch)
+      .where(eq(xinyuBindings.id, bindingId));
   }
 
   async removeFamily(userId: string, bindingId: string): Promise<void> {
@@ -296,6 +369,19 @@ export class XinyuBindingsService {
       expiresAt: invite.expiresAt ? invite.expiresAt.toISOString() : '',
       relation: (invite.relation as FamilyRelation) || 'other',
     };
+  }
+
+  private async countBindings(userId: string): Promise<number> {
+    const result = await this.db
+      .select({ count: sql<number>`count(*)` })
+      .from(xinyuBindings)
+      .where(
+        and(
+          or(eq(xinyuBindings.userIdA, userId), eq(xinyuBindings.userIdB, userId)),
+          eq(xinyuBindings.status, 'bound'),
+        ),
+      );
+    return Number(result[0]?.count ?? 0);
   }
 
   private generateSixDigitCode(): string {

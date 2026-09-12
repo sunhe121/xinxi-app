@@ -60,6 +60,12 @@ async function bootstrap(): Promise<void> {
     },
   }));
 
+  const uploadsDir = join(process.cwd(), 'uploads');
+  app.use('/uploads', express.static(uploadsDir, {
+    maxAge: '7d',
+    index: false,
+  }));
+
   const host = process.env.SERVER_HOST || '0.0.0.0';
   const port = Number(process.env.SERVER_PORT || '3000');
 

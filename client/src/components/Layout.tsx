@@ -6,7 +6,8 @@ import { registerServiceWorker } from '@/utils/register-sw';
 
 const Layout = () => {
   const location = useLocation();
-  const showNav = !['/onboarding', '/privacy', '/profile-edit', '/share'].includes(location.pathname);
+  const showNav = !location.pathname.startsWith('/chat') &&
+    !['/onboarding', '/privacy', '/profile-edit', '/share'].includes(location.pathname);
 
   useEffect(() => {
     registerServiceWorker();

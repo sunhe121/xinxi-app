@@ -42,8 +42,14 @@ export class AuthService {
   ) {}
 
   async register(dto: RegisterDto): Promise<AuthResponse> {
-    if (!dto.nickname || dto.nickname.trim().length < 2) {
-      throw new BadRequestException('昵称至少2个字符');
+    const trimmed = (dto.nickname || '').trim();
+    if (trimmed.length < 4) {
+      throw new BadRequestException('昵称至少4位');
+    }
+    const hasChinese = /[\u4e00-\u9fa5]/.test(trimmed);
+    const hasNumber = /\d/.test(trimmed);
+    if (!hasChinese || !hasNumber) {
+      throw new BadRequestException('昵称需包含中文和数字');
     }
     if (!dto.password || dto.password.length < 6) {
       throw new BadRequestException('密码至少6位');
@@ -52,7 +58,7 @@ export class AuthService {
     const existing = await this.db
       .select()
       .from(xinyuUsers)
-      .where(eq(xinyuUsers.nickname, dto.nickname.trim()))
+      .where(eq(xinyuUsers.nickname, trimmed))
       .limit(1);
 
     if (existing.length > 0) {
@@ -78,7 +84,7 @@ export class AuthService {
       .insert(xinyuUsers)
       .values({
         userId,
-        nickname: dto.nickname.trim(),
+        nickname: trimmed,
         passwordHash,
         inviteCode: code,
         gender: dto.gender || 'female',

@@ -14,6 +14,13 @@ import type {
   RedeemInviteCodeRequest,
   InitUserRequest,
   UpdatePrivacyRequest,
+  UpdateRemarkNameRequest,
+  UploadFileRequest,
+  UploadFileResponse,
+  SendTextMessageRequest,
+  SendFileMessageRequest,
+  MessageListResponse,
+  XinyuMessage,
   UpdateUserRequest,
   SendThinkOfYouRequest,
   ThinkOfYouResponse,
@@ -147,6 +154,49 @@ export const familyApi = {
     const res = await request.get(`/api/xinyu/family/${userId}/detail`);
     return res.data;
   },
+
+  async updateRemarkName(bindingId: string, remarkName: string): Promise<void> {
+    await request.patch(`/api/xinyu/family/${bindingId}/remark`, { bindingId, remarkName } as UpdateRemarkNameRequest);
+  },
+};
+
+export const messagesApi = {
+  async getMessages(bindingId: string, cursor?: string, limit = 30): Promise<MessageListResponse> {
+    let url = `/api/xinyu/messages?bindingId=${bindingId}&limit=${limit}`;
+    if (cursor) url += `&cursor=${cursor}`;
+    const res = await request.get(url);
+    return res.data;
+  },
+
+  async sendTextMessage(data: SendTextMessageRequest): Promise<XinyuMessage> {
+    const res = await request.post('/api/xinyu/messages/text', data);
+    return res.data;
+  },
+
+  async sendFileMessage(data: SendFileMessageRequest): Promise<XinyuMessage> {
+    const res = await request.post('/api/xinyu/messages/file', data);
+    return res.data;
+  },
+
+  async sendThinkOfYou(
+    targetUserId: string,
+    content: string,
+    type: 'text' | 'template' = 'text',
+  ): Promise<ThinkOfYouResponse> {
+    const res = await request.post('/api/xinyu/messages/think-of-you', {
+      targetUserId,
+      content,
+      type,
+    } satisfies SendThinkOfYouRequest);
+    return res.data;
+  },
+};
+
+export const uploadApi = {
+  async uploadFile(data: UploadFileRequest): Promise<UploadFileResponse> {
+    const res = await request.post('/api/xinyu/upload', data);
+    return res.data;
+  },
 };
 
 export const privacyApi = {
@@ -262,17 +312,3 @@ export const recordingsApi = {
   },
 };
 
-export const messagesApi = {
-  async sendThinkOfYou(
-    targetUserId: string,
-    content: string,
-    type: 'text' | 'template' = 'text',
-  ): Promise<ThinkOfYouResponse> {
-    const res = await request.post('/api/xinyu/messages/think-of-you', {
-      targetUserId,
-      content,
-      type,
-    } satisfies SendThinkOfYouRequest);
-    return res.data;
-  },
-};

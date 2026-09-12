@@ -15,6 +15,11 @@ const RELATION_LABELS: Record<FamilyRelation, string> = {
 
 export { RELATION_LABELS };
 
+export function getDisplayName(member: FamilyMember | null): string {
+  if (!member) return '家人';
+  return member.remarkName || member.nickname;
+}
+
 interface UserContextValue {
   user: XinyuUser | null;
   family: FamilyMember[];

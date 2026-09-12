@@ -12,10 +12,23 @@ const LoginPage = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
+  const validateNickname = (value: string): string | null => {
+    const trimmed = value.trim();
+    if (!trimmed) return '请输入昵称';
+    if (trimmed.length < 4) return '昵称至少4位';
+    const hasChinese = /[\u4e00-\u9fa5]/.test(trimmed);
+    const hasNumber = /\d/.test(trimmed);
+    if (!hasChinese || !hasNumber) {
+      return '昵称需包含中文和数字';
+    }
+    return null;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!nickname.trim()) {
-      toast.error('请输入昵称');
+    const nickError = validateNickname(nickname);
+    if (nickError) {
+      toast.error(nickError);
       return;
     }
     if (!password || password.length < 6) {
@@ -94,14 +107,19 @@ const LoginPage = () => {
               <label className="block text-[#4A3F3A] text-base font-medium mb-2">
                 昵称
               </label>
-              <input
-                type="text"
-                value={nickname}
-                onChange={(e) => setNickname(e.target.value)}
-                placeholder="请输入昵称"
-                className="w-full h-12 px-4 border border-[#F0E6DD] rounded-xl text-base text-[#4A3F3A] placeholder-[#B8ABA3] focus:outline-none focus:border-[#FF8C69] focus:ring-2 focus:ring-[#FF8C69]/20 transition-all"
-              />
-            </div>
+               <input
+                 type="text"
+                 value={nickname}
+                 onChange={(e) => setNickname(e.target.value)}
+                 placeholder="请输入昵称"
+                 className="w-full h-12 px-4 border border-[#F0E6DD] rounded-xl text-base text-[#4A3F3A] placeholder-[#B8ABA3] focus:outline-none focus:border-[#FF8C69] focus:ring-2 focus:ring-[#FF8C69]/20 transition-all"
+               />
+               {!isLogin && (
+                 <p className="text-xs text-[#8B7D75] mt-2">
+                   昵称需包含中文和数字，至少4位
+                 </p>
+               )}
+             </div>
 
             <div>
               <label className="block text-[#4A3F3A] text-base font-medium mb-2">

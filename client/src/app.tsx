@@ -15,6 +15,7 @@ import PrivacyPage from './pages/PrivacyPage/PrivacyPage';
 import ProfileEditPage from './pages/ProfileEditPage/ProfileEditPage';
 import SharePage from './pages/SharePage/SharePage';
 import LandingPage from './pages/LandingPage/LandingPage';
+import ChatPage from './pages/ChatPage/ChatPage';
 import { UserProvider } from './hooks/useUser';
 
 const RoutesComponent = () => {
@@ -93,6 +94,14 @@ const RoutesComponent = () => {
             element={
               <RequireAuth>
                 <OnboardingPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="chat/:familyId"
+            element={
+              <RequireAuth>
+                <ChatPage />
               </RequireAuth>
             }
           />

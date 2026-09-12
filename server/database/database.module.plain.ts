@@ -6,6 +6,7 @@ import postgres from 'postgres';
 import * as schema from './schema';
 
 export const DB = 'DB';
+export const DRIZZLE_DATABASE = 'DB';
 export type DbInstance = PostgresJsDatabase<typeof schema>;
 
 @Global()
@@ -19,11 +20,11 @@ export type DbInstance = PostgresJsDatabase<typeof schema>;
         if (!databaseUrl) {
           throw new Error('DATABASE_URL environment variable is required');
         }
-        const queryClient = postgres(databaseUrl);
+        const queryClient = postgres(databaseUrl, { max: 10 });
         return drizzle(queryClient, { schema });
       },
     },
   ],
-  exports: [DB],
+  exports: [DB, DRIZZLE_DATABASE],
 })
 export class DatabaseModule {}

@@ -63,10 +63,12 @@ export interface FamilyMember {
   city: string;
   relation: FamilyRelation;
   relationLabel: string;
+  remarkName: string;
   boundAt: string;
   hasUnread: boolean;
   lastActiveAt: string;
   lastBroadcastAt: string;
+  unreadReportCount: number;
 }
 
 export interface InviteCodeInfo {
@@ -221,6 +223,65 @@ export interface UpdatePrivacyRequest {
   ambientSoundEnabled?: boolean;
   callDurationEnabled?: boolean;
   heartRateEnabled?: boolean;
+}
+
+export interface UpdateRemarkNameRequest {
+  bindingId: string;
+  remarkName: string;
+}
+
+export type MessageType = 'text' | 'voice' | 'image' | 'video';
+
+export interface XinyuMessage {
+  id: string;
+  bindingId: string;
+  senderUserId: string;
+  receiverUserId: string;
+  messageType: MessageType;
+  content: string;
+  fileUrl: string;
+  duration: number;
+  isReported: boolean;
+  createdAt: string;
+}
+
+export interface MessageListResponse {
+  items: XinyuMessage[];
+  nextCursor: string | null;
+  hasMore: boolean;
+}
+
+export interface SendTextMessageRequest {
+  bindingId: string;
+  receiverUserId: string;
+  content: string;
+}
+
+export interface UploadMessageFileRequest {
+  bindingId: string;
+  receiverUserId: string;
+  messageType: 'voice' | 'image' | 'video';
+  content?: string;
+  duration?: number;
+}
+
+export interface SendFileMessageRequest {
+  bindingId: string;
+  receiverUserId: string;
+  messageType: 'voice' | 'image' | 'video';
+  fileUrl: string;
+  content?: string;
+  duration?: number;
+}
+
+export interface UploadFileRequest {
+  fileName: string;
+  fileBase64: string;
+  type: 'image' | 'voice' | 'video';
+}
+
+export interface UploadFileResponse {
+  fileUrl: string;
 }
 
 export interface WeekStepsItem {

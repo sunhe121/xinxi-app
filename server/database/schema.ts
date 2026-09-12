@@ -1,7 +1,7 @@
 /* eslint-disable */
 /** auto generated, do not edit */
 import { sql } from 'drizzle-orm';
-import { boolean, date, index, integer, jsonb, numeric, pgTable, text, uniqueIndex, uuid, varchar, customType } from "drizzle-orm/pg-core"
+import { boolean, date, foreignKey, index, integer, jsonb, numeric, pgTable, text, uniqueIndex, uuid, varchar, customType } from "drizzle-orm/pg-core"
 
 export const customTimestamptz = customType<{
   data: Date;
@@ -116,6 +116,34 @@ export const fileAttachmentArray = customType<{
     });
   },
 });
+
+export const xinyuMessages = pgTable("xinyu_messages", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  bindingId: uuid("binding_id").notNull(),
+  senderUserId: userProfile("sender_user_id").notNull(),
+  receiverUserId: userProfile("receiver_user_id").notNull(),
+  messageType: varchar("message_type", { length: 20 }).notNull().default('text'),
+  content: text("content"),
+  fileUrl: text("file_url"),
+  duration: integer("duration").default(0),
+  isReported: boolean("is_reported").notNull().default(false),
+  // System field: Creation time (auto-filled, do not modify)
+  createdAt: customTimestamptz("_created_at", { precision: 3 }).notNull().default(sql`CURRENT_TIMESTAMP`),
+  // System field: Creator (auto-filled, do not modify)
+  createdBy: userProfile("_created_by"),
+  // System field: Update time (auto-filled, do not modify)
+  updatedAt: customTimestamptz("_updated_at", { precision: 3 }).notNull().default(sql`CURRENT_TIMESTAMP`),
+  // System field: Updater (auto-filled, do not modify)
+  updatedBy: userProfile("_updated_by"),
+}, (table) => [
+  index("idx_messages_binding_created").on(table.bindingId, table.createdAt),
+  // Complex index: CREATE INDEX idx_messages_receiver_reported ON xinyu_messages USING btree (((receiver_user_id).user_id), is_reported),
+  foreignKey({
+    columns: [table.bindingId],
+    foreignColumns: [xinyuBindings.id],
+    name: "xinyu_messages_binding_id_fkey",
+  }).onDelete("cascade"),
+]);
 
 export const xinyuPrivacySettings = pgTable("xinyu_privacy_settings", {
   id: uuid("id").primaryKey().defaultRandom(),
@@ -245,6 +273,8 @@ export const xinyuBindings = pgTable("xinyu_bindings", {
   boundAt: customTimestamptz("bound_at", { precision: 6 }).default(sql`CURRENT_TIMESTAMP`),
   relationAToB: varchar("relation_a_to_b", { length: 20 }).default('other'),
   relationBToA: varchar("relation_b_to_a", { length: 20 }).default('other'),
+  remarkNameA: varchar("remark_name_a", { length: 50 }),
+  remarkNameB: varchar("remark_name_b", { length: 50 }),
   // System field: Creation time (auto-filled, do not modify)
   createdAt: customTimestamptz("_created_at", { precision: 3 }).notNull().default(sql`CURRENT_TIMESTAMP`),
   // System field: Creator (auto-filled, do not modify)
@@ -293,6 +323,7 @@ export const xinyuBindingsTable = xinyuBindings;
 export const xinyuBroadcastsTable = xinyuBroadcasts;
 export const xinyuDailyDataTable = xinyuDailyData;
 export const xinyuInviteCodesTable = xinyuInviteCodes;
+export const xinyuMessagesTable = xinyuMessages;
 export const xinyuPrivacySettingsTable = xinyuPrivacySettings;
 export const xinyuRecordingsTable = xinyuRecordings;
 export const xinyuUsersTable = xinyuUsers;

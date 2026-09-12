@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
 import { CurrentUser, type JwtPayload } from '@server/common/guards/jwt-auth.guard';
 import { XinyuBindingsService } from './xinyu-bindings.service';
 import type {
@@ -6,6 +6,7 @@ import type {
   FamilyMemberDetail,
   CreateInviteCodeRequest,
   RedeemInviteCodeRequest,
+  UpdateRemarkNameRequest,
 } from '@shared/api.interface';
 
 @Controller('api/xinyu/family')
@@ -46,6 +47,15 @@ export class XinyuBindingsController {
     @Param('userId') memberUserId: string,
   ): Promise<FamilyMemberDetail> {
     return this.bindingsService.getMemberDetail(user.userId, memberUserId);
+  }
+
+  @Patch(':bindingId/remark')
+  async updateRemarkName(
+    @CurrentUser() user: JwtPayload,
+    @Param('bindingId') bindingId: string,
+    @Body() body: UpdateRemarkNameRequest,
+  ): Promise<void> {
+    await this.bindingsService.updateRemarkName(user.userId, bindingId, body.remarkName);
   }
 
   @Delete(':bindingId')
