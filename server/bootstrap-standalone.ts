@@ -8,7 +8,7 @@ import express from 'express';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { AppModule } from './app.module';
 
-export async function bootstrapStandalone(): Promise<NestExpressApplication> {
+async function bootstrap(): Promise<void> {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     abortOnError: process.env.NODE_ENV !== 'development',
   });
@@ -43,6 +43,6 @@ export async function bootstrapStandalone(): Promise<NestExpressApplication> {
   await app.listen(port, host);
   logger.log(`Server running on ${host}:${port}`);
   logger.log(`API endpoints ready at http://${host}:${port}/api`);
-
-  return app;
 }
+
+bootstrap();
