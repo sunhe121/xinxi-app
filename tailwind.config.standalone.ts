@@ -1,6 +1,7 @@
 export default {
   content: [
-    './client/src/**/*.{ts,tsx,css}',
+    './client/**/*.{ts,tsx,css}',
+    './index.html',
   ],
   plugins: [],
 };

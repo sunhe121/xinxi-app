@@ -29,8 +29,19 @@ async function bootstrap(): Promise<void> {
     }),
   );
 
-  const assetsPath = join(process.cwd(), 'dist/client/assets');
-  app.use('/assets', express.static(assetsPath, { maxAge: '1y', immutable: true }));
+  const clientDistPath = join(process.cwd(), 'dist/client');
+  app.use(express.static(clientDistPath, {
+    index: false,
+    maxAge: '1y',
+    immutable: true,
+    setHeaders: (res, filePath) => {
+      if (filePath.includes('/assets/')) {
+        res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+      } else {
+        res.setHeader('Cache-Control', 'public, max-age=0');
+      }
+    },
+  }));
 
   const logger = new Logger('Bootstrap');
   const host = process.env.SERVER_HOST || '0.0.0.0';
