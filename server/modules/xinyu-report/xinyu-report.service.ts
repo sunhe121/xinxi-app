@@ -26,7 +26,14 @@ export class XinyuReportService implements OnModuleInit {
   ) {}
 
   onModuleInit(): void {
-    this.startScheduler();
+    try {
+      this.startScheduler();
+    } catch (error) {
+      this.logger.error(
+        `报告定时任务初始化失败: ${(error as Error).message}`,
+        (error as Error).stack,
+      );
+    }
   }
 
   private startScheduler(): void {
@@ -35,12 +42,21 @@ export class XinyuReportService implements OnModuleInit {
 
     // 每 30 分钟检查一次，确保每天只执行一次
     this.checkTimer = setInterval(() => {
-      void this.checkAndRunReport();
+      this.checkAndRunReport().catch((err) => {
+        this.logger.error(
+          `定时报告检查异常: ${err.message}`,
+          err.stack,
+        );
+      });
     }, 30 * 60 * 1000);
 
-    // 启动时也检查一次
     setTimeout(() => {
-      void this.checkAndRunReport();
+      this.checkAndRunReport().catch((err) => {
+        this.logger.error(
+          `启动时报告检查异常: ${err.message}`,
+          err.stack,
+        );
+      });
     }, 5000);
   }
 

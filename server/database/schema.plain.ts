@@ -207,6 +207,7 @@ export const xinyuUsers = pgTable('xinyu_users', {
   uniqueIndex('xinyu_users_invite_code_key').on(table.inviteCode),
 ]);
 
+export const xinyuMessagesTable = xinyuMessages;
 export const xinyuBindingsTable = xinyuBindings;
 export const xinyuBroadcastsTable = xinyuBroadcasts;
 export const xinyuDailyDataTable = xinyuDailyData;

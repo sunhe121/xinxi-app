@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { join } from 'path';
+import { mkdirSync } from 'fs';
 import { __express as hbsExpressEngine } from 'hbs';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import express from 'express';
@@ -9,8 +10,35 @@ import type { NestExpressApplication } from '@nestjs/platform-express';
 import { AppModule } from './app.module';
 import { runMigrations } from './database/migrate';
 
+process.on('unhandledRejection', (reason: unknown) => {
+  // eslint-disable-next-line no-console
+  console.error(
+    'FATAL: Unhandled promise rejection:',
+    reason instanceof Error ? reason.message : String(reason),
+    reason instanceof Error ? reason.stack : undefined,
+  );
+});
+
+process.on('uncaughtException', (err: Error) => {
+  // eslint-disable-next-line no-console
+  console.error('FATAL: Uncaught exception:', err.message, err.stack);
+  process.exit(1);
+});
+
 async function bootstrap(): Promise<void> {
   const logger = new Logger('Bootstrap');
+  const startTime = Date.now();
+  logger.log('Starting application...');
+  logger.log(`NODE_ENV: ${process.env.NODE_ENV || 'development'}`);
+  logger.log(`DATABASE_URL: ${process.env.DATABASE_URL ? 'set' : 'NOT SET'}`);
+
+  const uploadsDir = join(process.cwd(), 'uploads');
+  try {
+    mkdirSync(uploadsDir, { recursive: true });
+    logger.log(`Uploads directory ready at ${uploadsDir}`);
+  } catch (err) {
+    logger.error(`Failed to create uploads directory: ${(err as Error).message}`);
+  }
 
   const databaseUrl = process.env.DATABASE_URL;
   if (databaseUrl) {
@@ -19,24 +47,30 @@ async function bootstrap(): Promise<void> {
       await runMigrations(databaseUrl);
       logger.log('Database migrations completed');
     } catch (err) {
-      logger.error(`Database migration failed: ${(err as Error).message}`);
+      const error = err as Error;
+      logger.error(`Database migration failed: ${error.message}`);
+      logger.error(error.stack || '');
       throw err;
     }
   } else {
     logger.warn('DATABASE_URL not set, skipping migrations');
   }
 
+  logger.log('Creating Nest application...');
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
-    abortOnError: process.env.NODE_ENV !== 'development',
+    abortOnError: false,
+    bufferLogs: true,
   });
+  logger.log(`Nest app created in ${Date.now() - startTime}ms`);
+  app.flushLogs();
 
   app.enableCors({
     origin: true,
     credentials: true,
   });
 
-  app.use(express.json({ limit: '10mb' }));
-  app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+  app.use(express.json({ limit: '110mb' }));
+  app.use(express.urlencoded({ extended: true, limit: '110mb' }));
 
   app.useGlobalPipes(
     new ValidationPipe({
@@ -60,10 +94,10 @@ async function bootstrap(): Promise<void> {
     },
   }));
 
-  const uploadsDir = join(process.cwd(), 'uploads');
   app.use('/uploads', express.static(uploadsDir, {
     maxAge: '7d',
     index: false,
+    fallthrough: true,
   }));
 
   const host = process.env.SERVER_HOST || '0.0.0.0';
@@ -78,4 +112,17 @@ async function bootstrap(): Promise<void> {
   logger.log(`API endpoints ready at http://${host}:${port}/api`);
 }
 
-bootstrap();
+bootstrap()
+  .then(() => {
+    const logger = new Logger('Bootstrap');
+    logger.log('Application started successfully');
+  })
+  .catch((err: Error) => {
+    // eslint-disable-next-line no-console
+    console.error('FATAL: Bootstrap failed:', err.message);
+    // eslint-disable-next-line no-console
+    console.error(err.stack);
+    // eslint-disable-next-line no-console
+    console.error('Cause:', (err as { cause?: unknown }).cause);
+    process.exit(1);
+  });
