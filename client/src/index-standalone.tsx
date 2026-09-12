@@ -8,60 +8,58 @@ import './index.css';
 import { createPortal } from 'react-dom';
 import { Toaster } from '@client/src/components/ui/sonner';
 
-const CLIENT_BASE_PATH = (import.meta as any).env?.CLIENT_BASE_PATH || '/';
+const CLIENT_BASE_PATH = (import.meta as unknown as { env: Record<string, string> }).env?.CLIENT_BASE_PATH || '/';
 
-function SimpleErrorFallback({
-  error,
-  resetErrorBoundary,
-}: {
+const ErrorFallback = ({ error, resetErrorBoundary }: {
   error: Error;
   resetErrorBoundary: () => void;
-}) {
+}) => {
   return (
-    <div
-      style={{
-        padding: 20,
-        fontFamily: 'system-ui, -apple-system, sans-serif',
-        maxWidth: 600,
-        margin: '0 auto',
-      }}
-    >
-      <h2 style={{ color: '#d32f2f' }}>应用出错了</h2>
-      <pre
-        style={{
-          whiteSpace: 'pre-wrap',
-          color: '#666',
-          background: '#f5f5f5',
-          padding: 12,
-          borderRadius: 8,
-          fontSize: 13,
-        }}
-      >
-        {error.message}
-      </pre>
+    <div style={{
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      minHeight: '100vh',
+      padding: '24px',
+      fontFamily: 'system-ui, -apple-system, sans-serif',
+      color: '#4A3F3A',
+      backgroundColor: '#FFF8F3',
+      textAlign: 'center',
+    }}>
+      <h2 style={{ fontSize: '18px', fontWeight: 600, marginBottom: '12px' }}>
+        出错了
+      </h2>
+      <p style={{ fontSize: '14px', color: '#8B7D75', marginBottom: '20px', maxWidth: '320px', wordBreak: 'break-word' }}>
+        {error?.message || '发生了未知错误'}
+      </p>
       <button
         onClick={resetErrorBoundary}
         style={{
-          padding: '8px 16px',
-          borderRadius: 6,
-          border: '1px solid #ccc',
-          background: '#fff',
+          padding: '10px 24px',
+          borderRadius: '12px',
+          border: 'none',
+          backgroundColor: '#FF8C69',
+          color: '#fff',
+          fontSize: '14px',
+          fontWeight: 500,
           cursor: 'pointer',
+          minHeight: '40px',
         }}
       >
         重试
       </button>
     </div>
   );
-}
+};
 
 const MainApp = () => {
   return (
     <BrowserRouter basename={CLIENT_BASE_PATH}>
-      <div>
+      <>
         <ErrorBoundary
           fallbackRender={({ error, resetErrorBoundary }) => (
-            <SimpleErrorFallback
+            <ErrorFallback
               error={error as Error}
               resetErrorBoundary={resetErrorBoundary}
             />
@@ -70,7 +68,7 @@ const MainApp = () => {
           <RoutesComponent />
           {createPortal(<Toaster />, document.body)}
         </ErrorBoundary>
-      </div>
+      </>
     </BrowserRouter>
   );
 };

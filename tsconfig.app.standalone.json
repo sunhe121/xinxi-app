@@ -16,6 +16,7 @@
     "noUnusedParameters": false,
     "noFallthroughCasesInSwitch": true,
     "esModuleInterop": true,
+    "types": ["vite/client"],
     "baseUrl": "./",
     "paths": {
       "@client/*": ["client/*"],

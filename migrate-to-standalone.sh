@@ -11,109 +11,103 @@ echo ""
 cd "$(dirname "$0")"
 
 # 1. 替换 package.json
-echo "[1/9] 替换 package.json..."
+echo "[1/12] 替换 package.json..."
 rm -f package.json
 mv package-standalone.json package.json
+rm -f package-lock.json
 
-# 2. 替换前端入口
-echo "[2/9] 替换前端入口文件..."
+# 2. 替换前端入口 HTML
+echo "[2/12] 替换前端入口 HTML..."
 rm -f client/index.html
 mv client/index-standalone.html client/index.html
+
+# 3. 替换前端入口 TSX
+echo "[3/12] 替换前端入口 TSX..."
 rm -f client/src/index.tsx
 mv client/src/index-standalone.tsx client/src/index.tsx
 
-# 3. 替换 Vite 配置
-echo "[3/9] 替换 Vite 配置..."
+# 4. 替换前端 index.css
+echo "[4/12] 替换前端 index.css..."
+rm -f client/src/index.css
+mv client/src/index-standalone.css client/src/index.css
+
+# 5. 替换 Vite 配置
+echo "[5/12] 替换 Vite 配置..."
 rm -f vite.config.ts
 mv vite.config.standalone.ts vite.config.ts
 
-# 4. 替换 tsconfig
-echo "[4/9] 替换 TypeScript 配置..."
+# 6. 替换 tailwind 配置
+echo "[6/12] 替换 Tailwind 配置..."
+rm -f tailwind.config.ts
+mv tailwind.config.standalone.ts tailwind.config.ts
+
+# 7. 替换 tsconfig
+echo "[7/12] 替换 TypeScript 配置..."
 rm -f tsconfig.app.json
 mv tsconfig.app.standalone.json tsconfig.app.json
 rm -f tsconfig.node.json
 mv tsconfig.node.standalone.json tsconfig.node.json
 
-# 5. 替换 nest-cli 配置
-echo "[5/9] 替换 Nest CLI 配置..."
+# 8. 替换 nest-cli 配置
+echo "[8/12] 替换 Nest CLI 配置..."
 rm -f nest-cli.json
 mv nest-cli-standalone.json nest-cli.json
 
-# 6. 替换后端入口和 schema
-echo "[6/9] 替换后端入口和数据库 schema..."
+# 9. 替换后端入口和 schema 和 database module
+echo "[9/12] 替换后端入口、数据库 schema 和模块..."
 rm -f server/main.ts
 mv server/bootstrap-standalone.ts server/main.ts
+
 rm -f server/database/schema.ts
 mv server/database/schema.plain.ts server/database/schema.ts
 
-# 7. 修改 app.module.ts - 移除 PlatformModule，替换为 DatabaseModule
-echo "[7/9] 修改后端模块和 service..."
+rm -f server/database/database.module.ts
+mv server/database/database.module.plain.ts server/database/database.module.ts
 
-sed -i \
-  -e "s|import { PlatformModule } from '@lark-apaas/fullstack-nestjs-core';|import { DatabaseModule } from './database/database.module';|" \
-  -e "s|PlatformModule.forRoot()|DatabaseModule|" \
-  server/app.module.ts
+# 10. 替换 app.module 和 view.controller
+echo "[10/12] 替换 AppModule 和 ViewController..."
+rm -f server/app.module.ts
+mv server/app.module.standalone.ts server/app.module.ts
 
-# 替换所有 service 的 DRIZZLE_DATABASE -> DB，替换 drizzle 导入来源
+rm -f server/modules/view/view.controller.ts
+mv server/modules/view/view.controller.standalone.ts server/modules/view/view.controller.ts
+
+# 11. 批量替换所有 service 的数据库注入
+echo "[11/12] 替换数据库注入..."
 SERVICE_FILES=$(find server/modules -name "*.service.ts" -type f)
 for f in $SERVICE_FILES; do
   if grep -q "DRIZZLE_DATABASE" "$f"; then
     sed -i \
-      -e "s|@Inject(DRIZZLE_DATABASE)|@Inject(DB)|g" \
-      -e "s|DRIZZLE_DATABASE, ||g" \
-      -e "s|import { type PostgresJsDatabase } from '@lark-apaas/fullstack-nestjs-core';|import { type PostgresJsDatabase } from 'drizzle-orm/postgres-js';|" \
+      -e "s|import { DRIZZLE_DATABASE, type PostgresJsDatabase } from '@lark-apaas/fullstack-nestjs-core';|import { DB, type DbInstance } from '@server/database/database.module';|g" \
+      -e "s|@Inject(DRIZZLE_DATABASE) private readonly db: PostgresJsDatabase|@Inject(DB) private readonly db: DbInstance|g" \
       "$f"
   fi
 done
 
-# 修改 view.controller.ts - 移除平台数据注入
-cat > server/modules/view/view.controller.ts << 'EOF'
-import { Controller, Get, Render } from '@nestjs/common';
-import { Public } from '@server/common/guards/jwt-auth.guard';
+# 替换业务代码中所有的 logger 导入
+for f in $(grep -rl "@lark-apaas/client-toolkit/logger" client/src/ 2>/dev/null || true); do
+  if [[ "$f" == *"business-ui"* ]]; then
+    continue
+  fi
+  sed -i "s|import { logger } from '@lark-apaas/client-toolkit/logger';|import { appLogger as logger } from '@client/src/utils/logger';|g" "$f"
+done
 
-@Controller()
-@Public()
-export class ViewController {
+# 替换前端 logger 为纯 console 实现
+echo "  替换 logger 为纯 console 实现..."
+rm -f client/src/utils/logger.ts
+mv client/src/utils/logger.standalone.ts client/src/utils/logger.ts
 
-  @Get(['/', '*'])
-  @Render('index')
-  async render(): Promise<Record<string, string>> {
-    return {};
-  }
-}
-EOF
-
-# 8. 移除 business-ui 目录和 logger 替换
-echo "[8/9] 清理平台业务组件和工具..."
+# 移除 business-ui 目录（平台专属组件）
+echo "  移除 business-ui 平台组件..."
 rm -rf client/src/components/business-ui
 
-# 替换 logger 为纯 console 实现
-cat > client/src/utils/logger.ts << 'EOF'
-const PREFIX = '[心系]';
-
-export const appLogger = {
-  info(...args: unknown[]) {
-    console.log(PREFIX, ...args);
-  },
-  warn(...args: unknown[]) {
-    console.warn(PREFIX, ...args);
-  },
-  error(...args: unknown[]) {
-    console.error(PREFIX, ...args);
-  },
-  debug(...args: unknown[]) {
-    console.debug(PREFIX, ...args);
-  },
-};
-
-export default appLogger;
-EOF
-
-# 9. 删除迁移脚本自身和所有 standalone 残留
-echo "[9/9] 清理残留文件..."
+# 12. 清理残留文件
+echo "[12/12] 清理残留文件..."
 rm -f migrate-to-standalone.sh
-# 删除其他可能的 standalone 文件
 find . -name "*.standalone.*" -not -path "./node_modules/*" -delete 2>/dev/null || true
+
+# 删除平台相关脚本
+rm -rf scripts/
 
 echo ""
 echo "=== 迁移完成 ==="
@@ -122,6 +116,6 @@ echo "接下来的步骤："
 echo "1. 设置环境变量 DATABASE_URL=postgresql://user:pass@host:5432/dbname"
 echo "2. 设置 JWT_SECRET=your-secret-key-at-least-32-characters"
 echo "3. 执行 npm install 重新安装依赖"
-echo "4. 执行数据库迁移（将 user_profile 列转为 varchar(100)，参见 DEPLOY.md）"
+echo "4. 执行数据库建表（将 user_profile 列转为 varchar(100)，参见 DEPLOY.md）"
 echo "5. 执行 npm run build:prod 构建"
 echo "6. 执行 npm start 启动应用"

@@ -23,7 +23,7 @@ export const customTimestamptz = customType<{
     const precision = typeof config?.precision !== 'undefined'
       ? ` (${config.precision})`
       : '';
-    return `timestamamptz${precision}`;
+    return `timestamptz${precision}`;
   },
   toDriver(value: Date | string | number) {
     if (value == null) return value as any;
