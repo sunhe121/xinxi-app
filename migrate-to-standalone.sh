@@ -64,6 +64,9 @@ mv server/database/schema.plain.ts server/database/schema.ts
 rm -f server/database/database.module.ts
 mv server/database/database.module.plain.ts server/database/database.module.ts
 
+rm -f server/database/migrate.ts
+mv server/database/migrate.plain.ts server/database/migrate.ts
+
 # 10. 替换 app.module 和 view.controller
 echo "[10/12] 替换 AppModule 和 ViewController..."
 rm -f server/app.module.ts
