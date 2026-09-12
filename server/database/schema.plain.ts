@@ -43,14 +43,13 @@ export const userProfile = customType<{
   driverData: string;
 }>({
   dataType() {
-    return 'user_profile';
+    return 'varchar(100)';
   },
   toDriver(value: string) {
-    return sql`ROW(${value})::user_profile`;
+    return value;
   },
   fromDriver(value: string) {
-    const [userId] = value.slice(1, -1).split(',');
-    return userId.trim();
+    return value;
   },
 });
 
