@@ -10,7 +10,7 @@
     "dev:client": "NODE_ENV=development vite",
     "build": "npm run build:prod",
     "build:prod": "npm run build:server && npm run build:client",
-    "build:server": "NODE_ENV=production nest build",
+    "build:server": "NODE_ENV=production nest build && echo '{\"type\":\"commonjs\"}' > dist/package.json",
     "build:client": "NODE_ENV=production vite build",
     "start": "NODE_ENV=production node dist/server/main.js",
     "db:push": "NODE_ENV=production node dist/server/database/migrate.js",

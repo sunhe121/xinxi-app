@@ -161,6 +161,14 @@ done
 echo "  移除 business-ui 平台组件..."
 rm -rf client/src/components/business-ui
 
+# 11.6 清理不需要的 PostCSS / ESLint / Stylelint 配置
+# Tailwind v4 已通过 @tailwindcss/vite 插件集成，不再需要 postcss.config.js
+echo "  清理 PostCSS / ESLint / Stylelint 平台配置..."
+rm -f postcss.config.js
+rm -f eslint.config.js
+rm -f .stylelintrc.js
+rm -f .prettierrc
+
 # 12. 清理残留文件
 echo "[12/12] 清理残留文件..."
 rm -f migrate-to-standalone.sh
