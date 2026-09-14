@@ -9,7 +9,7 @@ import { DRIZZLE_DATABASE, type PostgresJsDatabase } from '@lark-apaas/fullstack
 import { eq, and } from 'drizzle-orm';
 import { ConfigService } from '@nestjs/config';
 import axios from 'axios';
-import { xinyuLanguageSamples, xinyuUsers } from '@server/database/schema.plain';
+import { xinyuLanguageSamples, xinyuUsers } from '@server/database/schema';
 import type {
   AnalyzeLanguageStyleResponse,
   CreateLanguageSampleRequest,

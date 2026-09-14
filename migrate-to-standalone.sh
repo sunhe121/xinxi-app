@@ -75,17 +75,29 @@ mv server/app.module.standalone.ts server/app.module.ts
 rm -f server/modules/view/view.controller.ts
 mv server/modules/view/view.controller.standalone.ts server/modules/view/view.controller.ts
 
-# 11. 批量替换所有 service 的数据库注入
-echo "[11/12] 替换数据库注入..."
-SERVICE_FILES=$(find server/modules -name "*.service.ts" -type f)
-for f in $SERVICE_FILES; do
-  if grep -q "DRIZZLE_DATABASE" "$f"; then
-    sed -i \
-      -e "s|import { DRIZZLE_DATABASE, type PostgresJsDatabase } from '@lark-apaas/fullstack-nestjs-core';|import { DB, type DbInstance } from '@server/database/database.module';|g" \
-      -e "s|@Inject(DRIZZLE_DATABASE) private readonly db: PostgresJsDatabase|@Inject(DB) private readonly db: DbInstance|g" \
-      "$f"
-  fi
-done
+# 11. 批量替换所有 service 的数据库注入和导入路径
+ echo "[11/12] 替换数据库注入和导入路径..."
+ SERVICE_FILES=$(find server/modules -name "*.service.ts" -type f)
+ for f in $SERVICE_FILES; do
+   if grep -q "DRIZZLE_DATABASE" "$f"; then
+     sed -i \
+       -e "s|import { DRIZZLE_DATABASE, type PostgresJsDatabase } from '@lark-apaas/fullstack-nestjs-core';|import { DB, type DbInstance } from '@server/database/database.module';|g" \
+       -e "s|@Inject(DRIZZLE_DATABASE) private readonly db: PostgresJsDatabase|@Inject(DB) private readonly db: DbInstance|g" \
+       "$f"
+   fi
+ done
+
+ # 批量替换所有 .plain 后缀的导入路径（schema.plain -> schema, database.module.plain -> database.module 等）
+ echo "  替换 .plain 导入路径..."
+ ALL_TS_FILES=$(find server -name "*.ts" -type f)
+ for f in $ALL_TS_FILES; do
+   sed -i \
+     -e "s|from '@server/database/schema.plain'|from '@server/database/schema'|g" \
+     -e "s|from './schema.plain'|from './schema'|g" \
+     -e "s|from '../database/schema.plain'|from '../database/schema'|g" \
+     -e "s|from '@server/database/database.module.plain'|from '@server/database/database.module'|g" \
+     "$f"
+ done
 
 # 替换业务代码中所有的 logger 导入
 for f in $(grep -rl "@lark-apaas/client-toolkit/logger" client/src/ 2>/dev/null || true); do
