@@ -3,17 +3,103 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <link rel="icon" href="/favicon.svg">
   <link rel="manifest" href="/manifest.json">
   <meta name="theme-color" content="#FF8C69">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="心系">
+  <meta name="description" content="心系 - AI亲情关怀应用，让陪伴不缺席">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <title>心系 - 让陪伴不缺席</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; background: #FFF8F3; -webkit-font-smoothing: antialiased; }
+    #splash {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #FFF8F3 0%, #FFE8DC 100%);
+      z-index: 9999;
+      transition: opacity 0.3s ease;
+    }
+    #splash.hidden { opacity: 0; pointer-events: none; }
+    .splash-logo {
+      width: 72px;
+      height: 72px;
+      border-radius: 20px;
+      background: linear-gradient(135deg, #FF8C69 0%, #FFB5B5 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+      box-shadow: 0 8px 24px rgba(255, 140, 105, 0.3);
+      animation: pulse 2s ease-in-out infinite;
+    }
+    .splash-logo::before {
+      content: '';
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.9);
+      position: relative;
+    }
+    .splash-logo::after {
+      content: '';
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #FF8C69;
+      margin-bottom: 4px;
+    }
+    .splash-title {
+      font-size: 22px;
+      font-weight: 600;
+      color: #4A3F3A;
+      margin-bottom: 6px;
+      font-family: system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+    .splash-subtitle {
+      font-size: 14px;
+      color: #8B7D75;
+      font-family: system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+    .splash-spinner {
+      margin-top: 24px;
+      width: 28px;
+      height: 28px;
+      border: 3px solid rgba(255, 140, 105, 0.2);
+      border-top-color: #FF8C69;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+    #root { min-height: 100%; }
+  </style>
 </head>
 
 <body>
+  <div id="splash">
+    <div class="splash-logo"></div>
+    <div class="splash-title">心系</div>
+    <div class="splash-subtitle">让陪伴不缺席</div>
+    <div class="splash-spinner"></div>
+  </div>
   <div id="root"></div>
   <script type="module" src="/src/index.tsx"></script>
 </body>

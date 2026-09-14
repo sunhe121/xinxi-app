@@ -5,6 +5,8 @@ import { mkdirSync } from 'fs';
 import { __express as hbsExpressEngine } from 'hbs';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import express from 'express';
+// eslint-disable-next-line import/no-extraneous-dependencies
+import compression from 'compression';
 
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { AppModule } from './app.module';
@@ -69,6 +71,23 @@ async function bootstrap(): Promise<void> {
     credentials: true,
   });
 
+  app.use(compression({
+    level: 6,
+    threshold: 1024,
+    filter: (req, res) => {
+      if (req.headers['x-no-compression']) return false;
+      return compression.filter(req, res);
+    },
+  }));
+
+  app.use((req, res, next) => {
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+    res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+    res.setHeader('Permissions-Policy', 'geolocation=(), microphone=(), camera=()');
+    next();
+  });
+
   app.use(express.json({ limit: '110mb' }));
   app.use(express.urlencoded({ extended: true, limit: '110mb' }));
 
@@ -83,11 +102,13 @@ async function bootstrap(): Promise<void> {
   const clientDistPath = join(process.cwd(), 'dist/client');
   app.use(express.static(clientDistPath, {
     index: false,
-    maxAge: '1y',
-    immutable: true,
     setHeaders: (res, filePath) => {
       if (filePath.includes('/assets/')) {
         res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+      } else if (filePath.endsWith('/index.html') || filePath.endsWith('\\index.html')) {
+        res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+        res.setHeader('Pragma', 'no-cache');
+        res.setHeader('Expires', '0');
       } else {
         res.setHeader('Cache-Control', 'public, max-age=0');
       }
@@ -98,6 +119,9 @@ async function bootstrap(): Promise<void> {
     maxAge: '7d',
     index: false,
     fallthrough: true,
+    setHeaders: (res) => {
+      res.setHeader('Cache-Control', 'public, max-age=604800');
+    },
   }));
 
   const host = process.env.SERVER_HOST || '0.0.0.0';
