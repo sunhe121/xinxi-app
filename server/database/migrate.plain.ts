@@ -29,6 +29,8 @@ const MIGRATION_STATEMENTS: Array<{ name: string; sql: string }> = [
   my_title VARCHAR(30),
   bio VARCHAR(100),
   password_hash VARCHAR(255),
+  phone VARCHAR(20) UNIQUE,
+  language_profile TEXT,
   _created_at TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
   _created_by VARCHAR(100),
   _updated_at TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -184,6 +186,45 @@ const MIGRATION_STATEMENTS: Array<{ name: string; sql: string }> = [
   {
     name: 'xinyu_invite_codes_code_idx index',
     sql: 'CREATE INDEX IF NOT EXISTS xinyu_invite_codes_code_idx ON xinyu_invite_codes (code);',
+  },
+  {
+    name: 'xinyu_users_phone column',
+    sql: `DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'xinyu_users' AND column_name = 'phone') THEN
+    ALTER TABLE xinyu_users ADD COLUMN phone VARCHAR(20);
+    CREATE UNIQUE INDEX IF NOT EXISTS xinyu_users_phone_idx ON xinyu_users (phone);
+  END IF;
+END$$;`,
+  },
+  {
+    name: 'xinyu_users_language_profile column',
+    sql: `DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'xinyu_users' AND column_name = 'language_profile') THEN
+    ALTER TABLE xinyu_users ADD COLUMN language_profile TEXT;
+  END IF;
+END$$;`,
+  },
+  {
+    name: 'xinyu_language_samples table',
+    sql: `CREATE TABLE IF NOT EXISTS xinyu_language_samples (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id VARCHAR(100) NOT NULL,
+  category VARCHAR(20) NOT NULL DEFAULT 'general',
+  title VARCHAR(100) NOT NULL,
+  transcript TEXT NOT NULL,
+  audio_url TEXT,
+  duration INTEGER DEFAULT 0,
+  _created_at TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  _created_by VARCHAR(100),
+  _updated_at TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  _updated_by VARCHAR(100)
+);`,
+  },
+  {
+    name: 'xinyu_language_samples_user_idx index',
+    sql: 'CREATE INDEX IF NOT EXISTS xinyu_language_samples_user_idx ON xinyu_language_samples (user_id);',
   },
 ];
 

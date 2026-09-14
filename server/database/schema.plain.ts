@@ -197,6 +197,8 @@ export const xinyuUsers = pgTable('xinyu_users', {
   myTitle: varchar('my_title', { length: 30 }),
   bio: varchar('bio', { length: 100 }),
   passwordHash: varchar('password_hash', { length: 255 }),
+  phone: varchar('phone', { length: 20 }),
+  languageProfile: text('language_profile'),
   createdAt: customTimestamptz('_created_at', { precision: 3 }).notNull().default(sql`CURRENT_TIMESTAMP`),
   createdBy: userProfile('_created_by'),
   updatedAt: customTimestamptz('_updated_at', { precision: 3 }).notNull().default(sql`CURRENT_TIMESTAMP`),
@@ -204,6 +206,23 @@ export const xinyuUsers = pgTable('xinyu_users', {
 }, (table) => [
   uniqueIndex('xinyu_users_user_id_key').on(table.userId),
   uniqueIndex('xinyu_users_invite_code_key').on(table.inviteCode),
+  uniqueIndex('xinyu_users_phone_idx').on(table.phone),
+]);
+
+export const xinyuLanguageSamples = pgTable('xinyu_language_samples', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: userProfile('user_id').notNull(),
+  category: varchar('category', { length: 20 }).notNull().default('general'),
+  title: varchar('title', { length: 100 }).notNull(),
+  transcript: text('transcript').notNull(),
+  audioUrl: text('audio_url'),
+  duration: integer('duration').default(0),
+  createdAt: customTimestamptz('_created_at', { precision: 3 }).notNull().default(sql`CURRENT_TIMESTAMP`),
+  createdBy: userProfile('_created_by'),
+  updatedAt: customTimestamptz('_updated_at', { precision: 3 }).notNull().default(sql`CURRENT_TIMESTAMP`),
+  updatedBy: userProfile('_updated_by'),
+}, (table) => [
+  index('xinyu_language_samples_user_idx').on(table.userId),
 ]);
 
 export const xinyuMessagesTable = xinyuMessages;
@@ -214,3 +233,4 @@ export const xinyuInviteCodesTable = xinyuInviteCodes;
 export const xinyuPrivacySettingsTable = xinyuPrivacySettings;
 export const xinyuRecordingsTable = xinyuRecordings;
 export const xinyuUsersTable = xinyuUsers;
+export const xinyuLanguageSamplesTable = xinyuLanguageSamples;

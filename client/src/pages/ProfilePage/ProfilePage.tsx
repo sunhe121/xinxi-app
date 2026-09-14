@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   User,
@@ -16,6 +16,8 @@ import {
   Check,
   Pencil,
   LogOut,
+  Sparkles,
+  RefreshCw,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useUser } from '@client/src/hooks/useUser';
@@ -52,7 +54,8 @@ const INITIAL_FESTIVALS: FestivalItem[] = [
 
 export default function ProfilePage() {
   const navigate = useNavigate();
-  const { user, family } = useUser();
+  const { user, family, loading, refresh } = useUser();
+  const [profileError, setProfileError] = useState(false);
 
   // 弹层状态
   const [showPushSheet, setShowPushSheet] = useState(false);
@@ -95,6 +98,11 @@ export default function ProfilePage() {
 
   const handleAddFestival = () => {
     toast.info('添加功能即将上线');
+  };
+
+  const handleRetryProfile = () => {
+    setProfileError(false);
+    refresh();
   };
 
   const handleLogout = () => {
@@ -174,8 +182,20 @@ export default function ProfilePage() {
       iconColor: 'text-accent',
     },
     {
+      icon: Sparkles,
+      label: '我的语言风格',
+      right: (
+        <span className="text-sm text-muted-foreground">
+          {user?.languageProfile ? '已学习' : '去学习'}
+        </span>
+      ),
+      onClick: () => navigate('/language-style'),
+      iconBg: 'bg-gradient-to-br from-purple-100 to-pink-100',
+      iconColor: 'text-purple-500',
+    },
+    {
       icon: MessageSquare,
-      label: '语言风格',
+      label: '语气风格',
       right: (
         <span className="text-sm text-muted-foreground">
           {TONE_STYLE_LABELS[selectedTone]}
@@ -205,28 +225,38 @@ export default function ProfilePage() {
         <div className="absolute -right-6 -top-6 w-32 h-32 rounded-full bg-white/10" />
         <div className="absolute -right-10 bottom-0 w-24 h-24 rounded-full bg-white/5" />
 
-        <div className="relative flex items-center gap-4">
-          <div className="relative w-16 h-16 rounded-full bg-white/30 backdrop-blur flex items-center justify-center ring-4 ring-white/20 overflow-hidden flex-shrink-0">
-            {user?.avatarUrl ? (
-              <Image
-                src={user.avatarUrl}
-                alt={user.nickname}
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <User size={32} className="text-white" />
-            )}
-            <div className="absolute bottom-0 right-0 w-6 h-6 rounded-full bg-white text-primary flex items-center justify-center shadow-md">
-              <Pencil size={12} />
+          <div className="relative flex items-center gap-4">
+            <div className="relative w-16 h-16 rounded-full bg-white/30 backdrop-blur flex items-center justify-center ring-4 ring-white/20 overflow-hidden flex-shrink-0">
+              {loading ? (
+                <div className="w-8 h-8 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+              ) : user?.avatarUrl ? (
+                <Image
+                  src={user.avatarUrl}
+                  alt={user.nickname}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <User size={32} className="text-white" />
+              )}
+              <div className="absolute bottom-0 right-0 w-6 h-6 rounded-full bg-white text-primary flex items-center justify-center shadow-md">
+                <Pencil size={12} />
+              </div>
             </div>
-          </div>
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2">
-              <h2 className="text-xl font-bold truncate">
-                {user?.nickname || '加载中...'}
-              </h2>
-              <Pencil size={16} className="text-white/80 flex-shrink-0" />
-            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2">
+                <h2 className="text-xl font-bold truncate">
+                  {loading ? '加载中...' : user?.nickname || (profileError ? '加载失败' : '加载中...')}
+                </h2>
+                {!loading && !user && (
+                  <button
+                    onClick={handleRetryProfile}
+                    className="text-white/80 hover:text-white transition-colors"
+                  >
+                    <RefreshCw size={16} />
+                  </button>
+                )}
+                <Pencil size={16} className="text-white/80 flex-shrink-0" />
+              </div>
             <div className="flex items-center gap-2 mt-1.5">
               <span className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-white/20 text-white text-xs font-medium">
                 {TONE_STYLE_LABELS[selectedTone]}

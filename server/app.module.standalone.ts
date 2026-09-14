@@ -18,6 +18,7 @@ import { XinyuPrivacyModule } from './modules/xinyu-privacy/xinyu-privacy.module
 import { XinyuMessagesModule } from './modules/xinyu-messages/xinyu-messages.module';
 import { XinyuUploadModule } from './modules/xinyu-upload/xinyu-upload.module';
 import { XinyuReportModule } from './modules/xinyu-report/xinyu-report.module';
+import { XinyuLanguageStyleModule } from './modules/xinyu-language-style/xinyu-language-style.module';
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { XinyuReportModule } from './modules/xinyu-report/xinyu-report.module';
     XinyuMessagesModule,
     XinyuUploadModule,
     XinyuReportModule,
+    XinyuLanguageStyleModule,
     // ====== @route-section: business-modules END ======
 
     // ⚠️ @route-order: last

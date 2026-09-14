@@ -31,16 +31,25 @@ export class AiService {
     senderTitle: string;
     toneStyle: ToneStyle;
     direction: 'to_partner' | 'from_partner';
+    languageProfile?: string;
   }): Promise<string> {
     if (!this.isConfigured) {
       return this.generateFallback(params);
     }
 
-    const { dailyData, weatherInfo, relation, senderTitle, toneStyle, direction } = params;
+    const { dailyData, weatherInfo, relation, senderTitle, toneStyle, direction, languageProfile } = params;
     const tonePrompt = this.getTonePrompt(toneStyle);
     const perspective = direction === 'from_partner'
       ? `请以"我"（播报发送者）的第一人称视角来撰写。发送者的称呼是"${senderTitle || relation}"。内容结构分两部分：① 用第一人称描述我今天一天的生活状态（包括天气、活动、心情、作息等日常细节，讲自己的事），② 然后自然地表达对家人的关心和想念（关心对方的身体、天气、生活）。整体像家人之间的语音通话，温暖自然，不要太正式。`
       : `请以播报者的身份，为${relation}整理今天的生活状态播报。内容包括：今天的天气情况、步数、睡眠、活动地点、心情状态等，最后加上对${relation}的关心和问候。语气像家人一样温暖自然。`;
+
+    const languageStyleInstruction = languageProfile
+      ? `【语言风格参考】
+请尽量模仿以下说话风格，让播报更像发送者本人：
+${languageProfile}
+
+`
+      : '';
 
     const prompt = `
 你是一位亲情播报助手，负责为异地家人生成温暖的日常关心播报。
@@ -48,7 +57,7 @@ ${perspective}
 
 【语气要求】${tonePrompt}
 
-【今日生活数据】
+${languageStyleInstruction}【今日生活数据】
 ${JSON.stringify(dailyData, null, 2)}
 
 【今日天气】

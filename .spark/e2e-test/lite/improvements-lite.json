@@ -1,0 +1,1 @@
+{"cases":[{"id":1,"priority":"p0","description":"登录页正常渲染，非白屏，含手机号输入框和密码框"},{"id":2,"priority":"p0","description":"登录页切换到注册模式，显示验证码+昵称+密码确认字段"},{"id":3,"priority":"p1","description":"登录页切换到忘记密码模式，显示新密码+确认密码字段"},{"id":4,"priority":"p1","description":"onboarding配对页邀请码输入框为单输入框样式"},{"id":5,"priority":"p0","description":"我的页面正常渲染，有用户信息和菜单项"}]}

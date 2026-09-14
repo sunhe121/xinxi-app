@@ -51,6 +51,8 @@ export interface XinyuUser {
   myTitle: string;
   bio: string;
   gender: 'male' | 'female';
+  phone?: string;
+  languageProfile?: string;
 }
 
 export interface FamilyMember {
@@ -214,6 +216,8 @@ export interface UpdateUserRequest {
   myTitle?: string;
   bio?: string;
   gender?: 'male' | 'female';
+  phone?: string;
+  languageProfile?: string;
 }
 
 export interface UpdatePrivacyRequest {
@@ -326,5 +330,49 @@ export const RECORDING_CATEGORY_LABELS: Record<Recording['category'], string> = 
   emotion: '情感表达',
   general: '通用',
 };
+
+export interface LanguageSample {
+  id: string;
+  userId: string;
+  category: 'daily' | 'greeting' | 'care' | 'emotion' | 'general';
+  title: string;
+  transcript: string;
+  audioUrl?: string;
+  duration: number;
+  createdAt: string;
+}
+
+export interface CreateLanguageSampleRequest {
+  category: LanguageSample['category'];
+  title: string;
+  transcript: string;
+  audioUrl?: string;
+  duration?: number;
+}
+
+export interface UpdateLanguageSampleRequest {
+  title?: string;
+  transcript?: string;
+  audioUrl?: string;
+  duration?: number;
+}
+
+export interface AnalyzeLanguageStyleRequest {
+  samples: string[];
+}
+
+export interface AnalyzeLanguageStyleResponse {
+  profile: string;
+  keywords: string[];
+  tone: string;
+}
+
+export const LANGUAGE_SAMPLE_CATEGORIES: { value: LanguageSample['category']; label: string }[] = [
+  { value: 'daily', label: '日常闲聊' },
+  { value: 'greeting', label: '问候关心' },
+  { value: 'care', label: '健康叮嘱' },
+  { value: 'emotion', label: '情感表达' },
+  { value: 'general', label: '其他' },
+];
 
 

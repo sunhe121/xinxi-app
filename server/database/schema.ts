@@ -117,6 +117,26 @@ export const fileAttachmentArray = customType<{
   },
 });
 
+export const xinyuLanguageSamples = pgTable("xinyu_language_samples", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  userId: userProfile("user_id").notNull(),
+  category: varchar("category", { length: 20 }).notNull().default('general'),
+  title: varchar("title", { length: 100 }).notNull(),
+  transcript: text("transcript").notNull(),
+  audioUrl: text("audio_url"),
+  duration: integer("duration").default(0),
+  // System field: Creation time (auto-filled, do not modify)
+  createdAt: customTimestamptz("_created_at", { precision: 3 }).notNull().default(sql`CURRENT_TIMESTAMP`),
+  // System field: Creator (auto-filled, do not modify)
+  createdBy: userProfile("_created_by").default(sql`CASE
+    WHEN (current_setting('app.user_id'::text, true) = ''::text) THEN NULL`),
+  // System field: Update time (auto-filled, do not modify)
+  updatedAt: customTimestamptz("_updated_at", { precision: 3 }).notNull().default(sql`CURRENT_TIMESTAMP`),
+  // System field: Updater (auto-filled, do not modify)
+  updatedBy: userProfile("_updated_by").default(sql`CASE
+    WHEN (current_setting('app.user_id'::text, true) = ''::text) THEN NULL`),
+});
+
 export const xinyuMessages = pgTable("xinyu_messages", {
   id: uuid("id").primaryKey().defaultRandom(),
   bindingId: uuid("binding_id").notNull(),
@@ -303,6 +323,8 @@ export const xinyuUsers = pgTable("xinyu_users", {
   myTitle: varchar("my_title", { length: 30 }),
   bio: varchar("bio", { length: 100 }),
   passwordHash: varchar("password_hash", { length: 255 }),
+  phone: varchar("phone", { length: 20 }),
+  languageProfile: text("language_profile"),
   // System field: Creation time (auto-filled, do not modify)
   createdAt: customTimestamptz("_created_at", { precision: 3 }).notNull().default(sql`CURRENT_TIMESTAMP`),
   // System field: Creator (auto-filled, do not modify)
@@ -323,6 +345,7 @@ export const xinyuBindingsTable = xinyuBindings;
 export const xinyuBroadcastsTable = xinyuBroadcasts;
 export const xinyuDailyDataTable = xinyuDailyData;
 export const xinyuInviteCodesTable = xinyuInviteCodes;
+export const xinyuLanguageSamplesTable = xinyuLanguageSamples;
 export const xinyuMessagesTable = xinyuMessages;
 export const xinyuPrivacySettingsTable = xinyuPrivacySettings;
 export const xinyuRecordingsTable = xinyuRecordings;

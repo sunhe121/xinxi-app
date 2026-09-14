@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Heart,
@@ -39,7 +39,6 @@ export default function OnboardingPage() {
   const [redeemCode, setRedeemCode] = useState('');
   const [redeemRelation, setRedeemRelation] = useState<FamilyRelation>('son');
   const [redeeming, setRedeeming] = useState(false);
-  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   const handleGenerateCode = async () => {
     setGenerating(true);
@@ -48,8 +47,10 @@ export default function OnboardingPage() {
       setInviteCode(res.code);
       setExpiresAt(res.expiresAt);
       toast.success('邀请码生成成功');
-    } catch {
-      toast.error('生成失败，请重试');
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
+      const msg = err.response?.data?.message || '生成失败，请重试';
+      toast.error(msg);
     } finally {
       setGenerating(false);
     }
@@ -67,20 +68,11 @@ export default function OnboardingPage() {
     }
   };
 
-  const handleCodeInput = (index: number, value: string) => {
-    const clean = value.replace(/[^0-9a-zA-Z]/g, '').slice(0, 1).toUpperCase();
-    const newCode = redeemCode.split('');
-    newCode[index] = clean;
-    const result = newCode.join('').padEnd(6, ' ').trim();
-    setRedeemCode(result);
-    if (clean && index < 5) {
-      inputRefs.current[index + 1]?.focus();
-    }
-  };
-
-  const handleCodeKeyDown = (index: number, e: React.KeyboardEvent) => {
-    if (e.key === 'Backspace' && !redeemCode[index] && index > 0) {
-      inputRefs.current[index - 1]?.focus();
+  const handleRedeemCodeChange = (value: string) => {
+    const clean = value.replace(/[^0-9a-zA-Z]/g, '').toUpperCase().slice(0, 6);
+    setRedeemCode(clean);
+    if (clean.length === 6 && !redeeming) {
+      setTimeout(() => handleRedeem(), 200);
     }
   };
 
@@ -98,8 +90,10 @@ export default function OnboardingPage() {
       toast.success('配对成功！');
       refresh();
       navigate('/', { replace: true });
-    } catch {
-      toast.error('配对失败，请检查邀请码');
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { message?: string } } };
+      const msg = err.response?.data?.message || '配对失败，请检查邀请码';
+      toast.error(msg);
     } finally {
       setRedeeming(false);
     }
@@ -249,23 +243,16 @@ export default function OnboardingPage() {
                 <label className="text-sm font-medium text-foreground">
                   输入6位邀请码
                 </label>
-                <div className="flex gap-2">
-                  {[0, 1, 2, 3, 4, 5].map((index) => (
-                    <input
-                      key={index}
-                      ref={(el) => {
-                        inputRefs.current[index] = el;
-                      }}
-                      type="text"
-                      inputMode="text"
-                      maxLength={1}
-                      value={redeemCode[index] || ''}
-                      onChange={(e) => handleCodeInput(index, e.target.value)}
-                      onKeyDown={(e) => handleCodeKeyDown(index, e)}
-                      className="flex-1 h-14 text-center text-2xl font-bold rounded-xl bg-card border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all uppercase"
-                    />
-                  ))}
-                </div>
+                <input
+                  type="text"
+                  inputMode="text"
+                  maxLength={6}
+                  autoFocus
+                  value={redeemCode}
+                  onChange={(e) => handleRedeemCodeChange(e.target.value)}
+                  placeholder="••••••"
+                  className="w-full h-14 text-center text-2xl font-bold tracking-widest rounded-xl bg-card border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all uppercase"
+                />
               </div>
 
               <div className="space-y-2">

@@ -181,6 +181,7 @@ export class XinyuBroadcastsService {
     const senderUser = direction === 'from_partner'
       ? await this.usersService.findByUserId(userId)
       : null;
+    const senderLanguageProfile = senderUser?.languageProfile || '';
 
     const [dailyData, weatherInfo] = await Promise.all([
       this.dailyDataService.getTodayData(targetUserId, targetUser.role),
@@ -202,6 +203,7 @@ export class XinyuBroadcastsService {
         senderTitle,
         toneStyle,
         direction,
+        languageProfile: senderLanguageProfile,
       });
     } catch (error) {
       this.logger.error('AI播报生成失败', error as Error);

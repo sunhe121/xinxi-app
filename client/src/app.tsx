@@ -16,6 +16,7 @@ import ProfileEditPage from './pages/ProfileEditPage/ProfileEditPage';
 import SharePage from './pages/SharePage/SharePage';
 import LandingPage from './pages/LandingPage/LandingPage';
 import ChatPage from './pages/ChatPage/ChatPage';
+import LanguageStylePage from './pages/LanguageStylePage/LanguageStylePage';
 import { UserProvider } from './hooks/useUser';
 
 const RoutesComponent = () => {
@@ -102,6 +103,14 @@ const RoutesComponent = () => {
             element={
               <RequireAuth>
                 <ChatPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="language-style"
+            element={
+              <RequireAuth>
+                <LanguageStylePage />
               </RequireAuth>
             }
           />

@@ -20,11 +20,15 @@ import type {
   SendTextMessageRequest,
   SendFileMessageRequest,
   MessageListResponse,
-  XinyuMessage,
-  UpdateUserRequest,
-  SendThinkOfYouRequest,
-  ThinkOfYouResponse,
-} from '@shared/api.interface';
+   XinyuMessage,
+   UpdateUserRequest,
+   SendThinkOfYouRequest,
+   ThinkOfYouResponse,
+   LanguageSample,
+   CreateLanguageSampleRequest,
+   UpdateLanguageSampleRequest,
+   AnalyzeLanguageStyleResponse,
+ } from '@shared/api.interface';
 const TOKEN_KEY = 'xinxi_token';
 
 export function getToken(): string {
@@ -83,13 +87,23 @@ export interface AuthResponse {
 }
 
 export const authApi = {
-  async register(nickname: string, password: string, gender?: string): Promise<AuthResponse> {
-    const res = await request.post('/api/xinyu/auth/register', { nickname, password, gender });
+  async register(phone: string, password: string, nickname: string, code: string): Promise<AuthResponse> {
+    const res = await request.post('/api/xinyu/auth/register', { phone, password, nickname, code });
     return res.data;
   },
 
-  async login(nickname: string, password: string): Promise<AuthResponse> {
-    const res = await request.post('/api/xinyu/auth/login', { nickname, password });
+  async login(phone: string, password: string): Promise<AuthResponse> {
+    const res = await request.post('/api/xinyu/auth/login', { phone, password });
+    return res.data;
+  },
+
+  async sendSmsCode(phone: string, scene: 'register' | 'reset_password' = 'register'): Promise<{ code: string }> {
+    const res = await request.post('/api/xinyu/auth/send-code', { phone, scene });
+    return res.data;
+  },
+
+  async resetPassword(phone: string, code: string, newPassword: string): Promise<{ success: true }> {
+    const res = await request.post('/api/xinyu/auth/reset-password', { phone, code, newPassword });
     return res.data;
   },
 
@@ -309,6 +323,37 @@ export const recordingsApi = {
 
   async syncToFamily(): Promise<void> {
     await request.post('/api/xinyu/recordings/sync-to-family');
+  },
+};
+
+export const languageStyleApi = {
+  async getSamples(): Promise<LanguageSample[]> {
+    const res = await request.get('/api/xinyu/language-style/samples');
+    return res.data;
+  },
+
+  async createSample(data: CreateLanguageSampleRequest): Promise<LanguageSample> {
+    const res = await request.post('/api/xinyu/language-style/samples', data);
+    return res.data;
+  },
+
+  async updateSample(id: string, data: UpdateLanguageSampleRequest): Promise<LanguageSample> {
+    const res = await request.patch(`/api/xinyu/language-style/samples/${id}`, data);
+    return res.data;
+  },
+
+  async deleteSample(id: string): Promise<void> {
+    await request.delete(`/api/xinyu/language-style/samples/${id}`);
+  },
+
+  async analyze(): Promise<AnalyzeLanguageStyleResponse> {
+    const res = await request.post('/api/xinyu/language-style/analyze');
+    return res.data;
+  },
+
+  async getProfile(): Promise<{ profile: string; keywords: string[]; tone: string }> {
+    const res = await request.get('/api/xinyu/language-style/profile');
+    return res.data;
   },
 };
 

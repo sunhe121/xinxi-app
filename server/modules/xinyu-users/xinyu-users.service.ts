@@ -95,10 +95,12 @@ export class XinyuUsersService {
         | 'partnerNickname'
         | 'myPartnerTitle'
         | 'myTitle'
-        | 'bio'
-        | 'gender'
-      >
-    >,
+         | 'bio'
+         | 'gender'
+         | 'phone'
+         | 'languageProfile'
+       >
+     >,
   ): Promise<XinyuUser> {
     const patch: Record<string, unknown> = {};
     if (data.nickname !== undefined) patch.nickname = data.nickname;
@@ -114,6 +116,8 @@ export class XinyuUsersService {
     if (data.myTitle !== undefined) patch.myTitle = data.myTitle;
     if (data.bio !== undefined) patch.bio = data.bio;
     if (data.gender !== undefined) patch.gender = data.gender;
+    if (data.phone !== undefined) patch.phone = data.phone;
+    if (data.languageProfile !== undefined) patch.languageProfile = data.languageProfile;
     if (Object.keys(patch).length === 0) {
       const user = await this.findByUserId(userId);
       if (!user) throw new NotFoundException('用户不存在');
@@ -156,6 +160,8 @@ export class XinyuUsersService {
       myTitle: row.myTitle ?? '',
       bio: row.bio ?? '',
       gender: row.gender as 'male' | 'female',
+      phone: row.phone ?? undefined,
+      languageProfile: row.languageProfile ?? undefined,
     };
   }
 }

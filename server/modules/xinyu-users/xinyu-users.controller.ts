@@ -44,10 +44,12 @@ export class XinyuUsersController {
         | 'partnerNickname'
         | 'myPartnerTitle'
         | 'myTitle'
-        | 'bio'
-        | 'gender'
-      >
-    >,
+         | 'bio'
+         | 'gender'
+         | 'phone'
+         | 'languageProfile'
+       >
+     >,
   ): Promise<XinyuUser> {
     const existing = await this.usersService.findByUserId(user.userId);
     if (!existing) throw new NotFoundException('用户不存在');
