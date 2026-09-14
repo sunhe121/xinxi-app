@@ -100,6 +100,7 @@ mv server/modules/view/view.controller.standalone.ts server/modules/view/view.co
  done
 
 # 替换业务代码中所有的 logger 导入
+echo "  替换 logger 导入为本地实现..."
 for f in $(grep -rl "@lark-apaas/client-toolkit/logger" client/src/ 2>/dev/null || true); do
   if [[ "$f" == *"business-ui"* ]]; then
     continue
@@ -135,6 +136,26 @@ export const appLogger = { info, warn, error, debug };
 
 export default appLogger;
 LOGGER_EOF
+
+# 11.5 批量清理所有 standalone 文件名引用（配置文件和代码中残留的引用）
+echo "  清理所有 standalone 文件名引用..."
+ALL_CONF_FILES=$(find . -name "*.json" -o -name "*.ts" -o -name "*.js" -o -name "*.css" -o -name "*.html" | grep -v node_modules | grep -v dist | grep -v ".git")
+for f in $ALL_CONF_FILES; do
+  if [[ "$f" == *"migrate-to-standalone.sh" ]]; then
+    continue
+  fi
+  sed -i \
+    -e "s|nest-cli-standalone.json|nest-cli.json|g" \
+    -e "s|vite.config.standalone.ts|vite.config.ts|g" \
+    -e "s|vite.config.standalone.js|vite.config.js|g" \
+    -e "s|tailwind.config.standalone.ts|tailwind.config.ts|g" \
+    -e "s|tailwind.config.standalone.js|tailwind.config.js|g" \
+    -e "s|tsconfig.app.standalone.json|tsconfig.app.json|g" \
+    -e "s|tsconfig.node.standalone.json|tsconfig.node.json|g" \
+    -e "s|postcss.config.standalone.js|postcss.config.js|g" \
+    -e "s|postcss.config.standalone.ts|postcss.config.ts|g" \
+    "$f" 2>/dev/null || true
+done
 
 # 移除 business-ui 目录（平台专属组件）
 echo "  移除 business-ui 平台组件..."

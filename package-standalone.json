@@ -10,13 +10,13 @@
     "dev:client": "NODE_ENV=development vite",
     "build": "npm run build:prod",
     "build:prod": "npm run build:server && npm run build:client",
-    "build:server": "NODE_ENV=production nest build --config nest-cli-standalone.json",
-    "build:client": "NODE_ENV=production vite build --config vite.config.standalone.ts",
+    "build:server": "NODE_ENV=production nest build",
+    "build:client": "NODE_ENV=production vite build",
     "start": "NODE_ENV=production node dist/server/main.js",
     "db:push": "NODE_ENV=production node dist/server/database/migrate.js",
     "type:check": "concurrently -n server,client -c blue,green \"npm run type:check:server\" \"npm run type:check:client\"",
-    "type:check:client": "tsc --noEmit --project tsconfig.app.standalone.json",
-    "type:check:server": "tsc --noEmit --project tsconfig.node.standalone.json",
+    "type:check:client": "tsc --noEmit --project tsconfig.app.json",
+    "type:check:server": "tsc --noEmit --project tsconfig.node.json",
     "eslint": "eslint . --quiet"
   },
   "dependencies": {
