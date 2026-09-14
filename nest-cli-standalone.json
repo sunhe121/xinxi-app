@@ -4,7 +4,7 @@
   "sourceRoot": "server",
   "compilerOptions": {
     "deleteOutDir": false,
-    "tsConfigPath": "tsconfig.node.json",
+    "tsConfigPath": "tsconfig.node.standalone.json",
     "typeCheck": false,
     "builder": {
       "type": "swc",

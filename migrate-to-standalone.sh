@@ -110,7 +110,31 @@ done
 # 替换前端 logger 为纯 console 实现
 echo "  替换 logger 为纯 console 实现..."
 rm -f client/src/utils/logger.ts
-mv client/src/utils/logger.standalone.ts client/src/utils/logger.ts
+rm -f client/src/utils/logger.standalone.ts
+cat > client/src/utils/logger.ts << 'LOGGER_EOF'
+/* eslint-disable no-console */
+const PREFIX = '[心系]';
+
+const info = (...args: unknown[]): void => {
+  console.info(PREFIX, ...args);
+};
+
+const warn = (...args: unknown[]): void => {
+  console.warn(PREFIX, ...args);
+};
+
+const error = (...args: unknown[]): void => {
+  console.error(PREFIX, ...args);
+};
+
+const debug = (...args: unknown[]): void => {
+  console.debug(PREFIX, ...args);
+};
+
+export const appLogger = { info, warn, error, debug };
+
+export default appLogger;
+LOGGER_EOF
 
 # 移除 business-ui 目录（平台专属组件）
 echo "  移除 business-ui 平台组件..."
