@@ -209,8 +209,8 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center px-6 py-8">
-      <div className="w-full max-w-sm">
+    <div className="min-h-screen w-full bg-background flex items-center justify-center">
+      <div className="w-full max-w-md mx-auto px-5 py-8">
         <div className="text-center mb-10">
           <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-primary to-orange-300 mb-5 shadow-lg shadow-primary/30">
             <Heart className="w-10 h-10 text-white fill-white" />
