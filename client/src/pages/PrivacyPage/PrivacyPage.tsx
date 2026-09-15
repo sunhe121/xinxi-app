@@ -166,7 +166,7 @@ export default function PrivacyPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background max-w-[480px] mx-auto">
       {/* 顶部导航 */}
       <div className="sticky top-0 z-30 bg-background/80 backdrop-blur px-5 py-4 flex items-center gap-3">
         <button
@@ -179,7 +179,7 @@ export default function PrivacyPage() {
         <h1 className="text-xl font-semibold text-foreground">隐私设置</h1>
       </div>
 
-      <div className="px-5 pb-8 space-y-5">
+      <div className="px-5 pb-28 space-y-5">
         {/* 顶部说明卡片 - 绝不采集 */}
         <div className="bg-gradient-to-br from-destructive/10 via-primary/10 to-accent/10 rounded-2xl p-5">
           <div className="flex items-start gap-3">

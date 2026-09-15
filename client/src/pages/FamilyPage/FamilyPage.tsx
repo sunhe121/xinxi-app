@@ -247,52 +247,52 @@ export default function FamilyPage() {
   const getStepsChartOption = () => {
     if (!memberDetail?.weekSteps?.length) return {};
     return {
-      grid: { left: 40, right: 20, top: 20, bottom: 30 },
-      xAxis: {
-        type: 'category',
-        data: memberDetail.weekSteps.map((item) => {
-          const d = new Date(item.date);
-          return `${d.getMonth() + 1}/${d.getDate()}`;
-        }),
-        axisLine: { lineStyle: { color: '#F0E6DD' } },
-        axisLabel: { color: '#8B7D75', fontSize: 11 },
-      },
-      yAxis: {
-        type: 'value',
-        axisLine: { show: false },
-        axisTick: { show: false },
-        splitLine: { lineStyle: { color: '#F0E6DD', type: 'dashed' } },
-        axisLabel: { color: '#8B7D75', fontSize: 11 },
-      },
-      series: [
-        {
-          data: memberDetail.weekSteps.map((item) => item.steps),
-          type: 'line',
-          smooth: true,
-          lineStyle: { color: '#FF8C69', width: 3 },
-          itemStyle: { color: '#FF8C69' },
-          areaStyle: {
-            color: {
-              type: 'linear',
-              x: 0, y: 0, x2: 0, y2: 1,
-              colorStops: [
-                { offset: 0, color: 'rgba(255, 140, 105, 0.3)' },
-                { offset: 1, color: 'rgba(255, 140, 105, 0.02)' },
-              ],
-            },
-          },
-        },
-      ],
-      tooltip: {
-        trigger: 'axis',
-        backgroundColor: '#fff',
-        borderColor: '#FF8C69',
-        textStyle: { color: '#4A3F3A' },
-        formatter: (params: any) => {
-          const p = params[0];
-          return `${p.axisValue}<br/>步数：${p.value} 步`;
-        },
-      },
+       grid: { left: 40, right: 20, top: 20, bottom: 30 },
+       xAxis: {
+         type: 'category',
+         data: memberDetail.weekSteps.map((item) => {
+           const d = new Date(item.date);
+           return `${d.getMonth() + 1}/${d.getDate()}`;
+         }),
+         axisLine: { lineStyle: { color: 'hsl(25 30% 90%)' } },
+         axisLabel: { color: 'hsl(20 8% 50%)', fontSize: 11 },
+       },
+       yAxis: {
+         type: 'value',
+         axisLine: { show: false },
+         axisTick: { show: false },
+         splitLine: { lineStyle: { color: 'hsl(25 30% 90%)', type: 'dashed' } },
+         axisLabel: { color: 'hsl(20 8% 50%)', fontSize: 11 },
+       },
+       series: [
+         {
+           data: memberDetail.weekSteps.map((item) => item.steps),
+           type: 'line',
+           smooth: true,
+           lineStyle: { color: 'hsl(15 100% 70%)', width: 3 },
+           itemStyle: { color: 'hsl(15 100% 70%)' },
+           areaStyle: {
+             color: {
+               type: 'linear',
+               x: 0, y: 0, x2: 0, y2: 1,
+               colorStops: [
+                 { offset: 0, color: 'hsla(15, 100%, 70%, 0.3)' },
+                 { offset: 1, color: 'hsla(15, 100%, 70%, 0.02)' },
+               ],
+             },
+           },
+         },
+       ],
+       tooltip: {
+         trigger: 'axis',
+         backgroundColor: '#fff',
+         borderColor: 'hsl(15 100% 70%)',
+         textStyle: { color: 'hsl(20 15% 25%)' },
+         formatter: (params: any) => {
+           const p = params[0];
+           return `${p.axisValue}<br/>步数：${p.value} 步`;
+         },
+       },
     };
   };
 
@@ -301,7 +301,7 @@ export default function FamilyPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background pb-8">
+    <div className="min-h-screen bg-background pb-28">
       {/* 顶部导航 */}
       <div className="sticky top-0 z-30 bg-background/80 backdrop-blur px-5 py-4 flex items-center justify-between">
         <h1 className="text-xl font-semibold text-foreground">我的家人</h1>

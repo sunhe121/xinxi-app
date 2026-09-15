@@ -186,7 +186,7 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen max-w-[480px] mx-auto px-5 py-6 pb-20 space-y-5">
+    <div className="min-h-screen max-w-[480px] mx-auto px-5 py-6 pb-28 space-y-5">
       {/* 顶部问候区 */}
       <div className="flex items-center justify-between">
         <div>

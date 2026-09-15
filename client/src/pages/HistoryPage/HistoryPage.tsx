@@ -95,7 +95,7 @@ export default function HistoryPage() {
   const unreadCount = broadcasts.filter((b) => !b.isRead).length;
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background max-w-[480px] mx-auto">
       {/* 顶部标题 */}
       <div className="px-5 pt-6 pb-4">
         <h1 className="text-2xl font-semibold text-foreground">历史播报</h1>
@@ -308,10 +308,10 @@ function EmptyState() {
       <div className="w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center mb-5">
         <Heart size={44} className="text-primary" fill="currentColor" />
       </div>
-      <p className="text-lg font-medium text-foreground mb-2">
+      <p className="text-lg font-semibold text-foreground mb-2">
         还没有历史播报
       </p>
-      <p className="text-sm text-muted-foreground text-center max-w-[260px]">
+      <p className="text-sm text-muted-foreground text-center max-w-[260px] leading-relaxed mb-6">
         家人的每日播报会在这里显示，耐心等待吧
       </p>
     </div>

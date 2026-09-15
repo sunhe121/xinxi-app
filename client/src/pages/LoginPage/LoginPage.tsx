@@ -196,9 +196,9 @@ const LoginPage = () => {
   };
 
   const inputClass =
-    'w-full h-12 px-4 border border-[#F0E6DD] rounded-xl text-base text-[#4A3F3A] placeholder-[#B8ABA3] focus:outline-none focus:border-[#FF8C69] focus:ring-2 focus:ring-[#FF8C69]/20 transition-all';
+    'w-full h-12 px-4 border border-border rounded-xl text-base text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all bg-card';
 
-  const labelClass = 'block text-[#4A3F3A] text-base font-medium mb-2';
+  const labelClass = 'block text-foreground text-base font-medium mb-2';
 
   const renderSendCodeButton = (scene: 'register' | 'reset_password') => {
     const countdown = scene === 'register' ? registerCountdown : forgotCountdown;
@@ -209,7 +209,7 @@ const LoginPage = () => {
         type="button"
         onClick={() => handleSendCode(scene)}
         disabled={disabled}
-        className="shrink-0 h-12 px-4 text-sm font-medium text-[#FF8C69] bg-[#FFF8F3] border border-[#F0E6DD] rounded-xl hover:bg-[#FFEDE5] disabled:text-[#B8ABA3] disabled:bg-[#F5F0EB] disabled:cursor-not-allowed transition-all"
+         className="shrink-0 h-12 px-4 text-sm font-medium text-primary bg-primary/10 border border-border rounded-xl hover:bg-primary/15 disabled:text-muted-foreground disabled:bg-muted disabled:cursor-not-allowed transition-all"
       >
         {countdown > 0 ? `${countdown}s后重发` : '获取验证码'}
       </button>
@@ -223,29 +223,29 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#FFF8F3] flex items-center justify-center px-6 py-8">
+    <div className="min-h-screen bg-background flex items-center justify-center px-6 py-8">
       <div className="w-full max-w-sm">
         {/* Logo 区域 */}
         <div className="text-center mb-10">
-          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-[#FF8C69] to-[#FFB5B5] mb-5 shadow-lg">
+          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-primary to-secondary mb-5 shadow-lg shadow-primary/20">
             <Heart className="w-10 h-10 text-white fill-white" />
           </div>
-          <h1 className="text-3xl font-bold text-[#4A3F3A] mb-2">心系</h1>
-          <p className="text-[#8B7D75] text-lg">让陪伴不缺席</p>
+           <h1 className="text-3xl font-bold text-foreground mb-2">心系</h1>
+           <p className="text-muted-foreground text-lg">让陪伴不缺席</p>
         </div>
 
         {/* 卡片 */}
-        <div className="bg-white rounded-2xl shadow-sm p-7 border border-[#F0E6DD]">
+         <div className="bg-card rounded-2xl shadow-sm p-7 border border-border">
           {/* 模式切换 Tab（登录/注册 用 tab，忘记密码不显示） */}
           {mode !== 'forgot' && (
-            <div className="flex mb-6 bg-[#FFF8F3] rounded-xl p-1">
+             <div className="flex mb-6 bg-secondary rounded-xl p-1">
               <button
                 type="button"
                 onClick={() => switchMode('login')}
                 className={`flex-1 min-h-11 px-4 rounded-lg text-base font-medium transition-colors ${
-                  mode === 'login'
-                    ? 'bg-white text-[#FF8C69] shadow-sm'
-                    : 'text-[#8B7D75]'
+                   mode === 'login'
+                     ? 'bg-card text-primary shadow-sm'
+                     : 'text-muted-foreground'
                 }`}
               >
                 登录
@@ -254,9 +254,9 @@ const LoginPage = () => {
                 type="button"
                 onClick={() => switchMode('register')}
                 className={`flex-1 min-h-11 px-4 rounded-lg text-base font-medium transition-colors ${
-                  mode === 'register'
-                    ? 'bg-white text-[#FF8C69] shadow-sm'
-                    : 'text-[#8B7D75]'
+                   mode === 'register'
+                     ? 'bg-card text-primary shadow-sm'
+                     : 'text-muted-foreground'
                 }`}
               >
                 注册
@@ -265,7 +265,7 @@ const LoginPage = () => {
           )}
 
           {mode === 'forgot' && (
-            <h2 className="text-xl font-semibold text-[#4A3F3A] mb-6">忘记密码</h2>
+            <h2 className="text-xl font-semibold text-foreground mb-6">忘记密码</h2>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-5">
@@ -304,7 +304,7 @@ const LoginPage = () => {
                   )}
                 </div>
                 {testCode && (
-                  <p className="text-xs text-[#FFB347] mt-2">
+                   <p className="text-xs text-warning mt-2">
                     测试环境验证码：{testCode}
                   </p>
                 )}
@@ -364,7 +364,7 @@ const LoginPage = () => {
                 <button
                   type="button"
                   onClick={() => switchMode('forgot')}
-                  className="text-sm text-[#FF8C69] font-medium"
+                  className="text-sm text-primary font-medium"
                 >
                   忘记密码？
                 </button>
@@ -375,7 +375,7 @@ const LoginPage = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full min-h-12 px-6 bg-gradient-to-r from-[#FF8C69] to-[#FFB5B5] text-white text-lg font-semibold rounded-xl hover:opacity-90 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
+               className="w-full min-h-12 px-6 bg-gradient-to-r from-primary to-secondary text-white text-lg font-semibold rounded-xl hover:opacity-90 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md shadow-primary/20"
             >
               {loading ? '处理中...' : modeTitle[mode]}
             </button>
@@ -383,46 +383,46 @@ const LoginPage = () => {
 
           {/* 底部切换文字 */}
           {mode === 'login' && (
-            <p className="text-center text-sm text-[#8B7D75] mt-6">
-              还没有账号？
-              <button
-                type="button"
-                onClick={() => switchMode('register')}
-                className="text-[#FF8C69] font-medium ml-1"
-              >
-                立即注册
-              </button>
-            </p>
-          )}
+             <p className="text-center text-sm text-muted-foreground mt-6">
+               还没有账号？
+               <button
+                 type="button"
+                 onClick={() => switchMode('register')}
+                 className="text-primary font-medium ml-1"
+               >
+                 立即注册
+               </button>
+             </p>
+           )}
 
-          {mode === 'register' && (
-            <p className="text-center text-sm text-[#8B7D75] mt-6">
-              已有账号？
-              <button
-                type="button"
-                onClick={() => switchMode('login')}
-                className="text-[#FF8C69] font-medium ml-1"
-              >
-                去登录
-              </button>
-            </p>
-          )}
+           {mode === 'register' && (
+             <p className="text-center text-sm text-muted-foreground mt-6">
+               已有账号？
+               <button
+                 type="button"
+                 onClick={() => switchMode('login')}
+                 className="text-primary font-medium ml-1"
+               >
+                 去登录
+               </button>
+             </p>
+           )}
 
-          {mode === 'forgot' && (
-            <p className="text-center text-sm text-[#8B7D75] mt-6">
-              想起来了？
-              <button
-                type="button"
-                onClick={() => switchMode('login')}
-                className="text-[#FF8C69] font-medium ml-1"
-              >
-                去登录
-              </button>
-            </p>
-          )}
+           {mode === 'forgot' && (
+             <p className="text-center text-sm text-muted-foreground mt-6">
+               想起来了？
+               <button
+                 type="button"
+                 onClick={() => switchMode('login')}
+                 className="text-primary font-medium ml-1"
+               >
+                 去登录
+               </button>
+             </p>
+           )}
         </div>
 
-        <p className="text-center text-xs text-[#B8ABA3] mt-6">
+        <p className="text-center text-xs text-muted-foreground mt-6">
           心系 · 为异地家人搭建温暖的情感桥梁
         </p>
       </div>

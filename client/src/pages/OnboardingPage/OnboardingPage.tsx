@@ -115,7 +115,7 @@ export default function OnboardingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-background flex flex-col max-w-[480px] mx-auto">
       <div className="flex-1 px-5 py-6">
         <div className="space-y-6 animate-fadeIn">
           <div className="text-center pt-8 mb-6">

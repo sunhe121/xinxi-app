@@ -326,33 +326,33 @@ export default function LanguageStylePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#FFF8F3] flex items-center justify-center">
-        <div className="text-[#8B7D75]">加载中...</div>
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-muted-foreground">加载中...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#FFF8F3] pb-8">
+    <div className="min-h-screen bg-background pb-24">
       {/* 顶部导航 */}
-      <div className="max-w-[480px] mx-auto bg-[#FFF8F3] sticky top-0 z-10 px-5 py-4 flex items-center gap-3">
+      <div className="max-w-[480px] mx-auto bg-background sticky top-0 z-10 px-5 py-4 flex items-center gap-3">
         <button
           onClick={() => navigate(-1)}
-          className="w-11 h-11 rounded-full bg-white shadow-sm flex items-center justify-center text-[#4A3F3A] hover:bg-[#FFF0E8] transition-colors"
+          className="w-11 h-11 rounded-full bg-secondary flex items-center justify-center text-foreground transition-colors"
           aria-label="返回"
         >
           <ArrowLeft size={20} />
         </button>
-        <h1 className="text-xl font-semibold text-[#4A3F3A]">语言风格学习</h1>
+        <h1 className="text-xl font-semibold text-foreground">语言风格学习</h1>
       </div>
 
       <div className="max-w-[480px] mx-auto px-5 space-y-5">
         {/* 风格画像展示区 */}
-        <div className="bg-white rounded-2xl shadow-sm p-5">
+        <div className="bg-card rounded-2xl shadow-sm p-5">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
-              <Sparkles size={20} className="text-[#FF8C69]" />
-              <h2 className="text-lg font-semibold text-[#4A3F3A]">我的语言风格</h2>
+              <Sparkles size={20} className="text-primary" />
+              <h2 className="text-lg font-semibold text-foreground">我的语言风格</h2>
             </div>
             <button
               onClick={handleAnalyze}
@@ -360,8 +360,8 @@ export default function LanguageStylePage() {
               className={cn(
                 'flex items-center gap-1.5 px-4 py-2.5 rounded-full text-base font-medium min-h-11 transition-all',
                 canAnalyze
-                  ? 'bg-gradient-to-r from-[#FF8C69] to-[#FFB347] text-white hover:shadow-md active:scale-95'
-                  : 'bg-[#F0E6DD] text-[#B0A59F] cursor-not-allowed',
+                  ? 'bg-gradient-to-r from-primary to-warning text-white shadow-md shadow-primary/20 active:scale-95'
+                   : 'bg-muted text-muted-foreground cursor-not-allowed',
               )}
               title={canAnalyze ? '重新分析' : '请先录制至少 3 段语音样本'}
             >
@@ -373,17 +373,17 @@ export default function LanguageStylePage() {
           {profile ? (
             <div className="space-y-4">
               <div>
-                <div className="text-sm text-[#8B7D75] mb-1">风格画像</div>
-                <p className="text-[#4A3F3A] leading-relaxed">{profile.profile}</p>
+                <div className="text-sm text-muted-foreground mb-1">风格画像</div>
+                <p className="text-foreground leading-relaxed">{profile.profile}</p>
               </div>
 
               <div>
-                <div className="text-sm text-[#8B7D75] mb-2">关键词</div>
+                <div className="text-sm text-muted-foreground mb-2">关键词</div>
                 <div className="flex flex-wrap gap-2">
                   {profile.keywords.map((kw: string, idx: number) => (
                     <span
                       key={idx}
-                      className="px-3.5 py-1.5 rounded-full bg-[#FFF0E8] text-[#FF8C69] text-sm"
+                      className="px-3.5 py-1.5 rounded-full bg-primary/10 text-primary text-sm"
                     >
                       {kw}
                     </span>
@@ -392,19 +392,19 @@ export default function LanguageStylePage() {
               </div>
 
               <div>
-                <div className="text-sm text-[#8B7D75] mb-1">语气特点</div>
-                <p className="text-[#4A3F3A]">{profile.tone}</p>
+                <div className="text-sm text-muted-foreground mb-1">语气特点</div>
+                <p className="text-foreground">{profile.tone}</p>
               </div>
             </div>
           ) : (
             <div className="text-center py-8">
-              <div className="w-16 h-16 mx-auto mb-3 rounded-full bg-[#FFF0E8] flex items-center justify-center">
-                <Mic size={28} className="text-[#FF8C69]" />
+              <div className="w-16 h-16 mx-auto mb-3 rounded-full bg-primary/10 flex items-center justify-center">
+                <Mic size={28} className="text-primary" />
               </div>
-              <p className="text-[#8B7D75] text-sm">
+              <p className="text-muted-foreground text-sm">
                 录制至少 3 段语音，AI 将分析你的语言风格
               </p>
-              <p className="text-[#B0A59F] text-xs mt-1">
+              <p className="text-muted-foreground/70 text-xs mt-1">
                 当前样本数：{samples.length}/3
               </p>
             </div>
@@ -412,18 +412,18 @@ export default function LanguageStylePage() {
         </div>
 
         {/* 语音样本列表 */}
-        <div className="bg-white rounded-2xl shadow-sm p-5">
+        <div className="bg-card rounded-2xl shadow-sm p-5">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
-              <Tag size={18} className="text-[#FF8C69]" />
-              <h2 className="text-lg font-semibold text-[#4A3F3A]">语音样本</h2>
-              <span className="text-sm text-[#8B7D75]">
+              <Tag size={18} className="text-primary" />
+              <h2 className="text-lg font-semibold text-foreground">语音样本</h2>
+              <span className="text-sm text-muted-foreground">
                 样本数：{samples.length}/3
               </span>
             </div>
             <button
               onClick={() => openRecorder()}
-              className="flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-gradient-to-r from-[#FF8C69] to-[#FFB347] text-white text-base font-medium min-h-11 hover:shadow-md active:scale-95 transition-all"
+              className="flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-gradient-to-r from-primary to-warning text-white text-base font-medium min-h-11 shadow-md shadow-primary/20 active:scale-95 transition-all"
             >
               <Plus size={18} />
               录制新样本
@@ -432,8 +432,8 @@ export default function LanguageStylePage() {
 
           {samples.length === 0 ? (
             <div className="text-center py-8">
-              <p className="text-[#B0A59F] text-sm">还没有语音样本</p>
-              <p className="text-[#C9BFB8] text-xs mt-1">
+              <p className="text-muted-foreground text-sm">还没有语音样本</p>
+              <p className="text-muted-foreground/60 text-xs mt-1">
                 点击"录制新样本"开始录制
               </p>
             </div>
@@ -442,19 +442,19 @@ export default function LanguageStylePage() {
               {samples.map((sample) => (
                 <div
                   key={sample.id}
-                  className="p-4 rounded-xl bg-[#FFFAF7] border border-[#F0E6DD] min-h-16"
+                  className="p-4 rounded-xl bg-secondary/50 border border-border min-h-16"
                 >
                   <div className="flex items-start justify-between mb-2">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
-                        <h3 className="font-medium text-[#4A3F3A] truncate">
+                        <h3 className="font-medium text-foreground truncate">
                           {sample.title}
                         </h3>
-                        <span className="text-xs px-2 py-0.5 rounded-full bg-[#FFF0E8] text-[#FF8C69] shrink-0">
+                        <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary shrink-0">
                           {getCategoryLabel(sample.category)}
                         </span>
                       </div>
-                      <div className="flex items-center gap-1 text-xs text-[#8B7D75]">
+                      <div className="flex items-center gap-1 text-xs text-muted-foreground">
                         <Clock size={12} />
                         <span>{formatDuration(sample.duration)}</span>
                       </div>
@@ -462,21 +462,21 @@ export default function LanguageStylePage() {
                     <div className="flex items-center gap-1 ml-2 shrink-0">
                       <button
                         onClick={() => openRecorder(sample)}
-                         className="w-11 h-11 rounded-full flex items-center justify-center text-[#8B7D75] hover:bg-[#F0E6DD] hover:text-[#4A3F3A] transition-colors"
+                          className="w-11 h-11 rounded-full flex items-center justify-center text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors"
                         aria-label="编辑"
                       >
                         <Edit3 size={18} />
                       </button>
                       <button
                         onClick={() => handleDelete(sample.id)}
-                         className="w-11 h-11 rounded-full flex items-center justify-center text-[#8B7D75] hover:bg-[#FFE4E0] hover:text-[#FF6B6B] transition-colors"
+                          className="w-11 h-11 rounded-full flex items-center justify-center text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
                         aria-label="删除"
                       >
                         <Trash2 size={18} />
                       </button>
                     </div>
                   </div>
-                  <p className="text-sm text-[#8B7D75] line-clamp-2 leading-relaxed">
+                  <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
                     {sample.transcript}
                   </p>
                 </div>
@@ -493,17 +493,17 @@ export default function LanguageStylePage() {
             className="absolute inset-0 bg-black/40 backdrop-blur-sm"
             onClick={closeRecorder}
           />
-          <div className="relative w-full max-w-[480px] bg-white rounded-t-3xl shadow-2xl max-h-[90vh] overflow-hidden animate-slide-up">
+          <div className="relative w-full max-w-[480px] bg-card rounded-t-3xl shadow-2xl max-h-[90vh] overflow-hidden animate-slide-up">
             {/* 弹层头部 */}
-            <div className="sticky top-0 bg-white px-5 py-4 flex items-center justify-between border-b border-[#F0E6DD] z-10">
+            <div className="sticky top-0 bg-card px-5 py-4 flex items-center justify-between border-b border-border z-10">
               <button
                 onClick={closeRecorder}
-                className="w-11 h-11 rounded-full flex items-center justify-center text-[#8B7D75] hover:bg-[#F0E6DD] transition-colors"
+                className="w-11 h-11 rounded-full flex items-center justify-center text-muted-foreground hover:bg-secondary transition-colors"
                 aria-label="关闭"
               >
                 <X size={20} />
               </button>
-              <h3 className="text-lg font-semibold text-[#4A3F3A]">
+                <h3 className="text-lg font-semibold text-foreground">
                 {editingSample ? '编辑样本' : '录制新样本'}
               </h3>
               <button
@@ -512,8 +512,8 @@ export default function LanguageStylePage() {
                 className={cn(
                   'px-4 py-2.5 rounded-full text-base font-medium min-h-11 transition-all',
                   saving || recording
-                    ? 'bg-[#F0E6DD] text-[#B0A59F] cursor-not-allowed'
-                    : 'bg-gradient-to-r from-[#FF8C69] to-[#FFB347] text-white hover:shadow-md active:scale-95',
+                    ? 'bg-muted text-muted-foreground cursor-not-allowed'
+                    : 'bg-gradient-to-r from-primary to-warning text-white shadow-md shadow-primary/20 active:scale-95',
                 )}
               >
                 {saving ? '保存中...' : '保存'}
@@ -523,7 +523,7 @@ export default function LanguageStylePage() {
             <div className="p-5 space-y-5 overflow-y-auto">
               {/* 标题输入 */}
               <div>
-                <label className="block text-sm font-medium text-[#4A3F3A] mb-2">
+                  <label className="block text-sm font-medium text-foreground mb-2">
                   标题
                 </label>
                 <input
@@ -531,13 +531,13 @@ export default function LanguageStylePage() {
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="给这段语音起个名字"
-                  className="w-full px-4 py-3 rounded-xl bg-[#FFFAF7] border border-[#F0E6DD] text-[#4A3F3A] placeholder:text-[#B0A59F] focus:outline-none focus:border-[#FF8C69] focus:ring-2 focus:ring-[#FF8C69]/20 transition-all"
+                  className="w-full px-4 py-3 rounded-xl bg-secondary/50 border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
                 />
               </div>
 
               {/* 分类选择 */}
               <div>
-                <label className="block text-sm font-medium text-[#4A3F3A] mb-2">
+                  <label className="block text-sm font-medium text-foreground mb-2">
                   分类
                 </label>
                 <div className="flex flex-wrap gap-2">
@@ -549,8 +549,8 @@ export default function LanguageStylePage() {
                       className={cn(
                         'px-3.5 py-2 rounded-full text-sm font-medium min-h-10 transition-all',
                         category === cat.value
-                          ? 'bg-[#FF8C69] text-white'
-                          : 'bg-[#FFFAF7] text-[#8B7D75] border border-[#F0E6DD] hover:border-[#FF8C69]/50',
+                         ? 'bg-primary text-white'
+                           : 'bg-secondary/50 text-muted-foreground border border-border hover:border-primary/50',
                         editingSample && 'opacity-60 cursor-not-allowed',
                       )}
                     >
@@ -562,36 +562,36 @@ export default function LanguageStylePage() {
 
               {/* 录音区域 */}
               <div>
-                <label className="block text-sm font-medium text-[#4A3F3A] mb-2">
+                  <label className="block text-sm font-medium text-foreground mb-2">
                   录音
                 </label>
-                <div className="p-6 rounded-xl bg-[#FFFAF7] border border-[#F0E6DD] flex flex-col items-center">
+                <div className="p-6 rounded-xl bg-secondary/50 border border-border flex flex-col items-center">
                   <button
                     onClick={recording ? stopRecording : startRecording}
                     disabled={!mediaRecorderSupported}
                     className={cn(
                       'w-20 h-20 rounded-full flex items-center justify-center transition-all',
                       recording
-                        ? 'bg-[#FF6B6B] text-white shadow-lg shadow-[#FF6B6B]/30 animate-pulse'
-                        : 'bg-gradient-to-br from-[#FF8C69] to-[#FFB347] text-white shadow-lg shadow-[#FF8C69]/30 hover:shadow-xl active:scale-95',
-                      !mediaRecorderSupported &&
-                        'bg-[#F0E6DD] text-[#B0A59F] cursor-not-allowed shadow-none',
+                        ? 'bg-destructive text-white shadow-lg shadow-destructive/20 animate-pulse'
+                         : 'bg-gradient-to-br from-primary to-warning text-white shadow-lg shadow-primary/20 hover:shadow-xl active:scale-95',
+                       !mediaRecorderSupported &&
+                         'bg-muted text-muted-foreground cursor-not-allowed shadow-none',
                     )}
                     aria-label={recording ? '停止录音' : '开始录音'}
                   >
                     <Mic size={32} />
                   </button>
-                  <div className="mt-3 text-lg font-medium text-[#4A3F3A]">
+                   <div className="mt-3 text-lg font-medium text-foreground">
                     {formatDuration(recording ? recordDuration : duration)}
                   </div>
-                  <div className="mt-1 text-xs text-[#8B7D75]">
-                    {recording
-                      ? '正在录音... 点击停止'
-                      : duration > 0
-                        ? '已录制完成'
-                        : mediaRecorderSupported
-                          ? '点击麦克风开始录音'
-                          : '你的浏览器不支持录音功能'}
+                   <div className="mt-1 text-xs text-muted-foreground">
+                     {recording
+                       ? '正在录音... 点击停止'
+                       : duration > 0
+                         ? '已录制完成'
+                         : mediaRecorderSupported
+                           ? '点击麦克风开始录音'
+                           : '你的浏览器不支持录音功能'}
                   </div>
                   {audioUrl && !recording && (
                     <audio
@@ -606,11 +606,11 @@ export default function LanguageStylePage() {
               {/* 转录文字 */}
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <label className="block text-sm font-medium text-[#4A3F3A]">
+                    <label className="block text-sm font-medium text-foreground">
                     转录文字
                   </label>
                   {!speechSupported && (
-                    <span className="text-xs text-[#FFB347]">
+                    <span className="text-xs text-warning">
                       请手动输入文字
                     </span>
                   )}
@@ -621,7 +621,7 @@ export default function LanguageStylePage() {
                   onBlur={stopSpeechRecognition}
                   placeholder="录音停止后将自动识别文字，你也可以手动编辑..."
                   rows={5}
-                  className="w-full px-4 py-3 rounded-xl bg-[#FFFAF7] border border-[#F0E6DD] text-[#4A3F3A] placeholder:text-[#B0A59F] focus:outline-none focus:border-[#FF8C69] focus:ring-2 focus:ring-[#FF8C69]/20 transition-all resize-none"
+                  className="w-full px-4 py-3 rounded-xl bg-secondary/50 border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all resize-none"
                 />
               </div>
             </div>

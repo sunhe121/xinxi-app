@@ -1,0 +1,1 @@
+{"cases":[{"id":1,"priority":"p0","description":"打开首页，验证页面标题、卡片布局和底部导航正常显示"},{"id":2,"priority":"p0","description":"导航到关心话页面(voice)，验证标题居中、统计卡片居中、分类标签样式、空状态居中"},{"id":3,"priority":"p0","description":"导航到家人页面(family)，验证页面内容正常展示"},{"id":4,"priority":"p1","description":"导航到历史页面，验证历史播报列表样式"},{"id":5,"priority":"p1","description":"导航到我的页面(profile)，验证个人信息和设置列表"}]}

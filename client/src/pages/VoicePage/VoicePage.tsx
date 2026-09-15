@@ -218,185 +218,192 @@ export default function VoicePage() {
   };
 
   return (
-    <div className="p-5 pb-24 space-y-5">
-      {/* 顶部标题区 */}
-      <div>
-        <h1 className="text-2xl font-semibold text-foreground">我的关心话</h1>
-        <p className="text-muted-foreground mt-1 text-sm leading-relaxed">
-          你录的关心话，会用在发给家人的每日播报里，让家人听到你的声音
-        </p>
-      </div>
-
-      {/* 同步状态卡片 */}
-      <div className="bg-gradient-to-r from-primary/10 to-secondary/10 rounded-2xl p-4 flex items-start gap-3">
-        <div className="w-10 h-10 rounded-full bg-white/80 flex items-center justify-center flex-shrink-0">
-          <Volume2 size={20} className="text-primary" />
-        </div>
-        <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium text-foreground">
-            已录制 {recordedCount}/{recordings.length || '...'} 句
-          </p>
-          <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">
-            录制完成后点击同步，家人收到的播报就会融入你真实的声音
+    <div className="min-h-screen bg-background">
+      <div className="max-w-[480px] mx-auto px-5 pt-8 pb-28">
+        {/* 顶部标题区 */}
+        <div className="text-center mb-8">
+          <h1 className="text-2xl font-bold text-foreground">我的关心话</h1>
+          <p className="text-muted-foreground mt-2.5 text-sm leading-relaxed max-w-xs mx-auto">
+            你录的关心话，会用在发给家人的每日播报里，让家人听到你的声音
           </p>
         </div>
-        <button
-          onClick={handleSyncToFamily}
-          disabled={syncing || loading}
-          className="flex items-center gap-1.5 px-4 min-h-10 py-2.5 rounded-xl bg-primary text-white text-sm font-medium active:scale-95 transition-transform disabled:opacity-50 flex-shrink-0"
-        >
-          {syncing ? (
-            <>
-              <RefreshCw size={14} className="animate-spin" />
-              同步中
-            </>
-          ) : (
-            <>
-              <Cloud size={14} />
-              同步家人
-            </>
-          )}
-        </button>
-      </div>
 
-      {/* 分类 Tab */}
-      <div className="flex gap-2 overflow-x-auto scrollbar-hide -mx-5 px-5">
-        {CATEGORIES.map((cat) => (
+        {/* 录制进度统计卡片 */}
+        <div className="bg-gradient-to-br from-primary/15 to-secondary/15 rounded-2xl p-5 mb-7">
+          <div className="flex items-center justify-center gap-3 mb-2">
+            <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm">
+              <Volume2 size={20} className="text-primary" />
+            </div>
+            <div className="flex items-baseline gap-1">
+              <span className="text-3xl font-bold text-foreground">
+                {recordedCount}
+              </span>
+              <span className="text-lg font-normal text-muted-foreground">
+                /{recordings.length || '...'}
+              </span>
+              <span className="text-base text-muted-foreground ml-0.5">句</span>
+            </div>
+          </div>
+          <p className="text-xs text-muted-foreground leading-relaxed text-center mb-4">
+            录制完成后点击下方同步，家人收到的播报就会融入你真实的声音
+          </p>
           <button
-            key={cat}
-            onClick={() => setActiveCategory(cat)}
+            onClick={handleSyncToFamily}
+            disabled={syncing || loading}
             className={cn(
-              'px-4 min-h-11 rounded-full text-base font-medium whitespace-nowrap transition-all duration-300 active:scale-95',
-              activeCategory === cat
-                ? 'bg-primary text-white shadow-md'
+              'w-full max-w-[280px] mx-auto h-11 rounded-xl text-sm font-medium flex items-center justify-center gap-1.5 transition-all active:scale-[0.98] disabled:opacity-50',
+              recordedCount > 0
+                ? 'bg-primary text-white shadow-md shadow-primary/25'
                 : 'bg-secondary text-muted-foreground'
             )}
           >
-            {RECORDING_CATEGORY_LABELS[cat]}
+            {syncing ? (
+              <>
+                <RefreshCw size={14} className="animate-spin" />
+                同步中...
+              </>
+            ) : (
+              <>
+                <Cloud size={14} />
+                同步给家人
+              </>
+            )}
           </button>
-        ))}
-      </div>
+        </div>
 
-      {/* 录音列表 */}
-      <div className="space-y-3">
+        {/* 分类 Tab */}
+        <div className="flex gap-2 overflow-x-auto scrollbar-hide -mx-5 px-5 mb-6 pb-1">
+          {CATEGORIES.map((cat) => (
+            <button
+              key={cat}
+              onClick={() => setActiveCategory(cat)}
+              className={cn(
+                'px-5 h-10 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-200 flex-shrink-0 active:scale-95',
+                activeCategory === cat
+                  ? 'bg-primary text-white shadow-md shadow-primary/30 scale-105'
+                  : 'bg-secondary/70 text-muted-foreground hover:bg-secondary'
+              )}
+            >
+              {RECORDING_CATEGORY_LABELS[cat]}
+            </button>
+          ))}
+        </div>
+
+        {/* 录音列表 / 空状态 */}
         {loading && (
           <div className="space-y-3">
-            {[0, 1, 2].map((i) => (
-              <div key={i} className="h-20 bg-card rounded-2xl animate-pulse" />
+            {[0, 1, 2].map((i: number) => (
+              <div key={i} className="h-20 bg-card rounded-2xl animate-pulse shadow-sm" />
             ))}
           </div>
         )}
 
         {!loading && recordings.length === 0 && (
-          <div className="text-center py-16">
-            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-secondary flex items-center justify-center">
-              <Mic size={28} className="text-muted-foreground" />
+          <div className="flex flex-col items-center justify-center py-16 text-center">
+            <div className="w-24 h-24 rounded-full bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center mb-5">
+              <Mic size={44} className="text-primary" />
             </div>
-            <p className="text-muted-foreground">暂无录音，快去录制吧~</p>
+            <p className="text-lg font-medium text-foreground mb-1">暂无录音</p>
+            <p className="text-sm text-muted-foreground">
+              选一个分类，开始录制你的关心话吧
+            </p>
           </div>
         )}
 
-        {!loading &&
-          recordings.map((rec: Recording) => (
-            <div
-              key={rec.id}
-              className="bg-card rounded-2xl p-4 shadow-sm flex items-center gap-4"
-            >
-              {/* 左侧图标 */}
+        {!loading && recordings.length > 0 && (
+          <div className="space-y-3">
+            {recordings.map((rec: Recording) => (
               <div
-                className={cn(
-                  'w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0',
-                  rec.isRecorded
-                    ? 'bg-success/15 text-success'
-                    : 'bg-primary/10 text-primary'
-                )}
+                key={rec.id}
+                className="bg-card rounded-2xl p-4 shadow-sm flex items-center gap-3"
               >
+                {/* 左侧：播放按钮或麦克风图标 */}
                 {rec.isRecorded ? (
-                  <Check size={22} strokeWidth={2.5} />
+                  <button
+                    onClick={() => togglePlay(rec)}
+                    className="w-11 h-11 rounded-full bg-primary/10 text-primary flex items-center justify-center flex-shrink-0 active:scale-95 transition-transform"
+                    aria-label={playingId === rec.id ? '暂停' : '播放'}
+                  >
+                    {playingId === rec.id ? (
+                      <Pause size={20} fill="currentColor" />
+                    ) : (
+                      <Play size={20} fill="currentColor" className="ml-0.5" />
+                    )}
+                  </button>
                 ) : (
-                  <Mic size={20} />
-                )}
-              </div>
-
-              {/* 中间文本 */}
-              <div className="flex-1 min-w-0">
-                <p className="font-medium text-base leading-snug line-clamp-2">
-                  {rec.presetText}
-                </p>
-                <div className="flex items-center gap-2 mt-1.5">
-                  <span className="text-xs text-muted-foreground">
-                    {rec.isRecorded
-                      ? `已录制 · ${formatDuration(rec.duration)}`
-                      : '未录制'}
-                  </span>
-                  {rec.isRecorded && (
-                    <span
-                      className={cn(
-                        'inline-flex items-center gap-1 text-xs',
-                        rec.syncedToFamily ? 'text-success' : 'text-muted-foreground'
-                      )}
-                    >
-                      {rec.syncedToFamily ? (
-                        <><Cloud size={12} />已同步</>
-                      ) : (
-                        <><CloudOff size={12} />未同步</>
-                      )}
-                    </span>
-                  )}
-                </div>
-                {/* 播放进度条 */}
-                {playingId === rec.id && (
-                  <div className="mt-2 h-1 bg-secondary rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-primary rounded-full transition-all duration-200"
-                      style={{ width: `${playProgress}%` }}
-                    />
+                  <div className="w-11 h-11 rounded-full bg-primary/10 text-primary flex items-center justify-center flex-shrink-0">
+                    <Mic size={20} />
                   </div>
                 )}
-              </div>
 
-              {/* 右侧操作 */}
-              <div className="flex items-center gap-2 flex-shrink-0">
-                {rec.isRecorded ? (
-                  <>
-                    <button
-                      onClick={() => togglePlay(rec)}
-                      className="w-11 h-11 rounded-full bg-primary/10 text-primary flex items-center justify-center active:scale-95 transition-transform"
-                      aria-label={playingId === rec.id ? '暂停' : '播放'}
-                    >
-                      {playingId === rec.id ? (
-                        <Pause size={20} fill="currentColor" />
-                      ) : (
-                        <Play size={20} fill="currentColor" />
-                      )}
-                    </button>
+                {/* 中间：文本内容 */}
+                <div className="flex-1 min-w-0">
+                  <p className="font-medium text-base leading-snug line-clamp-2">
+                    {rec.presetText}
+                  </p>
+                  <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                    <span className="text-sm text-muted-foreground">
+                      {rec.isRecorded
+                        ? formatDuration(rec.duration)
+                        : '未录制'}
+                    </span>
+                    {rec.isRecorded && rec.syncedToFamily && (
+                      <span className="inline-flex items-center gap-1 text-xs text-success">
+                        <Check size={12} strokeWidth={2.5} />
+                        已同步家人
+                      </span>
+                    )}
+                    {rec.isRecorded && !rec.syncedToFamily && (
+                      <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
+                        <CloudOff size={12} />
+                        未同步
+                      </span>
+                    )}
+                  </div>
+                  {/* 播放进度条 */}
+                  {playingId === rec.id && (
+                    <div className="mt-2 h-1 bg-secondary rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-primary rounded-full transition-all duration-200"
+                        style={{ width: `${playProgress}%` }}
+                      />
+                    </div>
+                  )}
+                </div>
+
+                {/* 右侧：操作按钮 */}
+                <div className="flex items-center gap-1.5 flex-shrink-0">
+                  {rec.isRecorded ? (
+                    <>
+                      <button
+                        onClick={() => openRecorder(rec)}
+                        className="w-10 h-10 rounded-full bg-secondary/70 text-muted-foreground flex items-center justify-center active:scale-95 transition-transform hover:bg-secondary"
+                        aria-label="重新录制"
+                      >
+                        <RefreshCw size={16} />
+                      </button>
+                      <button
+                        onClick={() => setDeleteConfirmId(rec.id)}
+                        className="w-10 h-10 rounded-full bg-destructive/10 text-destructive flex items-center justify-center active:scale-95 transition-transform"
+                        aria-label="删除"
+                      >
+                        <Trash2 size={18} />
+                      </button>
+                    </>
+                  ) : (
                     <button
                       onClick={() => openRecorder(rec)}
-                      className="w-11 h-11 rounded-full bg-secondary text-muted-foreground flex items-center justify-center active:scale-95 transition-transform"
-                      aria-label="重新录制"
+                      className="px-4 h-10 rounded-full bg-primary text-white text-sm font-medium flex items-center gap-1.5 active:scale-95 transition-transform shadow-sm"
                     >
-                      <RefreshCw size={18} />
+                      <Mic size={15} />
+                      录制
                     </button>
-                    <button
-                      onClick={() => setDeleteConfirmId(rec.id)}
-                      className="w-11 h-11 rounded-full bg-destructive/10 text-destructive flex items-center justify-center active:scale-95 transition-transform"
-                      aria-label="删除"
-                    >
-                      <Trash2 size={20} />
-                    </button>
-                  </>
-                ) : (
-                  <button
-                    onClick={() => openRecorder(rec)}
-                    className="px-5 min-h-11 rounded-full bg-primary text-white text-base font-medium flex items-center gap-1.5 active:scale-95 transition-transform shadow-sm"
-                  >
-                    <Mic size={16} />
-                    录制
-                  </button>
-                )}
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
+        )}
       </div>
 
       {/* 录音弹窗 - 底部抽屉 */}

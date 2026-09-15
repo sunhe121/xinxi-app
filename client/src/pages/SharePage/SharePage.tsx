@@ -84,7 +84,7 @@ export default function SharePage() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background max-w-[480px] mx-auto">
       {/* 顶部导航 */}
       <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-md border-b border-border/50">
         <div className="flex items-center h-14 px-5">
@@ -100,7 +100,7 @@ export default function SharePage() {
         </div>
       </div>
 
-      <div className="p-5 pb-10 space-y-6">
+      <div className="p-5 pb-28 space-y-6 max-w-[480px] mx-auto">
         {/* 邀请码卡片 */}
         <div className="bg-gradient-to-br from-primary via-primary/90 to-secondary rounded-3xl p-6 text-white shadow-lg shadow-primary/20">
           <div className="flex items-center gap-2 mb-4">
