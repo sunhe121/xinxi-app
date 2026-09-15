@@ -333,7 +333,7 @@ export default function LanguageStylePage() {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-24">
+    <div className="min-h-screen bg-background pb-[120px]">
       {/* 顶部导航 */}
       <div className="max-w-[480px] mx-auto bg-background sticky top-0 z-10 px-5 py-4 flex items-center gap-3">
         <button
@@ -348,7 +348,7 @@ export default function LanguageStylePage() {
 
       <div className="max-w-[480px] mx-auto px-5 space-y-5">
         {/* 风格画像展示区 */}
-        <div className="bg-card rounded-2xl shadow-sm p-5">
+        <div className="bg-card rounded-2xl shadow-sm p-6">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <Sparkles size={20} className="text-primary" />
@@ -412,8 +412,8 @@ export default function LanguageStylePage() {
         </div>
 
         {/* 语音样本列表 */}
-        <div className="bg-card rounded-2xl shadow-sm p-5">
-          <div className="flex items-center justify-between mb-4">
+        <div className="bg-card rounded-2xl shadow-sm p-6">
+          <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-2">
               <Tag size={18} className="text-primary" />
               <h2 className="text-lg font-semibold text-foreground">语音样本</h2>

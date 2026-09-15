@@ -1,0 +1,1 @@
+{"cases":[{"id":1,"priority":"p0","description":"登录页渲染正常，白色卡片+橙色主题+合理间距"},{"id":2,"priority":"p0","description":"登录后首页渲染正常，播报卡片白色圆角，页面左右有边距"},{"id":3,"priority":"p1","description":"我的关心话页卡片布局宽松，间距合理"},{"id":4,"priority":"p1","description":"个人中心页渐变用户卡+菜单列表卡片布局"},{"id":5,"priority":"p1","description":"历史播报页列表卡片布局正常"}]}

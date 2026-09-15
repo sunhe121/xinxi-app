@@ -354,8 +354,8 @@ export default function ChatInput({ bindingId, receiverUserId, onMessageSent }: 
           onKeyDown={handleKeyDown}
           placeholder="说点什么..."
           rows={1}
-          className="flex-1 px-4 py-3 rounded-full bg-secondary text-foreground text-base resize-none focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all placeholder:text-muted-foreground max-h-32"
-          style={{ minHeight: 48 }}
+          className="flex-1 px-4 py-3 rounded-xl bg-secondary text-foreground text-base resize-none focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all placeholder:text-muted-foreground max-h-32"
+          style={{ minHeight: 44 }}
           onInput={(e) => {
             const target = e.target as HTMLTextAreaElement;
             target.style.height = 'auto';

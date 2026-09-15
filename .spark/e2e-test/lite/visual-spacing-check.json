@@ -1,0 +1,1 @@
+{"cases":[{"id":1,"priority":"p0","description":"打开登录页，验证白色卡片、橙色按钮、整体布局间距合理"},{"id":2,"priority":"p0","description":"打开首页，验证播报卡片为白色圆角卡片，页面左右有边距不贴边"},{"id":3,"priority":"p1","description":"打开我的关心话页，验证统计卡片和列表间距宽松"},{"id":4,"priority":"p1","description":"打开个人中心页，验证用户信息卡片和菜单列表卡片布局"},{"id":5,"priority":"p1","description":"打开历史播报页，验证列表卡片布局和间距"}]}

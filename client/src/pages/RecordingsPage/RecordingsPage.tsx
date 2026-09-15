@@ -195,7 +195,7 @@ export default function RecordingsPage() {
   };
 
   return (
-    <div className="p-5 pb-24 space-y-5">
+    <div className="min-h-screen bg-background max-w-[480px] mx-auto px-5 pt-6 pb-[120px] space-y-4">
       {/* 顶部标题区 */}
       <div className="flex items-start justify-between">
         <div>
@@ -210,7 +210,7 @@ export default function RecordingsPage() {
       </div>
 
       {/* AI说明卡片 */}
-      <div className="bg-gradient-to-r from-primary/10 to-secondary/10 rounded-2xl p-4 flex items-start gap-3">
+      <div className="bg-gradient-to-r from-primary/10 to-secondary/10 rounded-2xl shadow-sm p-6 flex items-start gap-3">
         <div className="w-9 h-9 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
           <Volume2 size={18} className="text-primary" />
         </div>

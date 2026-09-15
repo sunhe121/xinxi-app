@@ -139,7 +139,7 @@ export default function HistoryPage() {
       )}
 
       {/* 列表 */}
-      <div className="px-5 pb-24 space-y-3">
+      <div className="px-5 pb-[120px] space-y-3">
         {loading ? (
           <SkeletonList />
         ) : broadcasts.length === 0 ? (

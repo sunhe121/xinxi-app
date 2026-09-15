@@ -116,27 +116,28 @@ export default function OnboardingPage() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col max-w-[480px] mx-auto">
-      <div className="flex-1 px-5 py-6">
-        <div className="space-y-6 animate-fadeIn">
-          <div className="text-center pt-8 mb-6">
-            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center shadow-lg shadow-primary/30">
+      <div className="flex-1 px-5 pt-6">
+        <div className="bg-card rounded-3xl shadow-lg p-8 space-y-6 animate-fadeIn">
+          {/* Logo / 标题区 */}
+          <div className="text-center">
+            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-primary to-orange-300 flex items-center justify-center shadow-lg shadow-primary/30">
               <Heart size={32} className="text-white" fill="white" />
             </div>
-            <h2 className="text-2xl font-bold text-foreground mb-2">配对家人</h2>
-            <p className="text-muted-foreground text-sm leading-relaxed">
+            <h2 className="text-2xl font-bold text-foreground mb-3">配对家人</h2>
+            <p className="text-sm text-muted-foreground leading-relaxed">
               {user?.nickname ? `你好，${user.nickname}！` : '你好！'}
               和家人配对后，就能收到TA的每日温暖播报啦
             </p>
           </div>
 
           {/* Tab 切换 */}
-          <div className="flex bg-secondary rounded-2xl p-1">
+          <div className="flex bg-secondary rounded-2xl p-1 h-12">
             <button
               onClick={() => setPairTab('generate')}
               className={cn(
-                'flex-1 min-h-11 px-3 rounded-xl text-base font-medium transition-all',
+                'flex-1 rounded-xl text-base font-medium transition-all',
                 pairTab === 'generate'
-                  ? 'bg-card shadow-sm text-foreground'
+                  ? 'bg-card text-primary shadow-md shadow-primary/10'
                   : 'text-muted-foreground'
               )}
             >
@@ -145,9 +146,9 @@ export default function OnboardingPage() {
             <button
               onClick={() => setPairTab('redeem')}
               className={cn(
-                'flex-1 min-h-11 px-3 rounded-xl text-base font-medium transition-all',
+                'flex-1 rounded-xl text-base font-medium transition-all',
                 pairTab === 'redeem'
-                  ? 'bg-card shadow-sm text-foreground'
+                  ? 'bg-card text-primary shadow-md shadow-primary/10'
                   : 'text-muted-foreground'
               )}
             >
@@ -157,8 +158,8 @@ export default function OnboardingPage() {
 
           {/* 生成邀请码 */}
           {pairTab === 'generate' && (
-            <div className="space-y-5">
-              <div className="space-y-2">
+            <div>
+              <div className="space-y-2.5">
                 <label className="text-sm font-medium text-foreground">
                   选择对方关系
                 </label>
@@ -184,7 +185,7 @@ export default function OnboardingPage() {
                 <button
                   onClick={handleGenerateCode}
                   disabled={generating}
-                  className="w-full min-h-12 px-6 bg-gradient-to-r from-primary to-secondary text-white rounded-2xl font-semibold text-lg shadow-lg shadow-primary/25 active:scale-[0.98] transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                  className="w-full h-12 bg-gradient-to-r from-primary to-orange-400 text-white rounded-xl text-lg font-semibold shadow-md shadow-primary/30 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-6"
                 >
                   {generating ? (
                     <>
@@ -199,7 +200,7 @@ export default function OnboardingPage() {
                   )}
                 </button>
               ) : (
-                <div className="bg-gradient-to-br from-primary/10 via-secondary/10 to-accent/10 rounded-2xl p-6 text-center">
+                <div className="bg-gradient-to-br from-primary/10 via-orange-200/30 to-secondary/30 rounded-2xl p-6 text-center mt-6">
                   <p className="text-sm text-muted-foreground mb-3">
                     你的6位邀请码
                   </p>
@@ -229,7 +230,7 @@ export default function OnboardingPage() {
               )}
 
               {inviteCode && (
-                <p className="text-center text-xs text-muted-foreground leading-relaxed">
+                <p className="text-center text-xs text-muted-foreground leading-relaxed mt-4">
                   把邀请码发给家人，让TA在&ldquo;输入邀请码&rdquo;中输入即可配对
                 </p>
               )}
@@ -238,49 +239,55 @@ export default function OnboardingPage() {
 
           {/* 输入邀请码 */}
           {pairTab === 'redeem' && (
-            <div className="space-y-5">
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">
-                  输入6位邀请码
-                </label>
-                <input
-                  type="text"
-                  inputMode="text"
-                  maxLength={6}
-                  autoFocus
-                  value={redeemCode}
-                  onChange={(e) => handleRedeemCodeChange(e.target.value)}
-                  placeholder="••••••"
-                  className="w-full h-14 text-center text-2xl font-bold tracking-widest rounded-xl bg-card border border-border text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all uppercase"
-                />
-              </div>
+            <div>
+              <div className="space-y-5">
+                <div className="space-y-2.5">
+                  <label className="text-sm font-medium text-foreground">
+                    输入6位邀请码
+                  </label>
+                  <input
+                    type="text"
+                    inputMode="text"
+                    autoComplete="off"
+                    autoCorrect="off"
+                    autoCapitalize="characters"
+                    spellCheck={false}
+                    maxLength={6}
+                    autoFocus
+                    value={redeemCode}
+                    onChange={(e) => handleRedeemCodeChange(e.target.value)}
+                    placeholder="请输入6位邀请码"
+                    className="w-full h-12 px-4 text-center text-base text-foreground rounded-xl bg-card border border-border placeholder:text-muted-foreground focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all uppercase"
+                  />
+                </div>
 
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">
-                  对方和你的关系
-                </label>
-                <div className="grid grid-cols-2 gap-3">
-                  {RELATION_OPTIONS.map((opt) => (
-                    <button
-                      key={opt.value}
-                      onClick={() => setRedeemRelation(opt.value)}
-                      className={cn(
-                        'py-4 rounded-xl text-base font-medium transition-all active:scale-95',
-                        redeemRelation === opt.value
-                          ? 'bg-primary text-white shadow-md'
-                          : 'bg-secondary text-muted-foreground'
-                      )}
-                    >
-                      {opt.label}
-                    </button>
-                  ))}
+                <div className="space-y-2.5">
+                  <label className="text-sm font-medium text-foreground">
+                    对方和你的关系
+                  </label>
+                  <div className="grid grid-cols-2 gap-3">
+                    {RELATION_OPTIONS.map((opt) => (
+                      <button
+                        key={opt.value}
+                        onClick={() => setRedeemRelation(opt.value)}
+                        className={cn(
+                          'py-4 rounded-xl text-base font-medium transition-all active:scale-95',
+                          redeemRelation === opt.value
+                            ? 'bg-primary text-white shadow-md'
+                            : 'bg-secondary text-muted-foreground'
+                        )}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
 
               <button
                 onClick={handleRedeem}
                 disabled={redeemCode.length !== 6 || redeeming}
-                className="w-full min-h-12 px-6 bg-gradient-to-r from-primary to-secondary text-white rounded-2xl font-semibold text-lg shadow-lg shadow-primary/25 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="w-full h-12 bg-gradient-to-r from-primary to-orange-400 text-white rounded-xl text-lg font-semibold shadow-md shadow-primary/30 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-6"
               >
                 {redeeming ? (
                   <>
@@ -300,7 +307,7 @@ export default function OnboardingPage() {
       </div>
 
       {/* 底部跳过按钮 */}
-      <div className="px-5 pb-8">
+      <div className="px-5 pb-[120px]">
         <button
           onClick={handleSkip}
           className="w-full py-3 text-muted-foreground text-sm font-medium active:scale-95 transition-transform"

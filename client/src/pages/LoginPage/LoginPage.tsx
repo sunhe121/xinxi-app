@@ -1,64 +1,45 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Heart, Eye, EyeOff } from 'lucide-react';
 import { toast } from 'sonner';
-import { Heart } from 'lucide-react';
 import { authApi, setToken } from '@client/src/api';
 
 type Mode = 'login' | 'register' | 'forgot';
 
 const PHONE_REGEX = /^1[3-9]\d{9}$/;
 
-const LoginPage = () => {
+export default function LoginPage() {
   const navigate = useNavigate();
+  const phoneInputRef = useRef<HTMLInputElement>(null);
+
   const [mode, setMode] = useState<Mode>('login');
   const [phone, setPhone] = useState('');
-  const [code, setCode] = useState('');
-  const [nickname, setNickname] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [code, setCode] = useState('');
+  const [nickname, setNickname] = useState('');
   const [loading, setLoading] = useState(false);
   const [registerCountdown, setRegisterCountdown] = useState(0);
   const [forgotCountdown, setForgotCountdown] = useState(0);
   const [testCode, setTestCode] = useState<string | null>(null);
-  const phoneInputRef = useRef<HTMLInputElement>(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  // 注册验证码倒计时
   useEffect(() => {
     if (registerCountdown <= 0) return;
-    const timer = setInterval(() => {
-      setRegisterCountdown((c) => c - 1);
-    }, 1000);
-    return () => clearInterval(timer);
+    const timer = setTimeout(() => setRegisterCountdown(registerCountdown - 1), 1000);
+    return () => clearTimeout(timer);
   }, [registerCountdown]);
 
-  // 忘记密码验证码倒计时
   useEffect(() => {
     if (forgotCountdown <= 0) return;
-    const timer = setInterval(() => {
-      setForgotCountdown((c) => c - 1);
-    }, 1000);
-    return () => clearInterval(timer);
+    const timer = setTimeout(() => setForgotCountdown(forgotCountdown - 1), 1000);
+    return () => clearTimeout(timer);
   }, [forgotCountdown]);
 
-  // 测试环境验证码 5 秒后消失
-  useEffect(() => {
-    if (!testCode) return;
-    const timer = setTimeout(() => {
-      setTestCode(null);
-    }, 5000);
-    return () => clearTimeout(timer);
-  }, [testCode]);
-
-  // 切换模式时自动聚焦手机号输入框
-  useEffect(() => {
-    if (phoneInputRef.current) {
-      phoneInputRef.current.focus();
-    }
-  }, [mode]);
-
-  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value.replace(/\D/g, '').slice(0, 11);
-    setPhone(value);
+  const handlePhoneChange = (value: string) => {
+    const clean = value.replace(/\D/g, '').slice(0, 11);
+    setPhone(clean);
   };
 
   const validatePhone = (): boolean => {
@@ -193,10 +174,15 @@ const LoginPage = () => {
     setPassword('');
     setConfirmPassword('');
     setTestCode(null);
+    setShowPassword(false);
+    setShowConfirmPassword(false);
   };
 
   const inputClass =
     'w-full h-12 px-4 border border-border rounded-xl text-base text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all bg-card';
+
+  const passwordInputClass =
+    'w-full h-12 pl-4 pr-12 border border-border rounded-xl text-base text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all bg-card';
 
   const labelClass = 'block text-foreground text-base font-medium mb-2';
 
@@ -209,7 +195,7 @@ const LoginPage = () => {
         type="button"
         onClick={() => handleSendCode(scene)}
         disabled={disabled}
-         className="shrink-0 h-12 px-4 text-sm font-medium text-primary bg-primary/10 border border-border rounded-xl hover:bg-primary/15 disabled:text-muted-foreground disabled:bg-muted disabled:cursor-not-allowed transition-all"
+        className="shrink-0 h-12 px-4 text-sm font-medium text-primary bg-primary/10 border border-border rounded-xl hover:bg-primary/15 disabled:text-muted-foreground disabled:bg-muted disabled:cursor-not-allowed transition-all"
       >
         {countdown > 0 ? `${countdown}s后重发` : '获取验证码'}
       </button>
@@ -225,27 +211,24 @@ const LoginPage = () => {
   return (
     <div className="min-h-screen bg-background flex items-center justify-center px-6 py-8">
       <div className="w-full max-w-sm">
-        {/* Logo 区域 */}
         <div className="text-center mb-10">
-          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-primary to-secondary mb-5 shadow-lg shadow-primary/20">
+          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-primary to-orange-300 mb-5 shadow-lg shadow-primary/30">
             <Heart className="w-10 h-10 text-white fill-white" />
           </div>
-           <h1 className="text-3xl font-bold text-foreground mb-2">心系</h1>
-           <p className="text-muted-foreground text-lg">让陪伴不缺席</p>
+          <h1 className="text-3xl font-bold text-foreground mb-2">心系</h1>
+          <p className="text-muted-foreground text-lg leading-relaxed">让陪伴不缺席</p>
         </div>
 
-        {/* 卡片 */}
-         <div className="bg-card rounded-2xl shadow-sm p-7 border border-border">
-          {/* 模式切换 Tab（登录/注册 用 tab，忘记密码不显示） */}
+        <div className="bg-card rounded-3xl shadow-lg shadow-primary/10 p-8 border border-border/50">
           {mode !== 'forgot' && (
-             <div className="flex mb-6 bg-secondary rounded-xl p-1">
+            <div className="flex mb-8 bg-secondary rounded-2xl p-1 h-12">
               <button
                 type="button"
                 onClick={() => switchMode('login')}
-                className={`flex-1 min-h-11 px-4 rounded-lg text-base font-medium transition-colors ${
-                   mode === 'login'
-                     ? 'bg-card text-primary shadow-sm'
-                     : 'text-muted-foreground'
+                className={`flex-1 text-base font-medium rounded-xl transition-all ${
+                  mode === 'login'
+                    ? 'bg-card text-primary shadow-md shadow-primary/10'
+                    : 'text-muted-foreground'
                 }`}
               >
                 登录
@@ -253,10 +236,10 @@ const LoginPage = () => {
               <button
                 type="button"
                 onClick={() => switchMode('register')}
-                className={`flex-1 min-h-11 px-4 rounded-lg text-base font-medium transition-colors ${
-                   mode === 'register'
-                     ? 'bg-card text-primary shadow-sm'
-                     : 'text-muted-foreground'
+                className={`flex-1 text-base font-medium rounded-xl transition-all ${
+                  mode === 'register'
+                    ? 'bg-card text-primary shadow-md shadow-primary/10'
+                    : 'text-muted-foreground'
                 }`}
               >
                 注册
@@ -265,11 +248,10 @@ const LoginPage = () => {
           )}
 
           {mode === 'forgot' && (
-            <h2 className="text-xl font-semibold text-foreground mb-6">忘记密码</h2>
+            <h2 className="text-xl font-semibold text-foreground mb-8">忘记密码</h2>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-5">
-            {/* 手机号 */}
             <div>
               <label className={labelClass}>手机号</label>
               <input
@@ -278,14 +260,13 @@ const LoginPage = () => {
                 inputMode="numeric"
                 maxLength={11}
                 value={phone}
-                onChange={handlePhoneChange}
+                onChange={(e) => handlePhoneChange(e.target.value)}
                 placeholder="请输入手机号"
                 className={inputClass}
                 autoFocus
               />
             </div>
 
-            {/* 验证码（注册 & 忘记密码） */}
             {(mode === 'register' || mode === 'forgot') && (
               <div>
                 <label className={labelClass}>验证码</label>
@@ -304,14 +285,13 @@ const LoginPage = () => {
                   )}
                 </div>
                 {testCode && (
-                   <p className="text-xs text-warning mt-2">
+                  <p className="text-xs text-warning mt-2">
                     测试环境验证码：{testCode}
                   </p>
                 )}
               </div>
             )}
 
-            {/* 昵称（注册） */}
             {mode === 'register' && (
               <div>
                 <label className={labelClass}>昵称</label>
@@ -326,39 +306,56 @@ const LoginPage = () => {
               </div>
             )}
 
-            {/* 密码 */}
             <div>
               <label className={labelClass}>
                 {mode === 'forgot' ? '新密码' : '密码'}
               </label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder={
-                  mode === 'forgot'
-                    ? '请输入新密码（至少6位）'
-                    : '请输入密码（至少6位）'
-                }
-                className={inputClass}
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder={
+                    mode === 'forgot'
+                      ? '请输入新密码（至少6位）'
+                      : '请输入密码（至少6位）'
+                  }
+                  className={passwordInputClass}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
+                  aria-label={showPassword ? '隐藏密码' : '显示密码'}
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
             </div>
 
-            {/* 确认密码（注册 & 忘记密码） */}
             {(mode === 'register' || mode === 'forgot') && (
               <div>
                 <label className={labelClass}>确认密码</label>
-                <input
-                  type="password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="请再次输入密码"
-                  className={inputClass}
-                />
+                <div className="relative">
+                  <input
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="请再次输入密码"
+                    className={passwordInputClass}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
+                    aria-label={showConfirmPassword ? '隐藏密码' : '显示密码'}
+                  >
+                    {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
               </div>
             )}
 
-            {/* 忘记密码链接（仅登录模式） */}
             {mode === 'login' && (
               <div className="text-right">
                 <button
@@ -371,63 +368,59 @@ const LoginPage = () => {
               </div>
             )}
 
-            {/* 提交按钮 */}
             <button
               type="submit"
               disabled={loading}
-               className="w-full min-h-12 px-6 bg-gradient-to-r from-primary to-secondary text-white text-lg font-semibold rounded-xl hover:opacity-90 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md shadow-primary/20"
+              className="w-full h-12 bg-gradient-to-r from-primary to-orange-400 text-white text-lg font-semibold rounded-xl shadow-md shadow-primary/30 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed mt-6"
             >
               {loading ? '处理中...' : modeTitle[mode]}
             </button>
           </form>
 
-          {/* 底部切换文字 */}
           {mode === 'login' && (
-             <p className="text-center text-sm text-muted-foreground mt-6">
-               还没有账号？
-               <button
-                 type="button"
-                 onClick={() => switchMode('register')}
-                 className="text-primary font-medium ml-1"
-               >
-                 立即注册
-               </button>
-             </p>
-           )}
+            <p className="text-center text-sm text-muted-foreground mt-6">
+              还没有账号？
+              <button
+                type="button"
+                onClick={() => switchMode('register')}
+                className="text-primary font-medium ml-1"
+              >
+                立即注册
+              </button>
+            </p>
+          )}
 
-           {mode === 'register' && (
-             <p className="text-center text-sm text-muted-foreground mt-6">
-               已有账号？
-               <button
-                 type="button"
-                 onClick={() => switchMode('login')}
-                 className="text-primary font-medium ml-1"
-               >
-                 去登录
-               </button>
-             </p>
-           )}
+          {mode === 'register' && (
+            <p className="text-center text-sm text-muted-foreground mt-6">
+              已有账号？
+              <button
+                type="button"
+                onClick={() => switchMode('login')}
+                className="text-primary font-medium ml-1"
+              >
+                去登录
+              </button>
+            </p>
+          )}
 
-           {mode === 'forgot' && (
-             <p className="text-center text-sm text-muted-foreground mt-6">
-               想起来了？
-               <button
-                 type="button"
-                 onClick={() => switchMode('login')}
-                 className="text-primary font-medium ml-1"
-               >
-                 去登录
-               </button>
-             </p>
-           )}
+          {mode === 'forgot' && (
+            <p className="text-center text-sm text-muted-foreground mt-6">
+              想起来了？
+              <button
+                type="button"
+                onClick={() => switchMode('login')}
+                className="text-primary font-medium ml-1"
+              >
+                去登录
+              </button>
+            </p>
+          )}
         </div>
 
-        <p className="text-center text-xs text-muted-foreground mt-6">
+        <p className="text-center text-xs text-muted-foreground mt-8">
           心系 · 为异地家人搭建温暖的情感桥梁
         </p>
       </div>
     </div>
   );
-};
-
-export default LoginPage;
+}

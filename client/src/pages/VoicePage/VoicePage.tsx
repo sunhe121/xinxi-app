@@ -219,7 +219,7 @@ export default function VoicePage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="max-w-[480px] mx-auto px-5 pt-8 pb-28">
+      <div className="max-w-[480px] mx-auto px-5 pt-6 pb-[120px]">
         {/* 顶部标题区 */}
         <div className="text-center mb-8">
           <h1 className="text-2xl font-bold text-foreground">我的关心话</h1>
@@ -229,7 +229,7 @@ export default function VoicePage() {
         </div>
 
         {/* 录制进度统计卡片 */}
-        <div className="bg-gradient-to-br from-primary/15 to-secondary/15 rounded-2xl p-5 mb-7">
+        <div className="bg-gradient-to-br from-primary/15 to-secondary/15 rounded-2xl p-6 mb-6 shadow-sm">
           <div className="flex items-center justify-center gap-3 mb-2">
             <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm">
               <Volume2 size={20} className="text-primary" />
@@ -272,7 +272,7 @@ export default function VoicePage() {
         </div>
 
         {/* 分类 Tab */}
-        <div className="flex gap-2 overflow-x-auto scrollbar-hide -mx-5 px-5 mb-6 pb-1">
+        <div className="flex gap-2 overflow-x-auto scrollbar-hide -mx-5 px-5 mb-4 pb-1">
           {CATEGORIES.map((cat) => (
             <button
               key={cat}
@@ -315,7 +315,7 @@ export default function VoicePage() {
             {recordings.map((rec: Recording) => (
               <div
                 key={rec.id}
-                className="bg-card rounded-2xl p-4 shadow-sm flex items-center gap-3"
+                className="bg-card rounded-2xl p-4 shadow-sm flex items-center gap-3 min-h-[56px]"
               >
                 {/* 左侧：播放按钮或麦克风图标 */}
                 {rec.isRecorded ? (

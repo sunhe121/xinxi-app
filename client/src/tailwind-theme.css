@@ -7,20 +7,20 @@
   --elevate-1: rgba(255, 140, 105, .04);
   --elevate-2: rgba(255, 140, 105, .08);
 
-  --background: hsl(25 57% 97%);
-  --foreground: hsl(20 15% 25%);
+  --background: hsl(24 60% 97.5%);
+  --foreground: hsl(20 15% 20%);
   --card: hsl(0 0% 100%);
-  --card-foreground: hsl(20 15% 25%);
+  --card-foreground: hsl(20 15% 20%);
   --popover: hsl(0 0% 100%);
-  --popover-foreground: hsl(20 15% 25%);
-  --primary: hsl(15 100% 70%);
+  --popover-foreground: hsl(20 15% 20%);
+  --primary: hsl(14 100% 66%);
   --primary-foreground: hsl(0 0% 100%);
-  --secondary: hsl(25 50% 94%);
-  --secondary-foreground: hsl(20 15% 25%);
-  --muted: hsl(25 30% 94%);
-  --muted-foreground: hsl(20 8% 50%);
-  --accent: hsl(160 40% 75%);
-  --accent-foreground: hsl(20 15% 25%);
+  --secondary: hsl(24 45% 95%);
+  --secondary-foreground: hsl(20 15% 20%);
+  --muted: hsl(24 25% 95%);
+  --muted-foreground: hsl(22 8% 55%);
+  --accent: hsl(160 35% 75%);
+  --accent-foreground: hsl(20 15% 20%);
   --info: hsl(210 70% 65%);
   --info-foreground: hsl(0 0% 100%);
   --destructive: hsl(0 75% 65%);
@@ -29,9 +29,9 @@
   --success-foreground: hsl(0 0% 100%);
   --warning: hsl(35 90% 65%);
   --warning-foreground: hsl(0 0% 100%);
-  --border: hsl(25 30% 90%);
-  --input: hsl(25 30% 90%);
-  --ring: hsl(15 100% 70%);
+  --border: hsl(24 35% 90%);
+  --input: hsl(24 35% 90%);
+  --ring: hsl(14 100% 66%);
   --chart-1: hsl(15 100% 70%);
   --chart-2: hsl(0 100% 85%);
   --chart-3: hsl(160 40% 75%);
@@ -60,26 +60,26 @@
   --font-serif:
     ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
   --font-mono: Source Code Pro, monospace;
-  --radius: 0.75rem;
+  --radius: 1rem;
   --shadow-x: 0px;
   --shadow-y: 2px;
   --shadow-blur: 16px;
   --shadow-spread: 0px;
   --shadow-opacity: 0.04;
-  --shadow-color: #FF8C69;
-  --shadow-2xs: 0px 2px 8px 0px hsl(15 100% 60% / 0.03);
-  --shadow-xs: 0px 2px 12px 0px hsl(15 100% 60% / 0.04);
+  --shadow-color: hsl(14 100% 66%);
+  --shadow-2xs: 0px 2px 8px 0px hsl(14 100% 60% / 0.04);
+  --shadow-xs: 0px 4px 16px 0px hsl(14 100% 60% / 0.05);
   --shadow-sm:
-    0px 2px 12px 0px hsl(15 100% 60% / 0.04), 0px 1px 2px -1px hsl(15 100% 60% / 0.03);
+    0px 4px 20px 0px hsl(14 100% 60% / 0.06), 0px 1px 2px -1px hsl(14 100% 60% / 0.04);
   --shadow:
-    0px 2px 16px 0px hsl(15 100% 60% / 0.05), 0px 1px 2px -1px hsl(15 100% 60% / 0.04);
+    0px 6px 24px 0px hsl(14 100% 60% / 0.07), 0px 2px 4px -1px hsl(14 100% 60% / 0.05);
   --shadow-md:
-    0px 2px 16px 0px hsl(15 100% 60% / 0.06), 0px 2px 4px -1px hsl(15 100% 60% / 0.04);
+    0px 8px 30px 0px hsl(14 100% 60% / 0.08), 0px 3px 6px -2px hsl(14 100% 60% / 0.06);
   --shadow-lg:
-    0px 4px 20px 0px hsl(15 100% 60% / 0.08), 0px 4px 6px -1px hsl(15 100% 60% / 0.05);
+    0px 12px 40px 0px hsl(14 100% 60% / 0.1), 0px 4px 8px -2px hsl(14 100% 60% / 0.07);
   --shadow-xl:
-    0px 4px 24px 0px hsl(15 100% 60% / 0.1), 0px 8px 10px -1px hsl(15 100% 60% / 0.06);
-  --shadow-2xl: 0px 8px 32px 0px hsl(15 100% 60% / 0.12);
+    0px 16px 48px 0px hsl(14 100% 60% / 0.12), 0px 6px 12px -3px hsl(14 100% 60% / 0.08);
+  --shadow-2xl: 0px 20px 60px 0px hsl(14 100% 60% / 0.15);
   --tracking-normal: 0em;
   --spacing: 0.25rem;
 }
@@ -128,10 +128,12 @@
   --font-mono: var(--font-mono);
   --font-serif: var(--font-serif);
 
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 8px);
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+  --radius-2xl: var(--radius-2xl);
+  --radius-3xl: var(--radius-3xl);
 
   --shadow-2xs: var(--shadow-2xs);
   --shadow-xs: var(--shadow-xs);

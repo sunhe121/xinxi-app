@@ -100,9 +100,9 @@ export default function SharePage() {
         </div>
       </div>
 
-      <div className="p-5 pb-28 space-y-6 max-w-[480px] mx-auto">
+      <div className="p-5 pb-10 space-y-4 max-w-[480px] mx-auto">
         {/* 邀请码卡片 */}
-        <div className="bg-gradient-to-br from-primary via-primary/90 to-secondary rounded-3xl p-6 text-white shadow-lg shadow-primary/20">
+        <div className="bg-gradient-to-br from-primary via-primary/90 to-secondary rounded-3xl p-6 text-white shadow-md">
           <div className="flex items-center gap-2 mb-4">
             <Heart size={20} fill="currentColor" />
             <span className="text-sm font-medium opacity-90">我的邀请码</span>
@@ -137,7 +137,7 @@ export default function SharePage() {
         </div>
 
         {/* 二维码卡片 */}
-        <div className="bg-card rounded-3xl p-6 shadow-sm">
+        <div className="bg-card rounded-2xl shadow-sm p-6">
           <h3 className="text-lg font-semibold text-foreground mb-4 text-center">
             扫码下载心系
           </h3>
@@ -158,7 +158,7 @@ export default function SharePage() {
         </div>
 
         {/* 操作指引 */}
-        <div className="bg-card rounded-3xl p-6 shadow-sm">
+        <div className="bg-card rounded-2xl shadow-sm p-6">
           <h3 className="text-lg font-semibold text-foreground mb-5">
             绑定步骤
           </h3>
@@ -194,7 +194,7 @@ export default function SharePage() {
         </div>
 
         {/* 底部按钮 */}
-        <div className="space-y-3 pt-2">
+        <div className="space-y-3 mt-6">
           <button
             onClick={handleShareLink}
             className="w-full py-4 bg-gradient-to-r from-primary to-secondary text-white rounded-2xl font-semibold text-base shadow-lg shadow-primary/25 active:scale-[0.98] transition-all flex items-center justify-center gap-2"

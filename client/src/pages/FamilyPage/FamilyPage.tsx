@@ -301,7 +301,7 @@ export default function FamilyPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background pb-28">
+    <div className="min-h-screen bg-background pb-[120px]">
       {/* 顶部导航 */}
       <div className="sticky top-0 z-30 bg-background/80 backdrop-blur px-5 py-4 flex items-center justify-between">
         <h1 className="text-xl font-semibold text-foreground">我的家人</h1>
@@ -321,7 +321,7 @@ export default function FamilyPage() {
       <div className="px-5 space-y-4">
         {/* 空状态 */}
         {family.length === 0 && (
-          <div className="bg-card rounded-3xl p-10 text-center shadow-sm">
+          <div className="bg-card rounded-2xl p-6 text-center shadow-sm">
             <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-primary/10 flex items-center justify-center">
               <UserPlus size={40} className="text-primary" />
             </div>
@@ -331,7 +331,7 @@ export default function FamilyPage() {
             </p>
             <button
               onClick={() => navigate('/onboarding')}
-              className="px-8 py-4 bg-gradient-to-r from-primary to-secondary text-white rounded-2xl font-semibold text-base shadow-lg shadow-primary/25 active:scale-[0.98] transition-all inline-flex items-center gap-2"
+              className="px-6 h-12 bg-gradient-to-r from-primary to-secondary text-white rounded-xl font-semibold text-base shadow-sm shadow-primary/20 active:scale-[0.98] transition-all inline-flex items-center gap-2"
             >
               <UserPlus size={20} />
               立即配对
@@ -350,10 +350,10 @@ export default function FamilyPage() {
                 {/* 卡片主体 */}
                 <button
                   onClick={() => handleExpand(member)}
-                  className="w-full p-4 flex items-center gap-4 text-left active:bg-muted/30 transition-colors"
+                  className="w-full p-6 flex items-center gap-4 text-left active:bg-muted/30 transition-colors min-h-[56px]"
                 >
                   <div className="relative flex-shrink-0">
-                    <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden">
+                    <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden">
                       {member.avatarUrl ? (
                         <Image
                           src={member.avatarUrl}
@@ -399,7 +399,7 @@ export default function FamilyPage() {
 
                 {/* 展开详情 */}
                 {expandedId === member.id && (
-                  <div className="border-t border-border/60 p-4 space-y-4 bg-gradient-to-b from-primary/5 to-transparent">
+                  <div className="border-t border-border/60 p-6 space-y-5 bg-gradient-to-b from-primary/5 to-transparent">
                     {detailLoading ? (
                       <div className="py-8 text-center">
                         <Loader2 size={24} className="text-primary animate-spin mx-auto" />

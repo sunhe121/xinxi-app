@@ -186,7 +186,7 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen max-w-[480px] mx-auto px-5 py-6 pb-28 space-y-5">
+    <div className="min-h-screen max-w-[480px] mx-auto px-5 py-6 pb-[120px] space-y-6">
       {/* 顶部问候区 */}
       <div className="flex items-center justify-between">
         <div>
@@ -283,7 +283,7 @@ export default function HomePage() {
       {currentFamily && (
         <>
           {broadcastLoading ? (
-            <div className="bg-card rounded-3xl p-6 shadow-sm">
+            <div className="bg-card rounded-2xl p-6 shadow-sm">
               <div className="flex items-center gap-3 mb-5">
                 <div className="w-12 h-12 rounded-full bg-secondary animate-pulse" />
                 <div className="flex-1">
@@ -301,7 +301,7 @@ export default function HomePage() {
               </div>
             </div>
           ) : latestBroadcast ? (
-            <div className="bg-gradient-to-br from-primary/5 via-secondary/20 to-accent/10 rounded-3xl p-6 shadow-sm">
+            <div className="bg-gradient-to-br from-primary/5 via-secondary/20 to-accent/10 rounded-2xl p-6 shadow-sm">
               {/* 卡片头 */}
               <button
                 onClick={() => navigate(`/chat/${currentFamily.id}`)}
@@ -463,7 +463,7 @@ export default function HomePage() {
               </div>
             </div>
           ) : (
-            <div className="bg-card rounded-3xl p-8 shadow-sm text-center">
+            <div className="bg-card rounded-2xl p-6 shadow-sm text-center">
               <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
                 <Clock size={36} className="text-primary" />
               </div>

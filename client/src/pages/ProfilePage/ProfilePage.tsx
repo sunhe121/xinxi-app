@@ -215,255 +215,326 @@ export default function ProfilePage() {
     },
   ];
 
-  return (
-    <div className="px-5 pb-28 space-y-5 pt-6">
-        {/* 顶部用户卡片 */}
-       <button
-         onClick={() => navigate('/profile-edit')}
-         className="relative w-full text-left bg-gradient-to-br from-primary via-primary/90 to-secondary rounded-3xl p-6 text-white overflow-hidden shadow-lg shadow-primary/20 active:scale-[0.98] transition-all"
-       >
-         <div className="absolute -right-6 -top-6 w-32 h-32 rounded-full bg-white/10" />
-         <div className="absolute -right-10 bottom-0 w-24 h-24 rounded-full bg-white/5" />
+  const careMenuItems = menuItems.slice(0, 2);
+  const settingsMenuItems = menuItems.slice(2, 7);
+  const aboutMenuItems = menuItems.slice(7);
 
-         <div className="relative flex items-center gap-4">
-           <div className="relative w-16 h-16 rounded-full bg-white/30 backdrop-blur flex items-center justify-center ring-4 ring-white/20 overflow-hidden flex-shrink-0">
-             {loading ? (
-               <div className="w-8 h-8 border-2 border-white/40 border-t-white rounded-full animate-spin" />
-             ) : user?.avatarUrl ? (
-               <Image
-                 src={user.avatarUrl}
-                 alt={user.nickname}
-                 className="w-full h-full object-cover"
-               />
-             ) : (
-               <User size={32} className="text-white" />
-             )}
-             <div className="absolute bottom-0 right-0 w-6 h-6 rounded-full bg-white text-primary flex items-center justify-center shadow-md">
-               <Pencil size={12} />
-             </div>
-           </div>
-           <div className="flex-1 min-w-0">
-             <div className="flex items-center gap-2">
-               <h2 className="text-xl font-bold truncate">
-                 {loading ? '加载中...' : user?.nickname || (profileError ? '加载失败' : '加载中...')}
-               </h2>
-               {!loading && !user && (
-                 <button
-                   onClick={handleRetryProfile}
-                   className="w-11 h-11 rounded-full flex items-center justify-center text-white/80 hover:text-white transition-colors"
-                   aria-label="重新加载"
-                 >
-                   <RefreshCw size={20} />
-                 </button>
-               )}
-               <Pencil size={16} className="text-white/80 flex-shrink-0" />
-             </div>
-             <div className="flex items-center gap-2 mt-1.5">
-               <span className="inline-flex items-center px-3 py-1 rounded-full bg-white/20 text-white text-sm font-medium">
-                 {TONE_STYLE_LABELS[selectedTone]}
-               </span>
-             </div>
-           </div>
-         </div>
-
-         {/* 个性签名 */}
-         {user?.bio && (
-           <p className="relative mt-4 text-sm text-white/85 leading-relaxed border-t border-white/15 pt-4">
-             {user.bio}
-           </p>
-         )}
-       </button>
-
-      {/* 功能菜单列表 */}
-      <div className="bg-card rounded-2xl overflow-hidden shadow-sm">
-        {menuItems.map((item, index) => (
-          <button
-            key={item.label}
-            onClick={item.onClick}
-              className={cn(
-                'w-full flex items-center gap-4 p-4 text-left transition-all active:bg-muted/50 min-h-14',
-                index < menuItems.length - 1
-                  ? 'border-b border-border/60'
-                  : '',
-              )}
-          >
-            <div
-              className={cn(
-                'w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0',
-                item.iconBg,
-              )}
-            >
-              <item.icon size={22} className={item.iconColor} />
-            </div>
-            <span className="flex-1 font-medium text-foreground text-base">
-              {item.label}
-            </span>
-            <div className="flex items-center">{item.right}</div>
-          </button>
-        ))}
-      </div>
-
-      {/* 产品理念 */}
-      <div className="bg-gradient-to-br from-primary/10 via-secondary/10 to-accent/10 rounded-2xl p-5">
-        <div className="flex items-center gap-3 mb-3">
-          <div className="w-10 h-10 rounded-full bg-white/80 flex items-center justify-center">
-            <Heart size={20} className="text-primary" fill="currentColor" />
-          </div>
-          <h3 className="text-lg font-semibold text-foreground">关于心系</h3>
-        </div>
-        <p className="text-sm text-muted-foreground leading-relaxed">
-          我们相信，距离不应该成为关心的阻碍。心系用AI把每天的生活变成温暖的语音，
-          让不在身边的家人，也能感受到彼此的陪伴。
-        </p>
-        <p className="text-sm text-muted-foreground leading-relaxed mt-2">
-          所有数据仅用于您和家人之间的连接，绝不会用于其他用途。
-        </p>
-      </div>
-
-      {/* 退出登录 */}
-      <button
-        onClick={handleLogout}
-        className="w-full min-h-12 px-4 bg-card rounded-2xl text-destructive font-medium text-base flex items-center justify-center gap-2 shadow-sm active:scale-[0.98] transition-all"
-      >
-        <LogOut size={20} />
-        退出登录
-      </button>
-
-      {/* 底部版本信息 */}
-      <div className="text-center pt-4 pb-2">
-        <p className="text-xs text-muted-foreground">
-           心系 v1.0 · 让陪伴不缺席
-        </p>
-      </div>
-
-      {/* 推送设置弹层 */}
-      {showPushSheet && (
-        <BottomSheet title="推送设置" onClose={() => setShowPushSheet(false)}>
-          <p className="text-sm text-muted-foreground mb-4">
-            选择你想收到播报的时间（可多选）
-          </p>
-          <div className="space-y-2 mb-6">
-            {PUSH_TIME_OPTIONS.map((opt) => (
-              <button
-                key={opt.value}
-                onClick={() => togglePushTime(opt.value)}
-                className={cn(
-                  'w-full flex items-center justify-between p-4 rounded-xl transition-all active:scale-[0.98]',
-                  selectedPushTimes.includes(opt.value)
-                    ? 'bg-primary/10 border-2 border-primary'
-                    : 'bg-secondary border-2 border-transparent'
-                )}
-              >
-                <span className="font-medium text-foreground">{opt.label}</span>
-                {selectedPushTimes.includes(opt.value) && (
-                  <Check size={20} className="text-primary" />
-                )}
-              </button>
-            ))}
-          </div>
-          <button
-            onClick={handleSavePushTime}
-            className="w-full py-4 bg-gradient-to-r from-primary to-secondary text-white rounded-2xl font-semibold text-base shadow-lg shadow-primary/25 active:scale-[0.98] transition-all"
-          >
-            保存设置
-          </button>
-        </BottomSheet>
-      )}
-
-      {/* 节日提醒弹层 */}
-      {showFestivalSheet && (
-        <BottomSheet title="节日提醒" onClose={() => setShowFestivalSheet(false)}>
-          <p className="text-sm text-muted-foreground mb-4">
-            重要日子提前提醒你，让关心不缺席
-          </p>
-          <div className="space-y-2 mb-4 max-h-[280px] overflow-y-auto">
-            {festivals.map((f) => (
-              <div
-                key={f.id}
-                className="flex items-center gap-3 p-3 bg-secondary rounded-xl"
-              >
-                <div className="w-10 h-10 rounded-lg bg-accent/20 flex items-center justify-center flex-shrink-0">
-                  <Calendar size={18} className="text-accent" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-medium text-foreground text-sm truncate">{f.name}</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">{f.date}</p>
-                </div>
-                <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary flex-shrink-0">
-                  {f.type === 'birthday' ? '生日' : f.type === 'festival' ? '节日' : '纪念日'}
-                </span>
-              </div>
-            ))}
-          </div>
-          <button
-            onClick={handleAddFestival}
-            className="w-full py-4 border-2 border-dashed border-border text-muted-foreground rounded-2xl font-medium text-base active:scale-[0.98] transition-all flex items-center justify-center gap-1.5"
-          >
-            + 添加提醒
-          </button>
-        </BottomSheet>
-      )}
-
-      {/* 语言风格弹层 */}
-      {showToneSheet && (
-        <BottomSheet title="语言风格" onClose={() => setShowToneSheet(false)}>
-          <p className="text-sm text-muted-foreground mb-4">
-            选择播报的语言风格，让TA感受到不一样的你
-          </p>
-          <div className="space-y-2 mb-6">
-            {TONE_STYLES.map((style) => (
-              <button
-                key={style.value}
-                onClick={() => setSelectedTone(style.value)}
-                className={cn(
-                  'w-full text-left p-4 rounded-xl transition-all active:scale-[0.98]',
-                  selectedTone === style.value
-                    ? 'bg-primary/10 border-2 border-primary'
-                    : 'bg-secondary border-2 border-transparent'
-                )}
-              >
-                <div className="flex items-center justify-between mb-1">
-                  <span className="font-medium text-foreground">
-                    {TONE_STYLE_LABELS[style.value]}
-                  </span>
-                  {selectedTone === style.value && (
-                    <Check size={18} className="text-primary" />
-                  )}
-                </div>
-                <p className="text-xs text-muted-foreground">{style.desc}</p>
-              </button>
-            ))}
-          </div>
-          <button
-            onClick={handleSaveTone}
-            className="w-full py-4 bg-gradient-to-r from-primary to-secondary text-white rounded-2xl font-semibold text-base shadow-lg shadow-primary/25 active:scale-[0.98] transition-all"
-          >
-            保存设置
-          </button>
-        </BottomSheet>
-      )}
-
-      {/* 关于心系弹层 */}
-      {showAboutSheet && (
-        <BottomSheet title="关于心系" onClose={() => setShowAboutSheet(false)}>
-          <div className="text-center py-6">
-            <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center shadow-lg shadow-primary/30">
-              <Heart size={36} className="text-white" fill="white" />
-            </div>
-            <h3 className="text-xl font-bold text-foreground mb-1">心系</h3>
-            <p className="text-sm text-muted-foreground mb-6">v1.0.0 · 让陪伴不缺席</p>
-          </div>
-          <div className="bg-secondary/50 rounded-2xl p-4 space-y-3">
-            <p className="text-sm text-foreground font-medium">产品理念</p>
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              心系是一款AI亲情关怀应用，帮助异地子女和老人通过AI自动总结每日生活状态，
-              生成温暖的语音播报，定时推送给对方，让陪伴不缺席。
-            </p>
-          </div>
-        </BottomSheet>
-      )}
+  const SectionTitle = ({ children }: { children: React.ReactNode }) => (
+    <div className="flex items-center text-base font-semibold text-foreground mb-3">
+      <span className="w-1 h-4 bg-primary rounded-full mr-2" />
+      {children}
     </div>
   );
+
+  return (
+<>
+      <div className="bg-background min-h-screen">
+        <div className="max-w-[480px] mx-auto px-5 pt-6 pb-[120px] flex flex-col gap-4">
+          {/* 页面标题 */}
+          <h1 className="text-xl font-bold text-foreground mb-6">个人中心</h1>
+
+          {/* 用户信息卡片 */}
+          <button
+            onClick={() => navigate('/profile-edit')}
+            className="relative w-full text-left bg-gradient-to-br from-primary via-primary/90 to-orange-400 rounded-3xl p-6 text-white overflow-hidden shadow-md active:scale-[0.98] transition-all"
+          >
+            <div className="absolute -right-6 -top-6 w-32 h-32 rounded-full bg-white/10" />
+            <div className="absolute -right-10 bottom-0 w-24 h-24 rounded-full bg-white/5" />
+
+            <div className="relative flex items-center gap-4">
+              <div className="relative w-16 h-16 rounded-full bg-white/30 backdrop-blur flex items-center justify-center ring-4 ring-white/30 overflow-hidden flex-shrink-0">
+                {loading ? (
+                  <div className="w-8 h-8 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                ) : user?.avatarUrl ? (
+                  <Image
+                    src={user.avatarUrl}
+                    alt={user.nickname}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <User size={32} className="text-white" />
+                )}
+                <div className="absolute bottom-0 right-0 w-6 h-6 rounded-full bg-white text-primary flex items-center justify-center shadow-md">
+                  <Pencil size={12} />
+                </div>
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <h2 className="text-xl font-bold truncate">
+                    {loading ? '加载中...' : user?.nickname || (profileError ? '加载失败' : '加载中...')}
+                  </h2>
+                  {!loading && !user && (
+                    <button
+                      onClick={handleRetryProfile}
+                      className="w-11 h-11 rounded-full flex items-center justify-center text-white/80 hover:text-white transition-colors"
+                      aria-label="重新加载"
+                    >
+                      <RefreshCw size={20} />
+                    </button>
+                  )}
+                  <Pencil size={16} className="text-white/80 flex-shrink-0" />
+                </div>
+                <div className="flex items-center gap-2 mt-1.5">
+                  <span className="text-sm text-white/80">
+                    {TONE_STYLE_LABELS[selectedTone]}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* 个性签名 */}
+            {user?.bio && (
+              <p className="relative mt-4 text-sm text-white/80 leading-relaxed border-t border-white/15 pt-4">
+                {user.bio}
+              </p>
+            )}
+          </button>
+
+          {/* 关心功能 */}
+          <div>
+            <SectionTitle>关心功能</SectionTitle>
+  <div className="bg-card rounded-2xl shadow-sm overflow-hidden">
+               {careMenuItems.map((item, index) => (
+                <button
+                  key={item.label}
+                  onClick={item.onClick}
+                  className={cn(
+                    'w-full flex items-center gap-3 px-4 py-3.5 text-left transition-all active:bg-muted/50 min-h-14',
+                    index < careMenuItems.length - 1
+                      ? 'border-b border-border/60'
+                      : '',
+                  )}
+                >
+                  <div className="w-9 h-9 rounded-xl bg-primary/10 text-primary flex items-center justify-center flex-shrink-0">
+                    <item.icon size={20} />
+                  </div>
+                  <span className="flex-1 font-medium text-foreground text-base">
+                    {item.label}
+                  </span>
+                  <div className="flex items-center text-muted-foreground">{item.right}</div>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* 设置 */}
+          <div>
+            <SectionTitle>设置</SectionTitle>
+  <div className="bg-card rounded-2xl shadow-sm overflow-hidden">
+               {settingsMenuItems.map((item, index) => (
+                <button
+                  key={item.label}
+                  onClick={item.onClick}
+                  className={cn(
+                    'w-full flex items-center gap-3 px-4 py-3.5 text-left transition-all active:bg-muted/50 min-h-14',
+                    index < settingsMenuItems.length - 1
+                      ? 'border-b border-border/60'
+                      : '',
+                  )}
+                >
+                  <div className="w-9 h-9 rounded-xl bg-primary/10 text-primary flex items-center justify-center flex-shrink-0">
+                    <item.icon size={20} />
+                  </div>
+                  <span className="flex-1 font-medium text-foreground text-base">
+                    {item.label}
+                  </span>
+                  <div className="flex items-center text-muted-foreground">{item.right}</div>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* 其他 */}
+          <div>
+            <SectionTitle>其他</SectionTitle>
+  <div className="bg-card rounded-2xl shadow-sm overflow-hidden">
+               {aboutMenuItems.map((item, index) => (
+                <button
+                  key={item.label}
+                  onClick={item.onClick}
+                  className={cn(
+                    'w-full flex items-center gap-3 px-4 py-3.5 text-left transition-all active:bg-muted/50 min-h-14',
+                    index < aboutMenuItems.length - 1
+                      ? 'border-b border-border/60'
+                      : '',
+                  )}
+                >
+                  <div className="w-9 h-9 rounded-xl bg-primary/10 text-primary flex items-center justify-center flex-shrink-0">
+                    <item.icon size={20} />
+                  </div>
+                  <span className="flex-1 font-medium text-foreground text-base">
+                    {item.label}
+                  </span>
+                  <div className="flex items-center text-muted-foreground">{item.right}</div>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* 产品理念 */}
+  <div className="bg-card rounded-2xl shadow-sm p-6">
+             <div className="flex items-center gap-3 mb-3">
+              <div className="w-9 h-9 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
+                <Heart size={20} fill="currentColor" />
+              </div>
+              <h3 className="text-base font-semibold text-foreground">产品理念</h3>
+            </div>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              我们相信，距离不应该成为关心的阻碍。心系用AI把每天的生活变成温暖的语音，
+              让不在身边的家人，也能感受到彼此的陪伴。
+            </p>
+            <p className="text-sm text-muted-foreground leading-relaxed mt-2">
+              所有数据仅用于您和家人之间的连接，绝不会用于其他用途。
+            </p>
+          </div>
+
+          {/* 退出登录 */}
+          <button
+            onClick={handleLogout}
+            className="w-full h-14 px-4 bg-card rounded-2xl text-destructive font-medium text-base flex items-center justify-center gap-2 shadow-sm active:scale-[0.98] transition-all"
+          >
+            <LogOut size={20} />
+            退出登录
+          </button>
+
+          {/* 底部版本信息 */}
+          <div className="text-center pt-2">
+            <p className="text-xs text-muted-foreground">
+               心系 v1.0 · 让陪伴不缺席
+            </p>
+          </div>
+
+        </div>
+
+        {/* 推送设置弹层 */}
+        {showPushSheet && (
+          <BottomSheet title="推送设置" onClose={() => setShowPushSheet(false)}>
+            <p className="text-sm text-muted-foreground mb-4">
+              选择你想收到播报的时间（可多选）
+            </p>
+            <div className="space-y-2 mb-6">
+              {PUSH_TIME_OPTIONS.map((opt) => (
+                <button
+                  key={opt.value}
+                  onClick={() => togglePushTime(opt.value)}
+                  className={cn(
+                    'w-full flex items-center justify-between p-4 rounded-xl transition-all active:scale-[0.98]',
+                    selectedPushTimes.includes(opt.value)
+                      ? 'bg-primary/10 border-2 border-primary'
+                      : 'bg-secondary border-2 border-transparent'
+                  )}
+                >
+                  <span className="font-medium text-foreground">{opt.label}</span>
+                  {selectedPushTimes.includes(opt.value) && (
+                    <Check size={20} className="text-primary" />
+                  )}
+                </button>
+              ))}
+            </div>
+            <button
+              onClick={handleSavePushTime}
+              className="w-full py-4 bg-gradient-to-r from-primary to-secondary text-white rounded-2xl font-semibold text-base shadow-lg shadow-primary/25 active:scale-[0.98] transition-all"
+            >
+              保存设置
+            </button>
+          </BottomSheet>
+        )}
+
+        {/* 节日提醒弹层 */}
+        {showFestivalSheet && (
+          <BottomSheet title="节日提醒" onClose={() => setShowFestivalSheet(false)}>
+            <p className="text-sm text-muted-foreground mb-4">
+              重要日子提前提醒你，让关心不缺席
+            </p>
+            <div className="space-y-2 mb-4 max-h-[280px] overflow-y-auto">
+              {festivals.map((f) => (
+                <div
+                  key={f.id}
+                  className="flex items-center gap-3 p-3 bg-secondary rounded-xl"
+                >
+                  <div className="w-10 h-10 rounded-lg bg-accent/20 flex items-center justify-center flex-shrink-0">
+                    <Calendar size={18} className="text-accent" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium text-foreground text-sm truncate">{f.name}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">{f.date}</p>
+                  </div>
+                  <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary flex-shrink-0">
+                    {f.type === 'birthday' ? '生日' : f.type === 'festival' ? '节日' : '纪念日'}
+                  </span>
+                </div>
+              ))}
+            </div>
+            <button
+              onClick={handleAddFestival}
+              className="w-full py-4 border-2 border-dashed border-border text-muted-foreground rounded-2xl font-medium text-base active:scale-[0.98] transition-all flex items-center justify-center gap-1.5"
+            >
+              + 添加提醒
+            </button>
+          </BottomSheet>
+        )}
+
+        {/* 语言风格弹层 */}
+        {showToneSheet && (
+          <BottomSheet title="语言风格" onClose={() => setShowToneSheet(false)}>
+            <p className="text-sm text-muted-foreground mb-4">
+              选择播报的语言风格，让TA感受到不一样的你
+            </p>
+            <div className="space-y-2 mb-6">
+              {TONE_STYLES.map((style) => (
+                <button
+                  key={style.value}
+                  onClick={() => setSelectedTone(style.value)}
+                  className={cn(
+                    'w-full text-left p-4 rounded-xl transition-all active:scale-[0.98]',
+                    selectedTone === style.value
+                      ? 'bg-primary/10 border-2 border-primary'
+                      : 'bg-secondary border-2 border-transparent'
+                  )}
+                >
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="font-medium text-foreground">
+                      {TONE_STYLE_LABELS[style.value]}
+                    </span>
+                    {selectedTone === style.value && (
+                      <Check size={18} className="text-primary" />
+                    )}
+                  </div>
+                  <p className="text-xs text-muted-foreground">{style.desc}</p>
+                </button>
+              ))}
+            </div>
+            <button
+              onClick={handleSaveTone}
+              className="w-full py-4 bg-gradient-to-r from-primary to-secondary text-white rounded-2xl font-semibold text-base shadow-lg shadow-primary/25 active:scale-[0.98] transition-all"
+            >
+              保存设置
+            </button>
+          </BottomSheet>
+        )}
+
+        {/* 关于心系弹层 */}
+        {showAboutSheet && (
+          <BottomSheet title="关于心系" onClose={() => setShowAboutSheet(false)}>
+            <div className="text-center py-6">
+              <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center shadow-lg shadow-primary/30">
+                <Heart size={36} className="text-white" fill="white" />
+              </div>
+              <h3 className="text-xl font-bold text-foreground mb-1">心系</h3>
+              <p className="text-sm text-muted-foreground mb-6">v1.0.0 · 让陪伴不缺席</p>
+            </div>
+            <div className="bg-secondary/50 rounded-2xl p-4 space-y-3">
+              <p className="text-sm text-foreground font-medium">产品理念</p>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                心系是一款AI亲情关怀应用，帮助异地子女和老人通过AI自动总结每日生活状态，
+                生成温暖的语音播报，定时推送给对方，让陪伴不缺席。
+              </p>
+            </div>
+          </BottomSheet>
+        )}
+      </div>
+</>
+);
 }
 
 function BottomSheet({

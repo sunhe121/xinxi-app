@@ -156,33 +156,33 @@ export default function MessageItem({
 
   return (
     <>
-      <div className={cn('flex gap-2', isMine ? 'flex-row-reverse' : 'flex-row')}>
+      <div className={cn('flex gap-2.5', isMine ? 'flex-row-reverse' : 'flex-row')}>
         {!isMine && (
-          <div className="w-10 h-10 rounded-full bg-primary/10 flex-shrink-0 flex items-center justify-center overflow-hidden">
+          <div className="w-9 h-9 rounded-full bg-primary/10 flex-shrink-0 flex items-center justify-center overflow-hidden shadow-sm shadow-primary/10">
             {avatarUrl ? (
               <Image src={avatarUrl} alt={partnerName} className="w-full h-full object-cover" />
             ) : (
-              <ImageIcon size={18} className="text-primary" />
+              <ImageIcon size={16} className="text-primary" />
             )}
           </div>
         )}
         <div className={cn('flex flex-col max-w-[78%] gap-1.5', isMine ? 'items-end' : 'items-start')}>
           <div
             className={cn(
-              'px-4 py-3 rounded-3xl shadow-sm',
+              'px-4.5 py-3 rounded-2xl shadow-sm shadow-primary/10',
               isMine
-                ? 'bg-gradient-to-br from-primary to-secondary text-white rounded-tr-md'
-                : 'bg-card text-foreground rounded-tl-md'
+                ? 'bg-gradient-to-br from-primary to-primary/85 text-white rounded-bl-md'
+                : 'bg-card text-foreground rounded-br-md'
             )}
           >
             {renderContent()}
           </div>
-          <div className={cn('flex items-center gap-2', isMine ? 'flex-row-reverse' : 'flex-row')}>
-            <span className="text-xs text-muted-foreground">
+          <div className={cn('flex items-center gap-1.5', isMine ? 'flex-row-reverse' : 'flex-row')}>
+            <span className="text-[11px] text-muted-foreground/60">
               {formatTime(message.createdAt)}
             </span>
             {isMine && (
-              <span className="text-xs text-muted-foreground/70">
+              <span className="text-[11px] text-muted-foreground/50">
                 已收集，将在每日报告中送达
               </span>
             )}

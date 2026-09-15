@@ -179,9 +179,9 @@ export default function PrivacyPage() {
         <h1 className="text-xl font-semibold text-foreground">隐私设置</h1>
       </div>
 
-      <div className="px-5 pb-28 space-y-5">
+      <div className="px-5 pb-10 space-y-5">
         {/* 顶部说明卡片 - 绝不采集 */}
-        <div className="bg-gradient-to-br from-destructive/10 via-primary/10 to-accent/10 rounded-2xl p-5">
+        <div className="bg-gradient-to-br from-destructive/10 via-primary/10 to-accent/10 rounded-2xl shadow-sm p-6">
           <div className="flex items-start gap-3">
             <div className="w-10 h-10 rounded-full bg-white/80 flex items-center justify-center flex-shrink-0">
               <Shield size={20} className="text-primary" />
@@ -310,10 +310,10 @@ export default function PrivacyPage() {
         </div>
 
         {/* 数据管理区块 */}
-        <div className="space-y-3">
-          <h3 className="text-sm font-medium text-muted-foreground px-1">
-            数据管理
-          </h3>
+<div className="space-y-3 mt-6">
+           <h3 className="text-sm font-medium text-muted-foreground px-1">
+             数据管理
+           </h3>
           <div className="bg-card rounded-2xl overflow-hidden shadow-sm space-y-px">
             <button
               onClick={handleDownloadData}

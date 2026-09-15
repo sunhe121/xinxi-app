@@ -6,43 +6,75 @@
 ## 设计规范
 
 ### 视觉风格
-- **风格定位**: 温暖、简洁、治愈
+- **风格定位**: 温暖、简洁、治愈、大留白
 - **主色调**: 暖橙色系，传递温暖关怀的感觉
 - **配色方案**:
-  - 主色：暖橙 `#FF8C69` (primary)
+  - 主色：暖橙 `#FF8C69` → `hsl(14 100% 66%)` (primary)
   - 次色：柔粉 `#FFB5B5` (secondary)
   - 点缀：柔绿 `#98D8C8` (accent)
-  - 背景：米白 `#FFF8F3` (background)
+  - 背景：米白 `#FFF8F3` → `hsl(24 60% 97.5%)` (background)
   - 卡片：纯白 `#FFFFFF` (card)
-  - 文字：深棕灰 `#4A3F3A` (foreground)
-  - 次要文字：棕灰 `#8B7D75` (muted-foreground)
-  - 边框：浅米色 `#F0E6DD` (border)
+  - 文字：深棕灰 `#4A3F3A` → `hsl(20 15% 20%)` (foreground)
+  - 次要文字：棕灰 `#8B7D75` → `hsl(22 8% 55%)` (muted-foreground)
+  - 边框：浅米色 `hsl(24 35% 90%)` (border)
   - 成功：柔绿 `#6BCB77`
   - 警告：暖橙 `#FFB347`
   - 危险：柔红 `#FF6B6B`
 
-### 字体与间距
+### 字体与行高
 - **字体**: 系统默认中文字体栈，圆润亲和
-- **字号层级**: 大字体优先，适合老人阅读
-  - 标题: text-2xl (24px), font-semibold
-  - 副标题: text-lg (18px), font-medium
-  - 正文: text-base (16px)
-  - 辅助文字: text-sm (14px)
+- **行高**: 正文 1.6，标题 1.3，辅助文字 1.5
+- **字号层级**:
+  - 页面大标题: text-2xl (24px), font-bold, 行高1.3
+  - 卡片/区块标题: text-xl (20px), font-semibold
+  - 副标题: text-base (16px), font-medium, 灰色
+  - 正文: text-base (16px), 行高1.6
+  - 输入框标签: text-base (16px), font-medium
+  - 按钮文字: text-base (16px), font-semibold
+  - 辅助文字: text-sm (14px), 灰色, 行高1.5
   - 小字: text-xs (12px)
-- **间距体系**: 大间距，呼吸感强
-  - xs: 4px, sm: 8px, md: 12px, lg: 16px, xl: 20px, 2xl: 24px, 3xl: 32px
+
+### 间距体系（全局规范，所有页面必须遵循）
+- **页面级**:
+  - 左右 padding: px-6 (24px)
+  - 顶部 padding: pt-6 (24px)
+  - 底部 padding: pb-[120px]（给底部导航留空间）
+  - 最大宽度: max-w-[480px], mx-auto 居中
+- **卡片级**:
+  - 背景: 白色 (bg-card)
+  - 圆角: rounded-2xl (16px)
+  - 阴影: shadow-sm (柔和暖色阴影)
+  - 内部 padding: p-6 (24px)
+  - 卡片之间间距: space-y-4 / gap-4 (16px)
+- **元素间距**:
+  - 标题与副标题之间: 3 (12px)
+  - 区块标题与内容之间: 4 (16px)
+  - 表单标签与输入框之间: 2 (8px)
+  - 两个输入框组之间: 5 (20px)
+  - 输入框与按钮之间: 6 (24px)
+  - 按钮与辅助文字之间: 4 (16px)
+  - 列表项之间: 3 (12px)
+  - 列表项内部 padding: py-4 px-4 (16px)
+  - 图标与文字之间: 2.5 (10px)
+
+### 组件尺寸（全局规范）
+- **主按钮**: h-12 (48px), rounded-xl (12px), 文字16px加粗, 渐变橙色 from-primary to-orange-400
+- **次按钮**: h-12 (48px), rounded-xl, 边框+橙色文字
+- **输入框**: h-12 (48px), rounded-xl (12px), 文字16px, px-4, border border-border, bg-white, 聚焦时 border-primary + ring-2 ring-primary/20
+- **标签/分类按钮**: h-9 (36px), rounded-full (18px), px-4
+- **列表项**: 最小高度 14 (56px)
+- **头像**: 12 (48px) 列表用, 16 (64px) 个人中心用
 
 ### 布局规范
 - **移动端优先**: 最大宽度 480px，居中显示，模拟原生App体验
 - **底部导航**: 固定在底部，高度 64px，4个tab（首页、录音库、历史播报、我的）
-- **顶部区域**: 问候语 + 身份切换（我的/家人）
-- **卡片**: 圆角 16px，柔和阴影，内边距 20px
-- **按钮**: 大按钮，圆角 12px，最小高度 48px
+- **表单页**: 白色卡片包裹所有表单元素，卡片内间距24px，元素间距20px
+- **列表页**: 白色卡片包裹列表，列表项间距12px
 
 ### 动效规范
 - 过渡动画：柔和缓动，duration 300ms
 - 页面切换：淡入淡出 + 轻微上移
-- 按钮点击：轻微缩放反馈
+- 按钮点击：轻微缩放反馈 (active:scale-[0.98])
 
 ## 数据模型
 
