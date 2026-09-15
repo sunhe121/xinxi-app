@@ -338,7 +338,7 @@ export default function LanguageStylePage() {
       <div className="max-w-[480px] mx-auto bg-[#FFF8F3] sticky top-0 z-10 px-5 py-4 flex items-center gap-3">
         <button
           onClick={() => navigate(-1)}
-          className="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center text-[#4A3F3A] hover:bg-[#FFF0E8] transition-colors"
+          className="w-11 h-11 rounded-full bg-white shadow-sm flex items-center justify-center text-[#4A3F3A] hover:bg-[#FFF0E8] transition-colors"
           aria-label="返回"
         >
           <ArrowLeft size={20} />
@@ -358,14 +358,14 @@ export default function LanguageStylePage() {
               onClick={handleAnalyze}
               disabled={analyzing || !canAnalyze}
               className={cn(
-                'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-all',
+                'flex items-center gap-1.5 px-4 py-2.5 rounded-full text-base font-medium min-h-11 transition-all',
                 canAnalyze
                   ? 'bg-gradient-to-r from-[#FF8C69] to-[#FFB347] text-white hover:shadow-md active:scale-95'
                   : 'bg-[#F0E6DD] text-[#B0A59F] cursor-not-allowed',
               )}
               title={canAnalyze ? '重新分析' : '请先录制至少 3 段语音样本'}
             >
-              <RefreshCw size={14} className={analyzing ? 'animate-spin' : ''} />
+              <RefreshCw size={18} className={analyzing ? 'animate-spin' : ''} />
               {analyzing ? '分析中...' : profile ? '重新分析' : '分析风格'}
             </button>
           </div>
@@ -383,7 +383,7 @@ export default function LanguageStylePage() {
                   {profile.keywords.map((kw: string, idx: number) => (
                     <span
                       key={idx}
-                      className="px-3 py-1 rounded-full bg-[#FFF0E8] text-[#FF8C69] text-sm"
+                      className="px-3.5 py-1.5 rounded-full bg-[#FFF0E8] text-[#FF8C69] text-sm"
                     >
                       {kw}
                     </span>
@@ -423,9 +423,9 @@ export default function LanguageStylePage() {
             </div>
             <button
               onClick={() => openRecorder()}
-              className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-gradient-to-r from-[#FF8C69] to-[#FFB347] text-white text-sm font-medium hover:shadow-md active:scale-95 transition-all"
+              className="flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-gradient-to-r from-[#FF8C69] to-[#FFB347] text-white text-base font-medium min-h-11 hover:shadow-md active:scale-95 transition-all"
             >
-              <Plus size={16} />
+              <Plus size={18} />
               录制新样本
             </button>
           </div>
@@ -442,7 +442,7 @@ export default function LanguageStylePage() {
               {samples.map((sample) => (
                 <div
                   key={sample.id}
-                  className="p-4 rounded-xl bg-[#FFFAF7] border border-[#F0E6DD]"
+                  className="p-4 rounded-xl bg-[#FFFAF7] border border-[#F0E6DD] min-h-16"
                 >
                   <div className="flex items-start justify-between mb-2">
                     <div className="flex-1 min-w-0">
@@ -462,17 +462,17 @@ export default function LanguageStylePage() {
                     <div className="flex items-center gap-1 ml-2 shrink-0">
                       <button
                         onClick={() => openRecorder(sample)}
-                        className="w-8 h-8 rounded-full flex items-center justify-center text-[#8B7D75] hover:bg-[#F0E6DD] hover:text-[#4A3F3A] transition-colors"
+                         className="w-11 h-11 rounded-full flex items-center justify-center text-[#8B7D75] hover:bg-[#F0E6DD] hover:text-[#4A3F3A] transition-colors"
                         aria-label="编辑"
                       >
-                        <Edit3 size={14} />
+                        <Edit3 size={18} />
                       </button>
                       <button
                         onClick={() => handleDelete(sample.id)}
-                        className="w-8 h-8 rounded-full flex items-center justify-center text-[#8B7D75] hover:bg-[#FFE4E0] hover:text-[#FF6B6B] transition-colors"
+                         className="w-11 h-11 rounded-full flex items-center justify-center text-[#8B7D75] hover:bg-[#FFE4E0] hover:text-[#FF6B6B] transition-colors"
                         aria-label="删除"
                       >
-                        <Trash2 size={14} />
+                        <Trash2 size={18} />
                       </button>
                     </div>
                   </div>
@@ -498,7 +498,7 @@ export default function LanguageStylePage() {
             <div className="sticky top-0 bg-white px-5 py-4 flex items-center justify-between border-b border-[#F0E6DD] z-10">
               <button
                 onClick={closeRecorder}
-                className="w-9 h-9 rounded-full flex items-center justify-center text-[#8B7D75] hover:bg-[#F0E6DD] transition-colors"
+                className="w-11 h-11 rounded-full flex items-center justify-center text-[#8B7D75] hover:bg-[#F0E6DD] transition-colors"
                 aria-label="关闭"
               >
                 <X size={20} />
@@ -510,7 +510,7 @@ export default function LanguageStylePage() {
                 onClick={handleSave}
                 disabled={saving || recording}
                 className={cn(
-                  'px-4 py-1.5 rounded-full text-sm font-medium transition-all',
+                  'px-4 py-2.5 rounded-full text-base font-medium min-h-11 transition-all',
                   saving || recording
                     ? 'bg-[#F0E6DD] text-[#B0A59F] cursor-not-allowed'
                     : 'bg-gradient-to-r from-[#FF8C69] to-[#FFB347] text-white hover:shadow-md active:scale-95',
@@ -547,7 +547,7 @@ export default function LanguageStylePage() {
                       onClick={() => setCategory(cat.value)}
                       disabled={!!editingSample}
                       className={cn(
-                        'px-3 py-1.5 rounded-full text-sm font-medium transition-all',
+                        'px-3.5 py-2 rounded-full text-sm font-medium min-h-10 transition-all',
                         category === cat.value
                           ? 'bg-[#FF8C69] text-white'
                           : 'bg-[#FFFAF7] text-[#8B7D75] border border-[#F0E6DD] hover:border-[#FF8C69]/50',

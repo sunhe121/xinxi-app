@@ -250,15 +250,16 @@ export default function ProfilePage() {
                 {!loading && !user && (
                   <button
                     onClick={handleRetryProfile}
-                    className="text-white/80 hover:text-white transition-colors"
+                    className="w-11 h-11 rounded-full flex items-center justify-center text-white/80 hover:text-white transition-colors"
+                    aria-label="重新加载"
                   >
-                    <RefreshCw size={16} />
+                    <RefreshCw size={20} />
                   </button>
                 )}
                 <Pencil size={16} className="text-white/80 flex-shrink-0" />
               </div>
             <div className="flex items-center gap-2 mt-1.5">
-              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-white/20 text-white text-xs font-medium">
+              <span className="inline-flex items-center px-3 py-1 rounded-full bg-white/20 text-white text-sm font-medium">
                 {TONE_STYLE_LABELS[selectedTone]}
               </span>
             </div>
@@ -279,12 +280,12 @@ export default function ProfilePage() {
           <button
             key={item.label}
             onClick={item.onClick}
-            className={cn(
-              'w-full flex items-center gap-4 p-4 text-left transition-all active:bg-muted/50',
-              index < menuItems.length - 1
-                ? 'border-b border-border/60'
-                : '',
-            )}
+              className={cn(
+                'w-full flex items-center gap-4 p-4 text-left transition-all active:bg-muted/50 min-h-14',
+                index < menuItems.length - 1
+                  ? 'border-b border-border/60'
+                  : '',
+              )}
           >
             <div
               className={cn(
@@ -322,7 +323,7 @@ export default function ProfilePage() {
       {/* 退出登录 */}
       <button
         onClick={handleLogout}
-        className="w-full py-4 bg-card rounded-2xl text-destructive font-medium text-base flex items-center justify-center gap-2 shadow-sm active:scale-[0.98] transition-all"
+        className="w-full min-h-12 px-4 bg-card rounded-2xl text-destructive font-medium text-base flex items-center justify-center gap-2 shadow-sm active:scale-[0.98] transition-all"
       >
         <LogOut size={20} />
         退出登录
@@ -487,7 +488,7 @@ function BottomSheet({
             <h2 className="text-xl font-semibold">{title}</h2>
             <button
               onClick={onClose}
-              className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center text-muted-foreground active:scale-95 transition-transform"
+              className="w-11 h-11 rounded-full bg-secondary flex items-center justify-center text-muted-foreground active:scale-95 transition-transform"
               aria-label="关闭"
             >
               <X size={20} />

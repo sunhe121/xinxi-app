@@ -114,37 +114,37 @@ export default function MessageItem({
         return (
           <button
             onClick={handlePlayVoice}
-            className="flex items-center gap-2 min-w-[100px] active:scale-95 transition-transform"
-          >
-            <div
-              className={cn(
-                'w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0',
-                isMine ? 'bg-white/20' : 'bg-primary/10'
-              )}
-            >
-              {playing ? (
-                <Pause size={14} className={isMine ? 'text-white' : 'text-primary'} fill="currentColor" />
-              ) : (
-                <Play size={14} className={isMine ? 'text-white ml-0.5' : 'text-primary ml-0.5'} fill="currentColor" />
+             className="flex items-center gap-3 min-w-[120px] active:scale-95 transition-transform"
+           >
+             <div
+               className={cn(
+                 'w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0',
+                 isMine ? 'bg-white/20' : 'bg-primary/10'
+               )}
+             >
+               {playing ? (
+                 <Pause size={18} className={isMine ? 'text-white' : 'text-primary'} fill="currentColor" />
+               ) : (
+                 <Play size={18} className={isMine ? 'text-white ml-0.5' : 'text-primary ml-0.5'} fill="currentColor" />
               )}
             </div>
-            <div className="flex items-center gap-1 flex-1">
-              {[...Array(Math.min(5, Math.max(2, Math.ceil(message.duration / 3))))].map((_, i) => (
-                <div
-                  key={i}
-                  className={cn(
-                    'rounded-full',
-                    isMine ? 'bg-white/60' : 'bg-primary/40',
-                    playing ? 'animate-pulse' : ''
-                  )}
-                  style={{
-                    width: 3,
-                    height: 12 + (i % 3) * 4,
-                  }}
-                />
-              ))}
-            </div>
-            <span className={cn('text-xs flex-shrink-0', isMine ? 'text-white/80' : 'text-muted-foreground')}>
+             <div className="flex items-center gap-1.5 flex-1">
+               {[...Array(Math.min(5, Math.max(2, Math.ceil(message.duration / 3))))].map((_, i) => (
+                 <div
+                   key={i}
+                   className={cn(
+                     'rounded-full',
+                     isMine ? 'bg-white/60' : 'bg-primary/40',
+                     playing ? 'animate-pulse' : ''
+                   )}
+                   style={{
+                     width: 4,
+                     height: 14 + (i % 3) * 5,
+                   }}
+                 />
+               ))}
+             </div>
+             <span className={cn('text-sm flex-shrink-0', isMine ? 'text-white/80' : 'text-muted-foreground')}>
               {formatDuration(message.duration)}
             </span>
           </button>
@@ -158,18 +158,18 @@ export default function MessageItem({
     <>
       <div className={cn('flex gap-2', isMine ? 'flex-row-reverse' : 'flex-row')}>
         {!isMine && (
-          <div className="w-9 h-9 rounded-full bg-primary/10 flex-shrink-0 flex items-center justify-center overflow-hidden">
+          <div className="w-10 h-10 rounded-full bg-primary/10 flex-shrink-0 flex items-center justify-center overflow-hidden">
             {avatarUrl ? (
               <Image src={avatarUrl} alt={partnerName} className="w-full h-full object-cover" />
             ) : (
-              <ImageIcon size={16} className="text-primary" />
+              <ImageIcon size={18} className="text-primary" />
             )}
           </div>
         )}
-        <div className={cn('flex flex-col max-w-[75%] gap-1', isMine ? 'items-end' : 'items-start')}>
+        <div className={cn('flex flex-col max-w-[78%] gap-1.5', isMine ? 'items-end' : 'items-start')}>
           <div
             className={cn(
-              'px-4 py-2.5 rounded-3xl shadow-sm',
+              'px-4 py-3 rounded-3xl shadow-sm',
               isMine
                 ? 'bg-gradient-to-br from-primary to-secondary text-white rounded-tr-md'
                 : 'bg-card text-foreground rounded-tl-md'
@@ -198,11 +198,11 @@ export default function MessageItem({
           onClick={() => setShowImage(false)}
         >
           <button
-            className="absolute top-6 right-6 w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-white z-10"
+             className="absolute top-6 right-6 w-11 h-11 rounded-full bg-white/20 flex items-center justify-center text-white z-10"
             onClick={() => setShowImage(false)}
             aria-label="关闭"
           >
-            <X size={22} />
+             <X size={24} />
           </button>
           {message.messageType === 'image' ? (
             <Image

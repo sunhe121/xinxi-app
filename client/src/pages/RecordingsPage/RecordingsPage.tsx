@@ -229,7 +229,7 @@ export default function RecordingsPage() {
           <button
             key={cat.key}
             onClick={() => setActiveCategory(cat.key)}
-            className={`px-5 py-2.5 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-300 ${
+            className={`px-4 min-h-11 rounded-full text-base font-medium whitespace-nowrap transition-all duration-300 ${
               activeCategory === cat.key
                 ? 'bg-primary text-white shadow-md'
                 : 'bg-secondary text-muted-foreground'
@@ -303,27 +303,27 @@ export default function RecordingsPage() {
                   <>
                     <button
                       onClick={() => togglePlay(rec)}
-                      className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center active:scale-95 transition-transform"
+                      className="w-11 h-11 rounded-full bg-primary/10 text-primary flex items-center justify-center active:scale-95 transition-transform"
                       aria-label={playingId === rec.id ? '暂停' : '播放'}
                     >
                       {playingId === rec.id ? (
-                        <Pause size={18} fill="currentColor" />
+                        <Pause size={20} fill="currentColor" />
                       ) : (
-                        <Play size={18} fill="currentColor" />
+                        <Play size={20} fill="currentColor" />
                       )}
                     </button>
                     <button
                       onClick={() => setDeleteConfirmId(rec.id)}
-                      className="w-10 h-10 rounded-full bg-destructive/10 text-destructive flex items-center justify-center active:scale-95 transition-transform"
+                      className="w-11 h-11 rounded-full bg-destructive/10 text-destructive flex items-center justify-center active:scale-95 transition-transform"
                       aria-label="删除"
                     >
-                      <Trash2 size={18} />
+                      <Trash2 size={20} />
                     </button>
                   </>
                 ) : (
                   <button
                     onClick={() => openRecorder(rec)}
-                    className="px-4 py-2.5 rounded-full bg-primary text-white text-sm font-medium flex items-center gap-1.5 active:scale-95 transition-transform shadow-sm"
+                    className="px-5 min-h-11 rounded-full bg-primary text-white text-base font-medium flex items-center gap-2 active:scale-95 transition-transform shadow-sm"
                   >
                     <Mic size={16} />
                     录制
@@ -352,10 +352,10 @@ export default function RecordingsPage() {
               <h2 className="text-xl font-semibold">录制你的声音</h2>
               <button
                 onClick={closeSheet}
-                className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center text-muted-foreground"
+                className="w-11 h-11 rounded-full bg-secondary flex items-center justify-center text-muted-foreground"
                 aria-label="关闭"
               >
-                <X size={20} />
+                 <X size={22} />
               </button>
             </div>
 
@@ -419,13 +419,13 @@ export default function RecordingsPage() {
                   <div className="flex items-center gap-3">
                     <button
                       onClick={() => doPlay('preview', recordedAudioUrl)}
-                      className="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center flex-shrink-0"
+                      className="w-11 h-11 rounded-full bg-primary text-white flex items-center justify-center flex-shrink-0"
                       aria-label="预览播放"
                     >
                       {playingId === 'preview' ? (
-                        <Pause size={18} fill="white" />
+                        <Pause size={20} fill="white" />
                       ) : (
-                        <Play size={18} fill="white" className="ml-0.5" />
+                        <Play size={20} fill="white" className="ml-0.5" />
                       )}
                     </button>
                     <div className="flex-1">

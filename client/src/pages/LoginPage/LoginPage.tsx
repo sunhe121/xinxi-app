@@ -242,7 +242,7 @@ const LoginPage = () => {
               <button
                 type="button"
                 onClick={() => switchMode('login')}
-                className={`flex-1 py-3 rounded-lg text-base font-medium transition-colors ${
+                className={`flex-1 min-h-11 px-4 rounded-lg text-base font-medium transition-colors ${
                   mode === 'login'
                     ? 'bg-white text-[#FF8C69] shadow-sm'
                     : 'text-[#8B7D75]'
@@ -253,7 +253,7 @@ const LoginPage = () => {
               <button
                 type="button"
                 onClick={() => switchMode('register')}
-                className={`flex-1 py-3 rounded-lg text-base font-medium transition-colors ${
+                className={`flex-1 min-h-11 px-4 rounded-lg text-base font-medium transition-colors ${
                   mode === 'register'
                     ? 'bg-white text-[#FF8C69] shadow-sm'
                     : 'text-[#8B7D75]'
@@ -375,7 +375,7 @@ const LoginPage = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full h-12 bg-gradient-to-r from-[#FF8C69] to-[#FFB5B5] text-white text-lg font-medium rounded-xl hover:opacity-90 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
+              className="w-full min-h-12 px-6 bg-gradient-to-r from-[#FF8C69] to-[#FFB5B5] text-white text-lg font-semibold rounded-xl hover:opacity-90 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md"
             >
               {loading ? '处理中...' : modeTitle[mode]}
             </button>

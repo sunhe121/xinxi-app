@@ -125,37 +125,37 @@ export default function ChatPage() {
     <div className="h-screen flex flex-col bg-background max-w-[480px] mx-auto">
       {/* 顶部导航栏 */}
       <div className="sticky top-0 z-20 bg-card/95 backdrop-blur border-b border-border/60">
-        <div className="flex items-center gap-3 px-3 py-3">
+        <div className="flex items-center gap-3 px-4 py-3.5">
           <button
             onClick={() => navigate(-1)}
-            className="w-9 h-9 rounded-full flex items-center justify-center active:bg-secondary transition-colors"
+            className="w-11 h-11 rounded-full flex items-center justify-center active:bg-secondary transition-colors"
             aria-label="返回"
           >
-            <ChevronLeft size={22} className="text-foreground" />
+            <ChevronLeft size={24} className="text-foreground" />
           </button>
 
           <div className="flex-1 flex flex-col items-center">
             <div className="flex items-center gap-2">
-              <span className="font-semibold text-foreground text-base">
+              <span className="font-semibold text-foreground text-lg">
                 {getDisplayName(member)}
               </span>
             </div>
             {hasUnreadReport && (
               <button
                 onClick={() => navigate(`/history?familyId=${member.userId}`)}
-                className="flex items-center gap-1 text-xs text-primary mt-0.5 active:scale-95 transition-transform"
-              >
-                <MessageCircleHeart size={12} />
-                今日报告已生成 →
+                 className="flex items-center gap-1.5 text-sm text-primary mt-0.5 active:scale-95 transition-transform"
+               >
+                 <MessageCircleHeart size={16} />
+                 今日报告已生成 →
               </button>
             )}
           </div>
 
-          <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden">
+          <div className="w-11 h-11 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden">
             {member.avatarUrl ? (
               <Image src={member.avatarUrl} alt={getDisplayName(member)} className="w-full h-full object-cover" />
             ) : (
-              <User size={18} className="text-primary" />
+               <User size={20} className="text-primary" />
             )}
           </div>
         </div>
@@ -165,7 +165,7 @@ export default function ChatPage() {
       <div
         ref={listRef}
         onScroll={handleScroll}
-        className="flex-1 overflow-y-auto px-3 py-4 space-y-4"
+        className="flex-1 overflow-y-auto px-4 py-5 space-y-4"
       >
         {loading && messages.length === 0 && (
           <div className="flex justify-center py-10">

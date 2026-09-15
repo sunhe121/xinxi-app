@@ -300,7 +300,7 @@ export default function ChatInput({ bindingId, receiverUserId, onMessageSent }: 
               <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center">
                 <ImageIcon size={24} className="text-primary" />
               </div>
-              <span className="text-xs text-muted-foreground">图片</span>
+              <span className="text-sm text-muted-foreground">图片</span>
             </button>
             <button
               onClick={() => videoInputRef.current?.click()}
@@ -309,7 +309,7 @@ export default function ChatInput({ bindingId, receiverUserId, onMessageSent }: 
               <div className="w-14 h-14 rounded-2xl bg-secondary flex items-center justify-center">
                 <Video size={24} className="text-primary" />
               </div>
-              <span className="text-xs text-muted-foreground">视频</span>
+              <span className="text-sm text-muted-foreground">视频</span>
             </button>
           </div>
         </div>
@@ -336,16 +336,16 @@ export default function ChatInput({ bindingId, receiverUserId, onMessageSent }: 
       )}
 
       {/* 输入栏 */}
-      <div className="flex items-end gap-2 p-3 bg-card border-t border-border">
+      <div className="flex items-end gap-3 p-4 bg-card border-t border-border">
         <button
           onClick={() => setShowPlus((s) => !s)}
-          className={cn(
-            'w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 transition-all active:scale-95',
-            showPlus ? 'bg-primary text-white' : 'bg-secondary text-foreground'
-          )}
-          aria-label="更多"
-        >
-          <Plus size={20} />
+           className={cn(
+             'w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0 transition-all active:scale-95',
+             showPlus ? 'bg-primary text-white' : 'bg-secondary text-foreground'
+           )}
+           aria-label="更多"
+         >
+           <Plus size={22} />
         </button>
 
         <textarea
@@ -354,8 +354,8 @@ export default function ChatInput({ bindingId, receiverUserId, onMessageSent }: 
           onKeyDown={handleKeyDown}
           placeholder="说点什么..."
           rows={1}
-          className="flex-1 px-4 py-2.5 rounded-full bg-secondary text-foreground text-base resize-none focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all placeholder:text-muted-foreground max-h-32"
-          style={{ minHeight: 40 }}
+          className="flex-1 px-4 py-3 rounded-full bg-secondary text-foreground text-base resize-none focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all placeholder:text-muted-foreground max-h-32"
+          style={{ minHeight: 48 }}
           onInput={(e) => {
             const target = e.target as HTMLTextAreaElement;
             target.style.height = 'auto';
@@ -367,29 +367,29 @@ export default function ChatInput({ bindingId, receiverUserId, onMessageSent }: 
           <button
             onClick={handleSendText}
             disabled={sending}
-            className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-secondary text-white flex items-center justify-center flex-shrink-0 shadow-md active:scale-95 transition-all disabled:opacity-50"
-            aria-label="发送"
-          >
-            <Send size={18} />
+             className="w-11 h-11 rounded-full bg-gradient-to-br from-primary to-secondary text-white flex items-center justify-center flex-shrink-0 shadow-md active:scale-95 transition-all disabled:opacity-50"
+             aria-label="发送"
+           >
+             <Send size={20} />
           </button>
         ) : (
           <button
-            className={cn(
-              'w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 active:scale-95 transition-all select-none',
-              recordingState !== 'idle'
-                ? 'bg-destructive text-white'
-                : 'bg-gradient-to-br from-primary to-secondary text-white shadow-md'
-            )}
-            aria-label="语音"
-            onTouchStart={handleTouchStart}
-            onTouchMove={handleTouchMove}
-            onTouchEnd={handleTouchEnd}
-            onMouseDown={handleMouseDown}
-            onMouseMove={handleMouseMove}
-            onMouseUp={handleMouseUp}
-            onMouseLeave={handleMouseLeave}
-          >
-            {recordingState !== 'idle' ? <X size={20} /> : <Mic size={20} />}
+             className={cn(
+               'w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0 active:scale-95 transition-all select-none',
+               recordingState !== 'idle'
+                 ? 'bg-destructive text-white'
+                 : 'bg-gradient-to-br from-primary to-secondary text-white shadow-md'
+             )}
+             aria-label="语音"
+             onTouchStart={handleTouchStart}
+             onTouchMove={handleTouchMove}
+             onTouchEnd={handleTouchEnd}
+             onMouseDown={handleMouseDown}
+             onMouseMove={handleMouseMove}
+             onMouseUp={handleMouseUp}
+             onMouseLeave={handleMouseLeave}
+           >
+             {recordingState !== 'idle' ? <X size={22} /> : <Mic size={22} />}
           </button>
         )}
       </div>

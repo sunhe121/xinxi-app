@@ -110,7 +110,7 @@ export default function HistoryPage() {
           <button
             onClick={() => setCurrentFamily(null)}
             className={cn(
-              'px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all active:scale-95 flex-shrink-0',
+              'px-4 min-h-11 rounded-full text-base font-medium whitespace-nowrap transition-all active:scale-95 flex-shrink-0',
               !currentFamily
                 ? 'bg-primary text-white shadow-md'
                 : 'bg-secondary text-muted-foreground'
@@ -123,7 +123,7 @@ export default function HistoryPage() {
               key={f.id}
               onClick={() => setCurrentFamily(f)}
               className={cn(
-                'flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all active:scale-95 flex-shrink-0',
+                'flex items-center gap-2 px-4 min-h-11 rounded-full text-base font-medium whitespace-nowrap transition-all active:scale-95 flex-shrink-0',
                 currentFamily?.id === f.id
                   ? 'bg-primary text-white shadow-md'
                   : 'bg-secondary text-muted-foreground'
@@ -190,7 +190,7 @@ export default function HistoryPage() {
                       handlePlay(item);
                     }}
                     className={cn(
-                      'w-10 h-10 rounded-full flex items-center justify-center transition-colors flex-shrink-0 active:scale-95',
+                      'w-11 h-11 rounded-full flex items-center justify-center transition-colors flex-shrink-0 active:scale-95',
                       playingId === item.id && isSpeaking
                         ? 'bg-primary text-white'
                         : 'bg-primary/10 text-primary hover:bg-primary/20'
@@ -198,9 +198,9 @@ export default function HistoryPage() {
                     aria-label={playingId === item.id ? '暂停' : '播放'}
                   >
                     {playingId === item.id && isSpeaking && !isPaused ? (
-                      <Pause size={16} fill="currentColor" />
+                      <Pause size={18} fill="currentColor" />
                     ) : (
-                      <Play size={16} className="ml-0.5" fill="currentColor" />
+                      <Play size={18} className="ml-0.5" fill="currentColor" />
                     )}
                   </button>
                 </div>

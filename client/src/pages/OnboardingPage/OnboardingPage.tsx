@@ -134,7 +134,7 @@ export default function OnboardingPage() {
             <button
               onClick={() => setPairTab('generate')}
               className={cn(
-                'flex-1 py-3 rounded-xl text-sm font-medium transition-all',
+                'flex-1 min-h-11 px-3 rounded-xl text-base font-medium transition-all',
                 pairTab === 'generate'
                   ? 'bg-card shadow-sm text-foreground'
                   : 'text-muted-foreground'
@@ -145,7 +145,7 @@ export default function OnboardingPage() {
             <button
               onClick={() => setPairTab('redeem')}
               className={cn(
-                'flex-1 py-3 rounded-xl text-sm font-medium transition-all',
+                'flex-1 min-h-11 px-3 rounded-xl text-base font-medium transition-all',
                 pairTab === 'redeem'
                   ? 'bg-card shadow-sm text-foreground'
                   : 'text-muted-foreground'
@@ -162,13 +162,13 @@ export default function OnboardingPage() {
                 <label className="text-sm font-medium text-foreground">
                   选择对方关系
                 </label>
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-2 gap-3">
                   {RELATION_OPTIONS.map((opt) => (
                     <button
                       key={opt.value}
                       onClick={() => setSelectedRelation(opt.value)}
                       className={cn(
-                        'py-3 rounded-xl text-sm font-medium transition-all active:scale-95',
+                        'py-4 rounded-xl text-base font-medium transition-all active:scale-95',
                         selectedRelation === opt.value
                           ? 'bg-primary text-white shadow-md'
                           : 'bg-secondary text-muted-foreground'
@@ -184,7 +184,7 @@ export default function OnboardingPage() {
                 <button
                   onClick={handleGenerateCode}
                   disabled={generating}
-                  className="w-full py-4 bg-gradient-to-r from-primary to-secondary text-white rounded-2xl font-semibold text-base shadow-lg shadow-primary/25 active:scale-[0.98] transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                  className="w-full min-h-12 px-6 bg-gradient-to-r from-primary to-secondary text-white rounded-2xl font-semibold text-lg shadow-lg shadow-primary/25 active:scale-[0.98] transition-all disabled:opacity-50 flex items-center justify-center gap-2"
                 >
                   {generating ? (
                     <>
@@ -259,13 +259,13 @@ export default function OnboardingPage() {
                 <label className="text-sm font-medium text-foreground">
                   对方和你的关系
                 </label>
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-2 gap-3">
                   {RELATION_OPTIONS.map((opt) => (
                     <button
                       key={opt.value}
                       onClick={() => setRedeemRelation(opt.value)}
                       className={cn(
-                        'py-3 rounded-xl text-sm font-medium transition-all active:scale-95',
+                        'py-4 rounded-xl text-base font-medium transition-all active:scale-95',
                         redeemRelation === opt.value
                           ? 'bg-primary text-white shadow-md'
                           : 'bg-secondary text-muted-foreground'
@@ -280,7 +280,7 @@ export default function OnboardingPage() {
               <button
                 onClick={handleRedeem}
                 disabled={redeemCode.length !== 6 || redeeming}
-                className="w-full py-4 bg-gradient-to-r from-primary to-secondary text-white rounded-2xl font-semibold text-base shadow-lg shadow-primary/25 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="w-full min-h-12 px-6 bg-gradient-to-r from-primary to-secondary text-white rounded-2xl font-semibold text-lg shadow-lg shadow-primary/25 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 {redeeming ? (
                   <>

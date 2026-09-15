@@ -311,7 +311,7 @@ export default function FamilyPage() {
             setRedeemCode('');
             setShowSheet(true);
           }}
-          className="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center active:scale-95 transition-transform shadow-md shadow-primary/20"
+          className="w-11 h-11 rounded-full bg-primary text-white flex items-center justify-center active:scale-95 transition-transform shadow-md shadow-primary/20"
           aria-label="添加家人"
         >
           <Plus size={22} strokeWidth={2.5} />
@@ -425,33 +425,33 @@ export default function FamilyPage() {
 
                         {/* 今日数据概览 */}
                         <div className="grid grid-cols-3 gap-2">
-                          <div className="bg-card rounded-xl p-3 text-center">
-                            <div className="w-8 h-8 mx-auto mb-1.5 rounded-full bg-primary/10 flex items-center justify-center">
-                              <Footprints size={16} className="text-primary" />
-                            </div>
-                            <p className="text-lg font-bold text-foreground">
-                              {memberDetail.dailyData?.steps?.toLocaleString() || 0}
-                            </p>
-                            <p className="text-xs text-muted-foreground">今日步数</p>
-                          </div>
-                          <div className="bg-card rounded-xl p-3 text-center">
-                            <div className="w-8 h-8 mx-auto mb-1.5 rounded-full bg-indigo-100 flex items-center justify-center">
-                              <Moon size={16} className="text-indigo-400" />
-                            </div>
-                            <p className="text-lg font-bold text-foreground">
-                              {memberDetail.dailyData?.sleepHours || 0}
-                            </p>
-                            <p className="text-xs text-muted-foreground">睡眠(小时)</p>
-                          </div>
-                          <div className="bg-card rounded-xl p-3 text-center">
-                            <div className="w-8 h-8 mx-auto mb-1.5 rounded-full bg-success/15 flex items-center justify-center">
-                              <Smile size={16} className="text-success" />
-                            </div>
-                            <p className="text-lg font-bold text-foreground">
-                              {memberDetail.dailyData?.moodIndex || 0}
-                            </p>
-                            <p className="text-xs text-muted-foreground">心情指数</p>
-                          </div>
+                        <div className="bg-card rounded-xl p-4 text-center">
+                             <div className="w-8 h-8 mx-auto mb-1.5 rounded-full bg-primary/10 flex items-center justify-center">
+                               <Footprints size={16} className="text-primary" />
+                             </div>
+                             <p className="text-lg font-bold text-foreground">
+                               {memberDetail.dailyData?.steps?.toLocaleString() || 0}
+                             </p>
+                             <p className="text-xs text-muted-foreground">今日步数</p>
+                           </div>
+                           <div className="bg-card rounded-xl p-4 text-center">
+                             <div className="w-8 h-8 mx-auto mb-1.5 rounded-full bg-indigo-100 flex items-center justify-center">
+                               <Moon size={16} className="text-indigo-400" />
+                             </div>
+                             <p className="text-lg font-bold text-foreground">
+                               {memberDetail.dailyData?.sleepHours || 0}
+                             </p>
+                             <p className="text-xs text-muted-foreground">睡眠(小时)</p>
+                           </div>
+                           <div className="bg-card rounded-xl p-4 text-center">
+                             <div className="w-8 h-8 mx-auto mb-1.5 rounded-full bg-success/15 flex items-center justify-center">
+                               <Smile size={16} className="text-success" />
+                             </div>
+                             <p className="text-lg font-bold text-foreground">
+                               {memberDetail.dailyData?.moodIndex || 0}
+                             </p>
+                             <p className="text-xs text-muted-foreground">心情指数</p>
+                           </div>
                         </div>
 
                         {/* 7天步数趋势 */}
@@ -474,36 +474,36 @@ export default function FamilyPage() {
                         )}
 
                         {/* 发消息按钮 */}
-                        <button
-                          onClick={() => navigate(`/chat/${member.id}`)}
-                          className="w-full py-3 bg-gradient-to-r from-primary to-secondary text-white rounded-xl font-medium text-sm active:scale-[0.98] transition-transform flex items-center justify-center gap-1.5 shadow-md shadow-primary/20"
-                        >
-                          <MessageCircleHeart size={16} />
-                          发消息
-                        </button>
+                         <button
+                           onClick={() => navigate(`/chat/${member.id}`)}
+                           className="w-full min-h-11 py-3.5 bg-gradient-to-r from-primary to-secondary text-white rounded-xl font-medium text-base active:scale-[0.98] transition-transform flex items-center justify-center gap-1.5 shadow-md shadow-primary/20"
+                         >
+                           <MessageCircleHeart size={18} />
+                           发消息
+                         </button>
 
-                        {/* 修改备注名按钮 */}
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleOpenRemark(member);
-                          }}
-                          className="w-full py-3 bg-secondary text-foreground rounded-xl font-medium text-sm active:scale-[0.98] transition-transform flex items-center justify-center gap-1.5"
-                        >
-                          <Pencil size={16} />
-                          修改备注名
-                        </button>
+                         {/* 修改备注名按钮 */}
+                         <button
+                           onClick={(e) => {
+                             e.stopPropagation();
+                             handleOpenRemark(member);
+                           }}
+                           className="w-full min-h-11 py-3.5 bg-secondary text-foreground rounded-xl font-medium text-base active:scale-[0.98] transition-transform flex items-center justify-center gap-1.5"
+                         >
+                           <Pencil size={18} />
+                           修改备注名
+                         </button>
 
-                        {/* 查看历史播报按钮 */}
-                        <button
-                          onClick={() =>
-                            navigate(`/history?familyId=${member.userId}`)
-                          }
-                          className="w-full py-3 bg-primary/10 text-primary rounded-xl font-medium text-sm active:scale-[0.98] transition-transform flex items-center justify-center gap-1.5"
-                        >
-                          查看TA的历史播报
-                          <ChevronRight size={16} />
-                        </button>
+                         {/* 查看历史播报按钮 */}
+                         <button
+                           onClick={() =>
+                             navigate(`/history?familyId=${member.userId}`)
+                           }
+                           className="w-full min-h-11 py-3.5 bg-primary/10 text-primary rounded-xl font-medium text-base active:scale-[0.98] transition-transform flex items-center justify-center gap-1.5"
+                         >
+                           查看TA的历史播报
+                           <ChevronRight size={18} />
+                         </button>
                       </>
                     ) : null}
                   </div>
@@ -531,7 +531,7 @@ export default function FamilyPage() {
                 <h2 className="text-xl font-semibold">添加家人</h2>
                 <button
                   onClick={handleCloseSheet}
-                  className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center text-muted-foreground active:scale-95 transition-transform"
+                   className="w-11 h-11 rounded-full bg-secondary flex items-center justify-center text-muted-foreground active:scale-95 transition-transform"
                   aria-label="关闭"
                 >
                   <X size={20} />
@@ -618,10 +618,10 @@ export default function FamilyPage() {
                       <p className="text-xs text-muted-foreground mb-4">
                         有效期 {getTimeRemaining()}
                       </p>
-                      <button
-                        onClick={handleCopyCode}
-                        className="px-6 py-2.5 bg-primary text-white rounded-full text-sm font-medium active:scale-95 transition-transform inline-flex items-center gap-1.5"
-                      >
+                       <button
+                         onClick={handleCopyCode}
+                         className="px-6 h-11 bg-primary text-white rounded-full text-sm font-medium active:scale-95 transition-transform inline-flex items-center gap-1.5"
+                       >
                         {copied ? (
                           <>
                             <Check size={16} />

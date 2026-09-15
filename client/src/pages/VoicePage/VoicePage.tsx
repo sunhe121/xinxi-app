@@ -243,7 +243,7 @@ export default function VoicePage() {
         <button
           onClick={handleSyncToFamily}
           disabled={syncing || loading}
-          className="flex items-center gap-1 px-3 py-2 rounded-xl bg-primary text-white text-xs font-medium active:scale-95 transition-transform disabled:opacity-50 flex-shrink-0"
+          className="flex items-center gap-1.5 px-4 min-h-10 py-2.5 rounded-xl bg-primary text-white text-sm font-medium active:scale-95 transition-transform disabled:opacity-50 flex-shrink-0"
         >
           {syncing ? (
             <>
@@ -266,7 +266,7 @@ export default function VoicePage() {
             key={cat}
             onClick={() => setActiveCategory(cat)}
             className={cn(
-              'px-5 py-2.5 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-300 active:scale-95',
+              'px-4 min-h-11 rounded-full text-base font-medium whitespace-nowrap transition-all duration-300 active:scale-95',
               activeCategory === cat
                 ? 'bg-primary text-white shadow-md'
                 : 'bg-secondary text-muted-foreground'
@@ -361,34 +361,34 @@ export default function VoicePage() {
                   <>
                     <button
                       onClick={() => togglePlay(rec)}
-                      className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center active:scale-95 transition-transform"
+                      className="w-11 h-11 rounded-full bg-primary/10 text-primary flex items-center justify-center active:scale-95 transition-transform"
                       aria-label={playingId === rec.id ? '暂停' : '播放'}
                     >
                       {playingId === rec.id ? (
-                        <Pause size={18} fill="currentColor" />
+                        <Pause size={20} fill="currentColor" />
                       ) : (
-                        <Play size={18} fill="currentColor" />
+                        <Play size={20} fill="currentColor" />
                       )}
                     </button>
                     <button
                       onClick={() => openRecorder(rec)}
-                      className="w-10 h-10 rounded-full bg-secondary text-muted-foreground flex items-center justify-center active:scale-95 transition-transform"
+                      className="w-11 h-11 rounded-full bg-secondary text-muted-foreground flex items-center justify-center active:scale-95 transition-transform"
                       aria-label="重新录制"
                     >
-                      <RefreshCw size={16} />
+                      <RefreshCw size={18} />
                     </button>
                     <button
                       onClick={() => setDeleteConfirmId(rec.id)}
-                      className="w-10 h-10 rounded-full bg-destructive/10 text-destructive flex items-center justify-center active:scale-95 transition-transform"
+                      className="w-11 h-11 rounded-full bg-destructive/10 text-destructive flex items-center justify-center active:scale-95 transition-transform"
                       aria-label="删除"
                     >
-                      <Trash2 size={18} />
+                      <Trash2 size={20} />
                     </button>
                   </>
                 ) : (
                   <button
                     onClick={() => openRecorder(rec)}
-                    className="px-4 py-2.5 rounded-full bg-primary text-white text-sm font-medium flex items-center gap-1.5 active:scale-95 transition-transform shadow-sm"
+                    className="px-5 min-h-11 rounded-full bg-primary text-white text-base font-medium flex items-center gap-1.5 active:scale-95 transition-transform shadow-sm"
                   >
                     <Mic size={16} />
                     录制
@@ -417,7 +417,7 @@ export default function VoicePage() {
               <h2 className="text-xl font-semibold">录制你的声音</h2>
               <button
                 onClick={closeSheet}
-                className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center text-muted-foreground active:scale-95 transition-transform"
+                className="w-11 h-11 rounded-full bg-secondary flex items-center justify-center text-muted-foreground active:scale-95 transition-transform"
                 aria-label="关闭"
               >
                 <Trash2 size={20} />
@@ -485,13 +485,13 @@ export default function VoicePage() {
                   <div className="flex items-center gap-3">
                     <button
                       onClick={() => doPlay('preview', recordedAudioUrl)}
-                      className="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center flex-shrink-0 active:scale-95 transition-transform"
+                      className="w-11 h-11 rounded-full bg-primary text-white flex items-center justify-center flex-shrink-0 active:scale-95 transition-transform"
                       aria-label="预览播放"
                     >
                       {playingId === 'preview' ? (
-                        <Pause size={18} fill="white" />
+                        <Pause size={20} fill="white" />
                       ) : (
-                        <Play size={18} fill="white" className="ml-0.5" />
+                        <Play size={20} fill="white" className="ml-0.5" />
                       )}
                     </button>
                     <div className="flex-1">

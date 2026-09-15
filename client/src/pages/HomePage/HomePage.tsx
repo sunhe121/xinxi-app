@@ -212,13 +212,13 @@ export default function HomePage() {
 
       {/* 家人切换条 */}
       {family.length > 0 && (
-        <div className="flex gap-2 overflow-x-auto scrollbar-hide -mx-5 px-5 pb-1">
+        <div className="flex gap-3 overflow-x-auto scrollbar-hide -mx-5 px-5 pb-1">
           {family.map((f: FamilyMember) => (
             <button
               key={f.id}
               onClick={() => setCurrentFamily(f)}
               className={cn(
-                'flex items-center gap-2 px-3 py-2 rounded-full whitespace-nowrap transition-all duration-300 flex-shrink-0 active:scale-95',
+                'flex items-center gap-2.5 px-3.5 py-2 min-h-11 rounded-full whitespace-nowrap transition-all duration-300 flex-shrink-0 active:scale-95',
                 currentFamily?.id === f.id
                   ? 'bg-primary text-white shadow-md'
                   : 'bg-secondary text-muted-foreground'
@@ -226,7 +226,7 @@ export default function HomePage() {
             >
               <div
                 className={cn(
-                  'w-7 h-7 rounded-full flex items-center justify-center overflow-hidden relative',
+                  'w-9 h-9 rounded-full flex items-center justify-center overflow-hidden relative',
                   currentFamily?.id === f.id ? 'bg-white/20' : 'bg-primary/10'
                 )}
               >
@@ -365,13 +365,13 @@ export default function HomePage() {
                 </button>
 
                 {/* 语速调节 */}
-                <div className="flex items-center gap-1.5 bg-white/80 rounded-full px-1.5 py-1 shadow-sm">
+                <div className="flex items-center gap-1 bg-white/80 rounded-full px-2 py-1.5 shadow-sm">
                   {SPEED_OPTIONS.map((speed) => (
                     <button
                       key={speed}
                       onClick={() => handleSpeedChange(speed)}
                       className={cn(
-                        'px-3 py-1 text-xs font-medium rounded-full transition-all duration-300',
+                        'px-3 py-1.5 text-sm font-medium rounded-full transition-all duration-300 min-h-9',
                         playbackSpeed === speed
                           ? 'bg-primary text-white shadow-sm'
                           : 'text-muted-foreground hover:text-foreground'
@@ -397,20 +397,20 @@ export default function HomePage() {
 
                 {/* 回复按钮组 */}
                 {!latestBroadcast.replyContent && !replyOpen && (
-                  <div className="flex gap-2">
+                  <div className="flex gap-3">
                     <button
                       onClick={handleReceived}
                       disabled={markingRead || latestBroadcast.isRead}
-                      className="flex-1 py-3 bg-primary/10 text-primary rounded-2xl font-medium text-sm active:scale-95 transition-transform disabled:opacity-60 flex items-center justify-center gap-1.5"
+                      className="flex-1 min-h-12 bg-primary/10 text-primary rounded-2xl font-medium text-base active:scale-95 transition-transform disabled:opacity-60 flex items-center justify-center gap-2"
                     >
-                      <Heart size={16} fill="currentColor" />
+                      <Heart size={18} fill="currentColor" />
                       {latestBroadcast.isRead ? '已收到' : '收到'}
                     </button>
                     <button
                       onClick={() => setReplyOpen(true)}
-                      className="flex-1 py-3 bg-gradient-to-r from-primary to-secondary text-white rounded-2xl font-medium text-sm active:scale-95 transition-transform shadow-md flex items-center justify-center gap-1.5"
+                      className="flex-1 min-h-12 bg-gradient-to-r from-primary to-secondary text-white rounded-2xl font-medium text-base active:scale-95 transition-transform shadow-md flex items-center justify-center gap-2"
                     >
-                      <Send size={16} />
+                      <Send size={18} />
                       回复TA
                     </button>
                   </div>
@@ -477,7 +477,7 @@ export default function HomePage() {
               </p>
               <button
                 onClick={loadLatestBroadcast}
-                className="px-6 py-3 bg-primary/10 text-primary rounded-full text-sm font-medium active:scale-95 transition-transform"
+                className="px-6 min-h-12 bg-primary/10 text-primary rounded-full text-base font-medium active:scale-95 transition-transform flex items-center justify-center inline-flex"
               >
                 刷新看看
               </button>
@@ -512,10 +512,10 @@ export default function HomePage() {
             </div>
             <button
               onClick={() => navigate('/history')}
-              className="text-xs text-primary font-medium flex items-center gap-0.5 flex-shrink-0"
+              className="min-h-10 px-3 text-sm text-primary font-medium flex items-center gap-1 flex-shrink-0 rounded-xl active:bg-primary/5 transition-colors"
             >
               历史
-              <ChevronRight size={14} />
+              <ChevronRight size={16} />
             </button>
           </div>
         </>
@@ -538,13 +538,13 @@ export default function HomePage() {
                 <MessageCircleHeart size={22} className="text-primary" />
                 对TA说句话
               </h2>
-              <button
-                onClick={() => setShowThinkSheet(false)}
-                className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center text-muted-foreground active:scale-95 transition-transform"
-                aria-label="关闭"
-              >
-                <X size={20} />
-              </button>
+            <button
+              onClick={() => setShowThinkSheet(false)}
+              className="w-11 h-11 rounded-full bg-secondary flex items-center justify-center text-muted-foreground active:scale-95 transition-transform"
+              aria-label="关闭"
+            >
+              <X size={22} />
+            </button>
             </div>
 
             <p className="text-sm text-muted-foreground mb-4">
@@ -552,13 +552,13 @@ export default function HomePage() {
             </p>
 
             {/* 模板按钮 */}
-            <div className="grid grid-cols-2 gap-2 mb-5">
+            <div className="grid grid-cols-2 gap-3 mb-5">
               {THINK_OF_YOU_TEMPLATES.map((tpl) => (
                 <button
                   key={tpl}
                   onClick={() => handleSendThinkOfYou(tpl, 'template')}
                   disabled={thinkSending}
-                  className="py-4 bg-secondary hover:bg-primary/10 text-foreground rounded-2xl font-medium text-base active:scale-95 transition-all disabled:opacity-50"
+                  className="min-h-12 bg-secondary hover:bg-primary/10 text-foreground rounded-2xl font-medium text-base active:scale-95 transition-all disabled:opacity-50 flex items-center justify-center"
                 >
                   {tpl}
                 </button>

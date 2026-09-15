@@ -126,10 +126,10 @@ export default function ProfileEditPage() {
     <div className="min-h-screen bg-background pb-24">
       {/* 顶部导航栏 */}
       <div className="sticky top-0 z-40 bg-background/90 backdrop-blur-sm border-b border-border/50">
-        <div className="max-w-[480px] mx-auto flex items-center justify-between px-4 h-14">
+        <div className="max-w-[480px] mx-auto flex items-center justify-between px-5 h-14">
           <button
             onClick={() => navigate(-1)}
-            className="w-10 h-10 rounded-full flex items-center justify-center text-foreground active:scale-95 transition-transform"
+            className="w-11 h-11 rounded-full flex items-center justify-center text-foreground active:scale-95 transition-transform"
             aria-label="返回"
           >
             <ArrowLeft size={22} />
@@ -138,7 +138,7 @@ export default function ProfileEditPage() {
           <button
             onClick={handleSave}
             disabled={saving}
-            className="px-4 h-9 rounded-full bg-gradient-to-r from-primary to-secondary text-white font-medium text-sm shadow-md shadow-primary/25 active:scale-95 transition-all disabled:opacity-60"
+            className="px-4 h-11 rounded-full bg-gradient-to-r from-primary to-secondary text-white font-medium text-base shadow-md shadow-primary/25 active:scale-95 transition-all disabled:opacity-60"
           >
             保存
           </button>
@@ -236,7 +236,7 @@ export default function ProfileEditPage() {
                 key={title}
                 onClick={() => handleSelectPreset(title)}
                 className={cn(
-                  'px-4 py-2 rounded-full whitespace-nowrap flex-shrink-0 text-sm font-medium transition-all active:scale-95',
+                  'px-4 min-h-10 py-2.5 rounded-full whitespace-nowrap flex-shrink-0 text-sm font-medium transition-all active:scale-95',
                   myTitle === title && !customTitle
                     ? 'bg-primary text-white shadow-md shadow-primary/25'
                     : 'bg-secondary text-foreground'
@@ -252,7 +252,7 @@ export default function ProfileEditPage() {
             onChange={(e) => handleCustomTitleChange(e.target.value)}
             placeholder="自定义称呼"
             maxLength={10}
-            className="w-full px-4 py-3 bg-card border border-border rounded-2xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all text-sm"
+            className="w-full px-4 py-3.5 bg-card border border-border rounded-2xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all text-base"
           />
         </div>
 
@@ -297,7 +297,7 @@ export default function ProfileEditPage() {
                 <h2 className="text-xl font-semibold text-foreground">选择头像</h2>
                 <button
                   onClick={() => setShowAvatarSheet(false)}
-                  className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center text-muted-foreground active:scale-95 transition-transform"
+                  className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-muted-foreground active:scale-95 transition-transform"
                   aria-label="关闭"
                 >
                   <X size={20} />

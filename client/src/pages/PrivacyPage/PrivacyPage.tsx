@@ -171,7 +171,7 @@ export default function PrivacyPage() {
       <div className="sticky top-0 z-30 bg-background/80 backdrop-blur px-5 py-4 flex items-center gap-3">
         <button
           onClick={() => navigate(-1)}
-          className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center active:scale-95 transition-transform"
+          className="w-11 h-11 rounded-full bg-secondary flex items-center justify-center active:scale-95 transition-transform"
           aria-label="返回"
         >
           <ArrowLeft size={20} className="text-foreground" />
@@ -221,12 +221,12 @@ export default function PrivacyPage() {
             {PRIVACY_ITEMS.map((item, index) => (
               <div
                 key={item.key}
-                className={cn(
-                  'flex items-start gap-4 p-4',
-                  index < PRIVACY_ITEMS.length - 1
-                    ? 'border-b border-border/60'
-                    : ''
-                )}
+                  className={cn(
+                    'flex items-start gap-4 p-4 min-h-14',
+                    index < PRIVACY_ITEMS.length - 1
+                      ? 'border-b border-border/60'
+                      : ''
+                  )}
               >
                 <div className="relative flex-shrink-0">
                   <div
@@ -253,16 +253,16 @@ export default function PrivacyPage() {
                   onClick={() => handleToggle(item.key)}
                   disabled={saving}
                   className={cn(
-                    'w-12 h-7 rounded-full transition-colors duration-300 relative flex-shrink-0 mt-1 active:scale-95',
+                    'w-14 h-8 rounded-full transition-colors duration-300 relative flex-shrink-0 mt-1 active:scale-95',
                     settings[item.key] ? 'bg-primary' : 'bg-muted'
                   )}
                   aria-label={settings[item.key] ? '关闭' : '开启'}
                 >
                   <span
                     className={cn(
-                      'absolute top-0.5 w-6 h-6 bg-white rounded-full shadow-md transition-transform duration-300',
+                      'absolute top-0.5 w-7 h-7 bg-white rounded-full shadow-md transition-transform duration-300',
                       settings[item.key]
-                        ? 'translate-x-5'
+                        ? 'translate-x-6'
                         : 'translate-x-0.5'
                     )}
                   />
@@ -317,10 +317,10 @@ export default function PrivacyPage() {
           <div className="bg-card rounded-2xl overflow-hidden shadow-sm space-y-px">
             <button
               onClick={handleDownloadData}
-              className="w-full flex items-center gap-4 p-4 text-left transition-all active:bg-muted/50"
-            >
-              <div className="w-11 h-11 rounded-xl bg-accent/20 flex items-center justify-center flex-shrink-0">
-                <Download size={22} className="text-accent" />
+             className="w-full flex items-center gap-4 p-4 min-h-14 text-left transition-all active:bg-muted/50"
+             >
+               <div className="w-11 h-11 rounded-xl bg-accent/20 flex items-center justify-center flex-shrink-0">
+                 <Download size={22} className="text-accent" />
               </div>
               <div className="flex-1">
                 <span className="font-medium text-foreground text-base block">
@@ -335,10 +335,10 @@ export default function PrivacyPage() {
             <div className="border-t border-border/60" />
             <button
               onClick={() => setShowDeleteConfirm(true)}
-              className="w-full flex items-center gap-4 p-4 text-left transition-all active:bg-muted/50"
-            >
-              <div className="w-11 h-11 rounded-xl bg-destructive/10 flex items-center justify-center flex-shrink-0">
-                <Trash2 size={22} className="text-destructive" />
+             className="w-full flex items-center gap-4 p-4 min-h-14 text-left transition-all active:bg-muted/50"
+             >
+               <div className="w-11 h-11 rounded-xl bg-destructive/10 flex items-center justify-center flex-shrink-0">
+                 <Trash2 size={22} className="text-destructive" />
               </div>
               <div className="flex-1">
                 <span className="font-medium text-destructive text-base block">

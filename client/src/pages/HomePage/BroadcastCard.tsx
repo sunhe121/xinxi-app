@@ -67,14 +67,14 @@ export function BroadcastCard({
       {/* 未生成状态 */}
       {!content && !loading && !error && (
         <div className="text-center py-6">
-          <p className="text-muted-foreground text-sm mb-6 leading-relaxed">
+          <p className="text-muted-foreground text-base mb-6 leading-relaxed">
             点击下方按钮，AI 为你生成温暖播报
             <br />
             把今日的关心，说给你听
           </p>
           <button
             onClick={onGenerate}
-            className="w-full py-4 bg-primary text-white rounded-2xl font-semibold text-base shadow-md hover:shadow-lg active:scale-[0.98] transition-all"
+            className="w-full min-h-12 bg-primary text-white rounded-xl font-semibold text-base shadow-md hover:shadow-lg active:scale-[0.98] transition-all flex items-center justify-center"
           >
             生成今日播报
           </button>
@@ -98,7 +98,7 @@ export function BroadcastCard({
           <p className="text-destructive text-sm mb-4">{error}</p>
           <button
             onClick={onGenerate}
-            className="w-full py-3 bg-primary text-white rounded-xl font-medium"
+            className="w-full min-h-12 bg-primary text-white rounded-xl font-medium text-base flex items-center justify-center"
           >
             重新生成
           </button>
@@ -107,20 +107,20 @@ export function BroadcastCard({
 
       {/* 已生成 */}
       {content && !loading && (
-        <div className="bg-white/70 backdrop-blur rounded-2xl p-4 shadow-sm">
+        <div className="bg-white/70 backdrop-blur rounded-2xl p-5 shadow-sm">
           {/* 顶部：日期 + 语速 + 播放控制 */}
           <div className="flex items-center justify-between mb-3">
             <span className="text-sm text-muted-foreground">{dateLabel}</span>
             <div className="flex items-center gap-2">
-              <div className="flex items-center bg-secondary/80 rounded-full px-1 py-0.5">
-                <Volume2 className="w-3.5 h-3.5 text-muted-foreground ml-1" />
-                <div className="flex">
+              <div className="flex items-center bg-secondary/80 rounded-full px-2 py-1.5">
+                <Volume2 className="w-4 h-4 text-muted-foreground ml-1" />
+                <div className="flex gap-0.5">
                   {SPEED_OPTIONS.map((speed) => (
                     <button
                       key={speed}
                       onClick={() => handleSpeedChange(speed)}
                       className={cn(
-                        'px-2 py-1 text-xs rounded-full transition-colors',
+                        'px-3 py-1.5 text-sm rounded-full transition-colors min-h-9',
                         playbackSpeed === speed
                           ? 'bg-primary text-white font-medium'
                           : 'text-muted-foreground'
@@ -134,19 +134,19 @@ export function BroadcastCard({
               <button
                 onClick={handleTogglePlay}
                 disabled={!isSupported}
-                className="w-9 h-9 rounded-full bg-primary text-white flex items-center justify-center shadow-sm active:scale-95 transition-transform disabled:opacity-50"
+                className="w-11 h-11 rounded-full bg-primary text-white flex items-center justify-center shadow-sm active:scale-95 transition-transform disabled:opacity-50"
               >
                 {isSpeaking && !isPaused ? (
-                  <Pause className="w-4 h-4" />
+                  <Pause className="w-5 h-5" />
                 ) : (
-                  <Play className="w-4 h-4 ml-0.5" />
+                  <Play className="w-5 h-5 ml-0.5" />
                 )}
               </button>
             </div>
           </div>
 
           {/* 播报内容 */}
-          <div className="max-h-48 overflow-y-auto scrollbar-hide text-foreground text-base leading-relaxed whitespace-pre-wrap">
+          <div className="max-h-48 overflow-y-auto scrollbar-hide text-foreground text-base leading-loose whitespace-pre-wrap">
             {content}
           </div>
 

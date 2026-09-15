@@ -87,10 +87,10 @@ export default function SharePage() {
     <div className="min-h-screen bg-background">
       {/* 顶部导航 */}
       <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-md border-b border-border/50">
-        <div className="flex items-center h-14 px-4">
+        <div className="flex items-center h-14 px-5">
           <button
             onClick={() => navigate(-1)}
-            className="w-10 h-10 -ml-2 flex items-center justify-center rounded-full active:bg-muted/50 transition-colors"
+            className="w-11 h-11 -ml-2 flex items-center justify-center rounded-full active:bg-muted/50 transition-colors"
           >
             <ArrowLeft size={22} className="text-foreground" />
           </button>
@@ -114,7 +114,7 @@ export default function SharePage() {
             </div>
           ) : (
             <div className="flex items-center justify-between">
-              <div className="text-5xl font-bold tracking-widest font-mono">
+              <div className="text-4xl font-bold tracking-widest font-mono">
                 {inviteCode || '------'}
               </div>
               <button
