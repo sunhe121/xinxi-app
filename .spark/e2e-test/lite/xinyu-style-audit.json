@@ -1,0 +1,24 @@
+{
+  "cases": [
+    {
+      "id": 1,
+      "priority": "p0",
+      "description": "打开登录页，验证毛玻璃暖橙粉风格（Logo、卡片、输入框、按钮）"
+    },
+    {
+      "id": 2,
+      "priority": "p0",
+      "description": "打开落地页 /landing，验证首屏毛玻璃风格正常"
+    },
+    {
+      "id": 3,
+      "priority": "p1",
+      "description": "打开 /onboarding 配对引导页，验证毛玻璃风格卡片和按钮"
+    },
+    {
+      "id": 4,
+      "priority": "p1",
+      "description": "打开 /share 分享页，验证邀请码卡片和分享列表风格"
+    }
+  ]
+}

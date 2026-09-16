@@ -1,9 +1,9 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Mic, Play, Pause, X, Volume2, MoreHorizontal } from 'lucide-react';
+import { Mic, Play, Pause, MoreHorizontal } from 'lucide-react';
 import { recordingsApi } from '@client/src/api';
-import { useRecorder } from '@client/src/hooks/useRecorder';
 import { appLogger } from '@client/src/utils/logger';
 import type { Recording } from '@shared/api.interface';
+import RecordingSheet from './RecordingSheet';
 
 const categories = [
   { key: 'weather', label: '天气' },
@@ -14,8 +14,6 @@ const categories = [
 ] as const;
 
 type CategoryKey = (typeof categories)[number]['key'];
-
-const MAX_RECORD_DURATION = 60;
 
 function formatDuration(seconds: number): string {
   const m = Math.floor(seconds / 60).toString().padStart(2, '0');
@@ -31,8 +29,6 @@ export default function RecordingsPage() {
   // 录音弹窗
   const [showSheet, setShowSheet] = useState(false);
   const [currentRecording, setCurrentRecording] = useState<Recording | null>(null);
-  const [recordedAudioUrl, setRecordedAudioUrl] = useState<string>('');
-  const [recordedDuration, setRecordedDuration] = useState(0);
   const [saving, setSaving] = useState(false);
 
   // 播放控制
@@ -43,21 +39,6 @@ export default function RecordingsPage() {
 
   // 删除确认
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
-
-  const recorder = useRecorder({
-    onRecordingStop: (blob: Blob, duration: number) => {
-      const url = URL.createObjectURL(blob);
-      setRecordedAudioUrl(url);
-      setRecordedDuration(duration);
-    },
-  });
-
-  // 自动停止：60 秒
-  useEffect(() => {
-    if (recorder.isRecording && recorder.duration >= MAX_RECORD_DURATION) {
-      recorder.stop();
-    }
-  }, [recorder.isRecording, recorder.duration, recorder]);
 
   // 加载录音列表
   const loadRecordings = useCallback(async (cat: CategoryKey) => {
@@ -101,32 +82,23 @@ export default function RecordingsPage() {
   // 打开录音弹窗
   const openRecorder = (rec: Recording) => {
     setCurrentRecording(rec);
-    setRecordedAudioUrl('');
-    setRecordedDuration(0);
-    recorder.reset();
     setShowSheet(true);
   };
 
   // 关闭录音弹窗
   const closeSheet = () => {
-    if (recorder.isRecording) {
-      recorder.stop();
-    }
-    recorder.reset();
     setShowSheet(false);
     setCurrentRecording(null);
-    setRecordedAudioUrl('');
-    setRecordedDuration(0);
   };
 
   // 完成录制并保存
-  const finishRecording = async () => {
-    if (!currentRecording || !recordedAudioUrl || recordedDuration <= 0) return;
+  const finishRecording = async (audioUrl: string, duration: number) => {
+    if (!currentRecording) return;
     setSaving(true);
     try {
       const updated = await recordingsApi.save(currentRecording.id, {
-        audioUrl: recordedAudioUrl,
-        duration: recordedDuration,
+        audioUrl,
+        duration,
       });
       setRecordings((prev: Recording[]) =>
         prev.map((r: Recording) => (r.id === updated.id ? updated : r))
@@ -200,36 +172,36 @@ export default function RecordingsPage() {
   };
 
   return (
-    <div className="px-5 pt-6 pb-6">
+    <div className="px-5 pt-6 pb-32 max-w-[480px] mx-auto animate-fade-in-up">
       {/* 顶部标题区 */}
-      <h1 className="text-[22px] font-bold text-[#333] mb-2">录音库</h1>
-      <p className="text-sm text-[#999] mb-6">
+      <h1 className="text-2xl font-bold text-[#333] mb-2">录音库</h1>
+      <p className="text-sm text-[#999] mb-5 leading-[1.7]">
         录制你的声音，让关心更真实 · 已录 {recordedCount}/{recordings.length}
       </p>
 
       {/* 分类 Tab */}
-      <div className="flex gap-3 overflow-x-auto scrollbar-hide -mx-5 px-5">
+      <div className="flex gap-3 overflow-x-auto scrollbar-hide -mx-5 px-5 mb-5">
         {categories.map((cat) => {
           const isActive = activeCategory === cat.key;
           return (
             <button
               key={cat.key}
               onClick={() => setActiveCategory(cat.key)}
-              className="px-4 py-2 rounded-[12px] text-sm whitespace-nowrap transition-all duration-300 flex-shrink-0"
+              className="px-4 h-9 rounded-full text-sm whitespace-nowrap transition-all duration-300 flex-shrink-0 font-medium"
               style={
                 isActive
                   ? {
                       background:
                         'linear-gradient(135deg, #FF8C69 0%, #FF6B6B 100%)',
                       color: '#FFFFFF',
-                      fontWeight: 500,
                       boxShadow: '0 4px 12px rgba(255, 107, 107, 0.3)',
                     }
                   : {
-                      background: 'rgba(255, 255, 255, 0.5)',
+                      background: 'rgba(255, 255, 255, 0.6)',
                       WebkitBackdropFilter: 'blur(10px)',
                       backdropFilter: 'blur(10px)',
                       color: '#999999',
+                      border: '1px solid rgba(255, 255, 255, 0.8)',
                     }
               }
             >
@@ -240,7 +212,7 @@ export default function RecordingsPage() {
       </div>
 
       {/* 录音列表 */}
-      <div className="space-y-4 mt-5">
+      <div className="space-y-4">
         {loading && (
           <div className="text-center text-[#999] py-10">加载中...</div>
         )}
@@ -343,180 +315,13 @@ export default function RecordingsPage() {
       </div>
 
       {/* 录音弹窗 - 底部抽屉 */}
-      {showSheet && (
-        <div className="fixed inset-0 z-50">
-          {/* 遮罩 */}
-          <div
-            className="absolute inset-0 bg-black/40 animate-fadeIn"
-            onClick={closeSheet}
-          />
-          {/* 抽屉 */}
-          <div
-            className="absolute bottom-0 left-0 right-0 rounded-t-3xl p-6 pb-8 animate-slideUp max-w-[480px] mx-auto"
-            style={{
-              background: 'rgba(255, 255, 255, 0.95)',
-              WebkitBackdropFilter: 'blur(20px)',
-              backdropFilter: 'blur(20px)',
-            }}
-          >
-            {/* 顶部把手 */}
-            <div className="w-10 h-1 bg-[#FF8C69]/20 rounded-full mx-auto mb-5" />
-
-            {/* 标题 */}
-            <div className="flex items-center justify-between mb-5">
-              <h2 className="text-xl font-semibold text-[#333]">录制你的声音</h2>
-              <button
-                onClick={closeSheet}
-                className="w-11 h-11 rounded-full bg-white/60 flex items-center justify-center text-[#999] active:scale-95 transition-transform"
-                aria-label="关闭"
-              >
-                <X size={22} />
-              </button>
-            </div>
-
-            {/* 预设句子 */}
-            {currentRecording && (
-              <div
-                className="rounded-2xl p-4 mb-6"
-                style={{
-                  background: 'rgba(255, 140, 105, 0.08)',
-                }}
-              >
-                <div className="flex items-start gap-3">
-                  <Volume2 size={20} className="text-[#FF8C69] flex-shrink-0 mt-0.5" />
-                  <p className="text-base leading-relaxed text-[#333]">
-                    {currentRecording.presetText}
-                  </p>
-                </div>
-              </div>
-            )}
-
-            {/* 录音主体区 */}
-            <div className="flex flex-col items-center py-6">
-              {/* 计时器 */}
-              <div className="text-4xl font-light mb-8 tabular-nums text-[#333]">
-                {formatDuration(recorder.duration)}
-              </div>
-
-              {/* 大录音按钮 */}
-              <button
-                onClick={() => {
-                  if (recorder.isRecording) {
-                    recorder.stop();
-                  } else {
-                    setRecordedAudioUrl('');
-                    recorder.start();
-                  }
-                }}
-                disabled={!recorder.isSupported}
-                className={`w-24 h-24 rounded-full flex items-center justify-center transition-all duration-300 active:scale-95 ${
-                  recorder.isRecording
-                    ? 'recording-pulse'
-                    : ''
-                }`}
-                style={
-                  recorder.isRecording
-                    ? {
-                        background:
-                          'linear-gradient(135deg, #FF6B6B 0%, #FF4757 100%)',
-                        color: '#FFFFFF',
-                      }
-                    : {
-                        background:
-                          'linear-gradient(135deg, #FF8C69 0%, #FF6B6B 100%)',
-                        color: '#FFFFFF',
-                        boxShadow: '0 8px 24px rgba(255, 107, 107, 0.35)',
-                      }
-                }
-                aria-label={recorder.isRecording ? '停止录音' : '开始录音'}
-              >
-                {recorder.isRecording ? (
-                  <div className="w-8 h-8 rounded-sm bg-white" />
-                ) : recordedAudioUrl ? (
-                  <Play size={36} fill="white" />
-                ) : (
-                  <Mic size={36} />
-                )}
-              </button>
-
-              <p className="text-sm text-[#999] mt-5">
-                {recorder.isRecording
-                  ? '录音中... 最长60秒'
-                  : recordedAudioUrl
-                    ? '已录制完成，点击可重新录制'
-                    : '点击按钮开始录音'}
-              </p>
-
-              {/* 录音完成后的预览 */}
-              {recordedAudioUrl && (
-                <div
-                  className="w-full mt-6 rounded-2xl p-4"
-                  style={{ background: 'rgba(255, 140, 105, 0.08)' }}
-                >
-                  <div className="flex items-center gap-3">
-                    <button
-                      onClick={() => doPlay('preview', recordedAudioUrl)}
-                      className="w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0"
-                      style={{
-                        background:
-                          'linear-gradient(135deg, #FF8C69 0%, #FF6B6B 100%)',
-                        color: '#FFFFFF',
-                      }}
-                      aria-label="预览播放"
-                    >
-                      {playingId === 'preview' ? (
-                        <Pause size={20} className="text-white" fill="white" />
-                      ) : (
-                        <Play size={20} className="text-white ml-0.5" fill="white" />
-                      )}
-                    </button>
-                    <div className="flex-1">
-                      <div className="h-2 bg-white/60 rounded-full overflow-hidden">
-                        <div
-                          className="h-full rounded-full transition-all"
-                          style={{
-                            width:
-                              playingId === 'preview'
-                                ? `${playProgress}%`
-                                : '0%',
-                            background:
-                              'linear-gradient(135deg, #FF8C69 0%, #FF6B6B 100%)',
-                          }}
-                        />
-                      </div>
-                    </div>
-                    <span className="text-xs text-[#999] tabular-nums">
-                      {formatDuration(recordedDuration)}
-                    </span>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* 底部按钮 */}
-            <div className="flex gap-3 mt-4">
-              <button
-                onClick={closeSheet}
-                className="flex-1 h-12 rounded-xl bg-white/60 text-[#333] font-medium active:scale-[0.98] transition-transform border border-white/80"
-              >
-                取消
-              </button>
-              <button
-                onClick={finishRecording}
-                disabled={!recordedAudioUrl || saving || recorder.isRecording}
-                className="flex-1 h-12 rounded-xl text-white font-medium active:scale-[0.98] transition-transform disabled:opacity-50 disabled:cursor-not-allowed"
-                style={{
-                  background:
-                    'linear-gradient(135deg, #FF8C69 0%, #FF6B6B 100%)',
-                  boxShadow: '0 4px 12px rgba(255, 107, 107, 0.25)',
-                }}
-              >
-                {saving ? '保存中...' : '完成'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <RecordingSheet
+        open={showSheet}
+        recording={currentRecording}
+        onClose={closeSheet}
+        onFinish={finishRecording}
+        saving={saving}
+      />
 
       {/* 删除确认弹窗 */}
       {deleteConfirmId && (
@@ -525,33 +330,25 @@ export default function RecordingsPage() {
             className="absolute inset-0 bg-black/40 animate-fadeIn"
             onClick={() => setDeleteConfirmId(null)}
           />
-          <div
-            className="relative rounded-2xl p-6 w-full max-w-sm animate-scaleIn"
-            style={{
-              background: 'rgba(255, 255, 255, 0.95)',
-              WebkitBackdropFilter: 'blur(20px)',
-              backdropFilter: 'blur(20px)',
-              boxShadow: '0 8px 32px rgba(255, 107, 107, 0.1)',
-            }}
-          >
+          <div className="relative glass-card p-6 w-full max-w-sm animate-scaleIn">
             <h3 className="text-lg font-semibold mb-2 text-[#333]">确认删除</h3>
-            <p className="text-sm text-[#999] mb-6">
+            <p className="text-sm text-[#999] mb-5 leading-[1.7]">
               删除后录音将无法恢复，确定要删除吗？
             </p>
             <div className="flex gap-3">
               <button
                 onClick={() => setDeleteConfirmId(null)}
-                className="flex-1 h-11 rounded-xl bg-white/60 text-[#333] font-medium text-sm border border-white/80"
+                className="flex-1 h-[52px] rounded-2xl bg-white/60 backdrop-blur-sm text-[#333] font-medium border border-white/80 active:scale-[0.98] transition-transform"
               >
                 取消
               </button>
               <button
                 onClick={() => handleDelete(deleteConfirmId)}
-                className="flex-1 h-11 rounded-xl text-white font-medium text-sm"
+                className="flex-1 h-[52px] rounded-2xl text-white font-semibold active:scale-[0.98] transition-transform"
                 style={{
                   background:
                     'linear-gradient(135deg, #FF8C69 0%, #FF6B6B 100%)',
-                  boxShadow: '0 4px 12px rgba(255, 107, 107, 0.25)',
+                  boxShadow: '0 8px 24px rgba(255, 107, 107, 0.25)',
                 }}
               >
                 删除
@@ -561,28 +358,23 @@ export default function RecordingsPage() {
         </div>
       )}
 
-      {/* 内联样式：动画 */}
       <style>{`
         @keyframes fadeIn {
           from { opacity: 0; }
           to { opacity: 1; }
         }
-        @keyframes slideUp {
-          from { transform: translateY(100%); }
-          to { transform: translateY(0); }
-        }
         @keyframes scaleIn {
           from { opacity: 0; transform: scale(0.9); }
           to { opacity: 1; transform: scale(1); }
         }
-        @keyframes recordingPulse {
-          0%, 100% { box-shadow: 0 0 0 0 rgba(255, 107, 107, 0.5); }
-          50% { box-shadow: 0 0 0 20px rgba(255, 107, 107, 0); }
-        }
         .animate-fadeIn { animation: fadeIn 0.3s ease-out; }
-        .animate-slideUp { animation: slideUp 0.3s ease-out; }
         .animate-scaleIn { animation: scaleIn 0.2s ease-out; }
-        .recording-pulse { animation: recordingPulse 1.5s ease-in-out infinite; }
+        .line-clamp-2 {
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+          overflow: hidden;
+        }
       `}</style>
     </div>
   );

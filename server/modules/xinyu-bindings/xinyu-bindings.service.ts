@@ -371,6 +371,19 @@ export class XinyuBindingsService {
     };
   }
 
+  async getAllBoundBindings(): Promise<Array<{ id: string; userIdA: string; userIdB: string; boundAt: Date | null }>> {
+    const rows = await this.db
+      .select({
+        id: xinyuBindings.id,
+        userIdA: xinyuBindings.userIdA,
+        userIdB: xinyuBindings.userIdB,
+        boundAt: xinyuBindings.boundAt,
+      })
+      .from(xinyuBindings)
+      .where(eq(xinyuBindings.status, 'bound'));
+    return rows;
+  }
+
   private async countBindings(userId: string): Promise<number> {
     const result = await this.db
       .select({ count: sql<number>`count(*)` })

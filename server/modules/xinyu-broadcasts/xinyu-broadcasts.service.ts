@@ -1,7 +1,7 @@
 import { BadRequestException, Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { DRIZZLE_DATABASE, type PostgresJsDatabase } from '@lark-apaas/fullstack-nestjs-core';
-import { xinyuBroadcasts } from '@server/database/schema';
-import { eq, desc, count, and } from 'drizzle-orm';
+import { xinyuBroadcasts, xinyuMessages, xinyuRecordings } from '@server/database/schema';
+import { eq, desc, count, and, or, gte, lt } from 'drizzle-orm';
 import type {
   Broadcast,
   BroadcastDirection,
@@ -14,6 +14,7 @@ import { AiService } from '../ai/ai.service';
 import { XinyuDailyDataService } from '../xinyu-daily-data/xinyu-daily-data.service';
 import { XinyuWeatherService } from '../xinyu-weather/xinyu-weather.service';
 import { XinyuUsersService } from '../xinyu-users/xinyu-users.service';
+import { XinyuBindingsService } from '../xinyu-bindings/xinyu-bindings.service';
 
 @Injectable()
 export class XinyuBroadcastsService {
@@ -25,6 +26,7 @@ export class XinyuBroadcastsService {
     private readonly dailyDataService: XinyuDailyDataService,
     private readonly weatherService: XinyuWeatherService,
     private readonly usersService: XinyuUsersService,
+    private readonly bindingsService: XinyuBindingsService,
   ) {}
 
   async getInbox(
@@ -238,6 +240,178 @@ export class XinyuBroadcastsService {
     }
 
     return { content, summary, broadcastId };
+  }
+
+  async generateDailyReport(
+    userId: string,
+    targetUserId: string,
+    direction: BroadcastDirection,
+    toneStyle: ToneStyle = 'warm_chatter',
+  ): Promise<{ broadcastId: string; content: string }> {
+    const targetUser = await this.usersService.findByUserId(targetUserId);
+    if (!targetUser) throw new BadRequestException('目标用户不存在');
+
+    const senderUser = direction === 'from_partner'
+      ? await this.usersService.findByUserId(userId)
+      : null;
+    const senderLanguageProfile = senderUser?.languageProfile || '';
+    const senderTitle = senderUser?.myTitle || '';
+
+    // Find binding between the two users
+    const familyMembers = await this.bindingsService.getFamilyList(userId);
+    const targetMember = familyMembers.find((m) => m.userId === targetUserId);
+    const bindingId = targetMember?.bindingId;
+    const relation = targetMember
+      ? this.getRelationLabel(targetMember.relation)
+      : '家人';
+
+    // Today's date range (half-open interval)
+    const today = new Date().toISOString().split('T')[0];
+    const dayStart = new Date(`${today}T00:00:00.000Z`);
+    const nextDayStart = new Date(dayStart.getTime() + 24 * 60 * 60 * 1000);
+
+    const [dailyData, weatherInfo] = await Promise.all([
+      this.dailyDataService.getTodayData(targetUserId, targetUser.role),
+      this.weatherService.getWeather(targetUser.city),
+    ]);
+
+    // Query today's messages between the two users
+    const textMessages: string[] = [];
+    const thinkOfYous: string[] = [];
+    const voiceMessages: string[] = [];
+
+    if (bindingId) {
+      const messageRows = await this.db
+        .select({
+          messageType: xinyuMessages.messageType,
+          content: xinyuMessages.content,
+        })
+        .from(xinyuMessages)
+        .where(
+          and(
+            eq(xinyuMessages.bindingId, bindingId),
+            gte(xinyuMessages.createdAt, dayStart),
+            lt(xinyuMessages.createdAt, nextDayStart),
+            or(
+              eq(xinyuMessages.senderUserId, userId),
+              eq(xinyuMessages.senderUserId, targetUserId),
+            ),
+          ),
+        );
+
+      for (const row of messageRows) {
+        const content = row.content ?? '';
+        if (!content) continue;
+        if (row.messageType === 'text') {
+          textMessages.push(content);
+        } else if (row.messageType === 'think_of_you') {
+          thinkOfYous.push(content);
+        } else if (row.messageType === 'voice') {
+          voiceMessages.push(content);
+        }
+      }
+    }
+
+    // Query today's caring words (recordings synced to family)
+    const caringWords: string[] = [];
+    const recordingRows = await this.db
+      .select({ presetText: xinyuRecordings.presetText })
+      .from(xinyuRecordings)
+      .where(
+        and(
+          eq(xinyuRecordings.userId, userId),
+          eq(xinyuRecordings.syncedToFamily, true),
+          eq(xinyuRecordings.isRecorded, true),
+          gte(xinyuRecordings.syncedAt, dayStart),
+          lt(xinyuRecordings.syncedAt, nextDayStart),
+        ),
+      );
+
+    for (const row of recordingRows) {
+      if (row.presetText) caringWords.push(row.presetText);
+    }
+
+    const dailyDataStr = JSON.stringify(dailyData);
+
+    let content = '';
+    try {
+      content = await this.aiService.generateDailyReport({
+        dailyData: dailyDataStr as unknown as Record<string, unknown>,
+        weatherInfo,
+        relation,
+        senderTitle,
+        toneStyle,
+        direction,
+        languageProfile: senderLanguageProfile,
+        messages: [...textMessages, ...voiceMessages],
+        thinkOfYous,
+        caringWords,
+      });
+    } catch (error) {
+      this.logger.error('AI每日报告生成失败', error as Error);
+      content = this.generateFallbackBroadcast(
+        targetUser.nickname,
+        dailyData.moodIndex,
+        weatherInfo,
+        relation,
+        toneStyle,
+      );
+    }
+
+    if (!content) {
+      content = this.generateFallbackBroadcast(
+        targetUser.nickname,
+        dailyData.moodIndex,
+        weatherInfo,
+        relation,
+        toneStyle,
+      );
+    }
+
+    const summary = content.slice(0, 100);
+
+    let broadcastId = '';
+    try {
+      const inserted = await this.db.insert(xinyuBroadcasts).values({
+        userId,
+        targetUserId,
+        content,
+        summary,
+        broadcastDate: today,
+        moodIndex: dailyData.moodIndex,
+        steps: dailyData.steps,
+        sleepHours: String(dailyData.sleepHours),
+        weatherInfo: weatherInfo as unknown as Record<string, unknown>,
+        status: 'generated',
+        direction,
+        toneStyle,
+      }).returning({ id: xinyuBroadcasts.id });
+      broadcastId = inserted[0]?.id ?? '';
+    } catch (error) {
+      this.logger.error('保存每日报告失败', error as Error);
+    }
+
+    return { broadcastId, content };
+  }
+
+  async hasDailyReportFor(
+    userId: string,
+    targetUserId: string,
+    direction: BroadcastDirection,
+    dateStr: string,
+  ): Promise<boolean> {
+    const result = await this.db
+      .select({ count: count() })
+      .from(xinyuBroadcasts)
+      .where(
+        and(
+          eq(xinyuBroadcasts.userId, userId),
+          eq(xinyuBroadcasts.targetUserId, targetUserId),
+          eq(xinyuBroadcasts.direction, direction),
+          eq(xinyuBroadcasts.broadcastDate, dateStr),
+        ),
+      );
+    return Number(result[0]?.count ?? 0) > 0;
   }
 
   private getTonePrompt(toneStyle: ToneStyle): string {

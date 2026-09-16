@@ -127,7 +127,7 @@ export default function ChatPage() {
   if (!member) {
     return (
       <div className="h-screen flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-primary animate-spin" />
+        <Loader2 className="w-8 h-8 animate-spin" style={{ color: '#FF8C69' }} />
       </div>
     );
   }
@@ -136,20 +136,23 @@ export default function ChatPage() {
 
   return (
     <div className="h-screen flex flex-col max-w-[480px] mx-auto bg-transparent">
-      {/* 顶部导航栏 */}
+      {/* 顶部导航栏 — 毛玻璃固定 */}
       <div
-        className="sticky top-0 z-20 flex items-center px-4"
+        className="sticky top-0 z-20 flex items-center flex-shrink-0"
         style={{
           height: '56px',
+          paddingLeft: '12px',
+          paddingRight: '12px',
           background: 'rgba(255, 255, 255, 0.85)',
           WebkitBackdropFilter: 'blur(20px)',
           backdropFilter: 'blur(20px)',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.6)',
+          borderBottom: '1px solid rgba(255, 255, 255, 0.8)',
         }}
       >
         <button
           onClick={() => navigate(-1)}
-          className="w-9 h-9 rounded-full flex items-center justify-center active:scale-95 transition-transform flex-shrink-0"
+          className="w-10 h-10 rounded-full flex items-center justify-center active:scale-95 transition-transform flex-shrink-0"
+          style={{ background: 'rgba(255, 255, 255, 0.6)' }}
           aria-label="返回"
         >
           <ChevronLeft size={22} style={{ color: '#FF8C69' }} />
@@ -159,10 +162,17 @@ export default function ChatPage() {
           <div className="flex items-center gap-2">
             <div
               className="w-9 h-9 rounded-full flex items-center justify-center overflow-hidden flex-shrink-0"
-              style={{ boxShadow: '0 2px 8px rgba(255, 107, 107, 0.15)' }}
+              style={{
+                boxShadow: '0 2px 8px rgba(255, 107, 107, 0.15)',
+                background: 'rgba(255, 140, 105, 0.1)',
+              }}
             >
               {member.avatarUrl ? (
-                <Image src={member.avatarUrl} alt={getDisplayName(member)} className="w-full h-full object-cover" />
+                <Image
+                  src={member.avatarUrl}
+                  alt={getDisplayName(member)}
+                  className="w-full h-full object-cover"
+                />
               ) : (
                 <User size={16} style={{ color: '#FF8C69' }} />
               )}
@@ -178,7 +188,7 @@ export default function ChatPage() {
           {hasUnreadReport && (
             <button
               onClick={() => navigate(`/history?familyId=${member.userId}`)}
-              className="flex items-center gap-1 text-xs mt-0.5 active:scale-95 transition-transform"
+              className="flex items-center gap-1 text-xs mt-0.5 active:scale-95 transition-transform font-medium"
               style={{ color: '#FF8C69' }}
             >
               <MessageCircleHeart size={12} />
@@ -188,7 +198,8 @@ export default function ChatPage() {
         </div>
 
         <button
-          className="w-9 h-9 rounded-full flex items-center justify-center active:scale-95 transition-transform flex-shrink-0"
+          className="w-10 h-10 rounded-full flex items-center justify-center active:scale-95 transition-transform flex-shrink-0"
+          style={{ background: 'rgba(255, 255, 255, 0.6)' }}
           aria-label="更多"
         >
           <Phone size={20} style={{ color: '#FF8C69' }} />
@@ -200,6 +211,7 @@ export default function ChatPage() {
         ref={listRef}
         onScroll={handleScroll}
         className="flex-1 overflow-y-auto px-4 py-4"
+        style={{ WebkitOverflowScrolling: 'touch' }}
       >
         {loading && messages.length === 0 && (
           <div className="flex justify-center py-16">
@@ -224,8 +236,10 @@ export default function ChatPage() {
             >
               <MessageCircleHeart size={32} style={{ color: '#FF8C69' }} />
             </div>
-            <p className="font-semibold text-lg" style={{ color: '#333333' }}>开始聊天吧</p>
-            <p className="text-sm mt-1.5" style={{ color: '#999999' }}>
+            <p className="font-semibold text-lg" style={{ color: '#333333' }}>
+              开始聊天吧
+            </p>
+            <p className="text-sm mt-1.5" style={{ color: '#999999', lineHeight: 1.5 }}>
               发送一条消息，让陪伴更近一步
             </p>
             <div className="flex flex-wrap justify-center gap-2.5 mt-6 px-2">
@@ -233,9 +247,9 @@ export default function ChatPage() {
                 <button
                   key={phrase}
                   onClick={() => handleQuickPhrase(phrase)}
-                  className="px-4 py-2 rounded-full text-sm active:scale-95 transition-transform"
+                  className="px-4 py-2 rounded-full text-sm font-medium active:scale-[0.98] transition-transform"
                   style={{
-                    background: 'rgba(255, 255, 255, 0.7)',
+                    background: 'rgba(255, 255, 255, 0.75)',
                     WebkitBackdropFilter: 'blur(10px)',
                     backdropFilter: 'blur(10px)',
                     color: '#FF8C69',
@@ -262,7 +276,7 @@ export default function ChatPage() {
         </div>
       </div>
 
-      {/* 底部输入区 */}
+      {/* 底部输入区 — 毛玻璃固定 */}
       <ChatInput
         bindingId={member.bindingId}
         receiverUserId={member.userId}

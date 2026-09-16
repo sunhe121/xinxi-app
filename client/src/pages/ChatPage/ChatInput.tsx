@@ -1,10 +1,11 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
-import { Plus, Mic, Send, Image as ImageIcon, Video, X } from 'lucide-react';
+import { Mic, Send, Plus, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { logger } from '@lark-apaas/client-toolkit/logger';
 import { cn } from '@client/src/utils/cn';
 import { uploadApi, messagesApi } from '@client/src/api';
 import type { XinyuMessage } from '@shared/api.interface';
+import ChatPlusMenu from './ChatPlusMenu';
 
 interface ChatInputProps {
   bindingId: string;
@@ -35,9 +36,6 @@ export default function ChatInput({ bindingId, receiverUserId, onMessageSent }: 
   const chunksRef = useRef<Blob[]>([]);
   const timerRef = useRef<number | null>(null);
   const startYRef = useRef<number>(0);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const videoInputRef = useRef<HTMLInputElement>(null);
-  const recognitionRef = useRef<unknown>(null);
 
   const stopTimer = useCallback(() => {
     if (timerRef.current) {
@@ -60,7 +58,6 @@ export default function ChatInput({ bindingId, receiverUserId, onMessageSent }: 
       const reader = new FileReader();
       reader.onloadend = () => {
         const result = reader.result as string;
-        // 去掉 data:...;base64, 前缀
         const base64 = result.split(',')[1] || '';
         resolve(base64);
       };
@@ -69,57 +66,51 @@ export default function ChatInput({ bindingId, receiverUserId, onMessageSent }: 
     });
   };
 
-  // 尝试语音转文字
-  const trySpeechToText = useCallback(async (audioBlob: Blob): Promise<string> => {
-    try {
-      const SpeechRecognition =
-        (window as { SpeechRecognition?: unknown; webkitSpeechRecognition?: unknown })
-          .SpeechRecognition ||
-        (window as { webkitSpeechRecognition?: unknown }).webkitSpeechRecognition;
-      if (!SpeechRecognition) return '';
-
-      // 注意：浏览器 SpeechRecognition 通常基于实时麦克风输入，不能直接传音频文件
-      // 这里作为降级，返回空字符串（真实项目可用服务端 ASR）
-      return '';
-    } catch {
-      return '';
-    }
-  }, []);
-
-  // 发送语音消息
-  const sendVoiceMessage = useCallback(
-    async (audioBlob: Blob, duration: number) => {
+  // 发送文件消息（图片/视频/语音）
+  const sendFileMessage = useCallback(
+    async (
+      fileBase64: string,
+      fileName: string,
+      type: 'image' | 'video' | 'voice',
+      duration?: number,
+      content?: string
+    ) => {
       try {
         setSending(true);
-        const base64 = await blobToBase64(audioBlob);
-        const fileName = `voice_${Date.now()}.webm`;
         const uploadRes = await uploadApi.uploadFile({
           fileName,
-          fileBase64: base64,
-          type: 'voice',
+          fileBase64,
+          type,
         });
-
-        // 尝试转文字
-        const transcript = await trySpeechToText(audioBlob);
 
         const msg = await messagesApi.sendFileMessage({
           bindingId,
           receiverUserId,
-          messageType: 'voice',
+          messageType: type,
           fileUrl: uploadRes.fileUrl,
-          content: transcript,
-          duration: Math.round(duration),
+          content,
+          duration,
         });
         onMessageSent(msg);
       } catch (err) {
         const msg = err instanceof Error ? err.message : '发送失败';
         toast.error(msg);
-        logger.error(`sendVoiceMessage error: ${msg}`);
+        logger.error(`sendFileMessage error: ${msg}`);
       } finally {
         setSending(false);
       }
     },
-    [bindingId, receiverUserId, onMessageSent, trySpeechToText]
+    [bindingId, receiverUserId, onMessageSent]
+  );
+
+  // 发送语音消息
+  const sendVoiceMessage = useCallback(
+    async (audioBlob: Blob, duration: number) => {
+      const base64 = await blobToBase64(audioBlob);
+      const fileName = `voice_${Date.now()}.webm`;
+      await sendFileMessage(base64, fileName, 'voice', Math.round(duration), '');
+    },
+    [sendFileMessage]
   );
 
   // 开始录音
@@ -169,7 +160,7 @@ export default function ChatInput({ bindingId, receiverUserId, onMessageSent }: 
 
   // 长按处理
   const handleTouchStart = (e: React.TouchEvent) => {
-    if (text.trim()) return; // 有文字时是发送按钮
+    if (text.trim()) return;
     e.preventDefault();
     startYRef.current = e.touches[0].clientY;
     startRecording();
@@ -258,14 +249,7 @@ export default function ChatInput({ bindingId, receiverUserId, onMessageSent }: 
     }
   };
 
-  // 选择图片/视频
-  const handleFileSelect = async (
-    e: React.ChangeEvent<HTMLInputElement>,
-    type: 'image' | 'video'
-  ) => {
-    const file = e.target.files?.[0];
-    e.target.value = '';
-    if (!file) return;
+  const handleSelectImage = async (file: File) => {
     if (file.size > 20 * 1024 * 1024) {
       toast.error('文件不能超过20MB');
       return;
@@ -274,22 +258,30 @@ export default function ChatInput({ bindingId, receiverUserId, onMessageSent }: 
       setSending(true);
       setShowPlus(false);
       const base64 = await blobToBase64(file);
-      const uploadRes = await uploadApi.uploadFile({
-        fileName: file.name,
-        fileBase64: base64,
-        type,
-      });
-      const msg = await messagesApi.sendFileMessage({
-        bindingId,
-        receiverUserId,
-        messageType: type,
-        fileUrl: uploadRes.fileUrl,
-      });
-      onMessageSent(msg);
+      await sendFileMessage(base64, file.name, 'image');
     } catch (err) {
       const msg = err instanceof Error ? err.message : '发送失败';
       toast.error(msg);
-      logger.error(`sendFile error: ${msg}`);
+      logger.error(`sendImage error: ${msg}`);
+    } finally {
+      setSending(false);
+    }
+  };
+
+  const handleSelectVideo = async (file: File) => {
+    if (file.size > 20 * 1024 * 1024) {
+      toast.error('文件不能超过20MB');
+      return;
+    }
+    try {
+      setSending(true);
+      setShowPlus(false);
+      const base64 = await blobToBase64(file);
+      await sendFileMessage(base64, file.name, 'video');
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : '发送失败';
+      toast.error(msg);
+      logger.error(`sendVideo error: ${msg}`);
     } finally {
       setSending(false);
     }
@@ -300,65 +292,34 @@ export default function ChatInput({ bindingId, receiverUserId, onMessageSent }: 
   return (
     <div className="relative">
       {/* + 号展开面板 */}
-      {showPlus && (
-        <div
-          className="absolute bottom-full left-0 right-0 p-4 animate-fadeIn"
-          style={{
-            background: 'rgba(255, 255, 255, 0.85)',
-            WebkitBackdropFilter: 'blur(20px)',
-            backdropFilter: 'blur(20px)',
-            borderTop: '1px solid rgba(255, 255, 255, 0.6)',
-          }}
-        >
-          <div className="flex gap-8">
-            <button
-              onClick={() => fileInputRef.current?.click()}
-              className="flex flex-col items-center gap-2 active:scale-95 transition-transform"
-            >
-              <div
-                className="w-14 h-14 rounded-2xl flex items-center justify-center"
-                style={{
-                  background: 'rgba(255, 140, 105, 0.12)',
-                  border: '1px solid rgba(255, 140, 105, 0.2)',
-                }}
-              >
-                <ImageIcon size={24} style={{ color: '#FF8C69' }} />
-              </div>
-              <span className="text-sm" style={{ color: '#999999' }}>图片</span>
-            </button>
-            <button
-              onClick={() => videoInputRef.current?.click()}
-              className="flex flex-col items-center gap-2 active:scale-95 transition-transform"
-            >
-              <div
-                className="w-14 h-14 rounded-2xl flex items-center justify-center"
-                style={{
-                  background: 'rgba(255, 140, 105, 0.12)',
-                  border: '1px solid rgba(255, 140, 105, 0.2)',
-                }}
-              >
-                <Video size={24} style={{ color: '#FF8C69' }} />
-              </div>
-              <span className="text-sm" style={{ color: '#999999' }}>视频</span>
-            </button>
-          </div>
-        </div>
-      )}
+      <ChatPlusMenu
+        visible={showPlus}
+        onSelectImage={handleSelectImage}
+        onSelectVideo={handleSelectVideo}
+      />
 
       {/* 录音提示遮罩 */}
       {recordingState !== 'idle' && (
-        <div className="absolute bottom-full left-0 right-0 h-full w-full bg-black/30 flex items-center justify-center pointer-events-none">
+        <div
+          className="absolute bottom-full left-0 right-0 h-full w-full flex items-center justify-center pointer-events-none"
+          style={{ background: 'rgba(0, 0, 0, 0.3)' }}
+        >
           <div
-            className={cn(
-              'px-8 py-6 rounded-3xl text-center transition-all',
-              recordingState === 'cancel-swipe' ? 'bg-destructive/90' : 'bg-primary/90'
-            )}
+            className="px-8 py-6 text-center transition-all rounded-3xl"
+            style={{
+              background:
+                recordingState === 'cancel-swipe'
+                  ? 'rgba(255, 107, 107, 0.9)'
+                  : 'rgba(255, 140, 105, 0.9)',
+              backdropFilter: 'blur(10px)',
+              WebkitBackdropFilter: 'blur(10px)',
+            }}
           >
             <div className="text-white text-4xl font-bold mb-2">
               {Math.floor(recordDuration / 60)}:
               {(recordDuration % 60).toString().padStart(2, '0')}
             </div>
-            <div className="text-white/90 text-sm">
+            <div className="text-white/90 text-sm" style={{ lineHeight: 1.5 }}>
               {recordingState === 'cancel-swipe' ? '松开取消发送' : '松开发送，上滑取消'}
             </div>
           </div>
@@ -370,33 +331,37 @@ export default function ChatInput({ bindingId, receiverUserId, onMessageSent }: 
         className="flex items-end gap-3"
         style={{
           padding: '12px 16px',
-          paddingBottom: `calc(12px + env(safe-area-inset-bottom))`,
+          paddingBottom: 'calc(12px + env(safe-area-inset-bottom))',
           background: 'rgba(255, 255, 255, 0.9)',
           WebkitBackdropFilter: 'blur(20px)',
           backdropFilter: 'blur(20px)',
-          borderTop: '1px solid rgba(255, 255, 255, 0.7)',
+          borderTop: '1px solid rgba(255, 255, 255, 0.8)',
         }}
       >
         <button
           onClick={() => setShowPlus((s) => !s)}
-           className={cn(
-             'w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0 transition-all active:scale-95',
-           )}
-           style={showPlus ? {
-             background: 'linear-gradient(135deg, #FF8C69 0%, #FF6B6B 100%)',
-             color: '#FFFFFF',
-             boxShadow: '0 4px 12px rgba(255, 107, 107, 0.3)',
-           } : {
-             background: 'rgba(255, 255, 255, 0.7)',
-             WebkitBackdropFilter: 'blur(10px)',
-             backdropFilter: 'blur(10px)',
-             color: '#FF8C69',
-             border: '1px solid rgba(255, 140, 105, 0.25)',
-           }}
-           aria-label="更多"
-         >
-           <Plus size={20} />
-         </button>
+          className={cn(
+            'w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0 transition-all active:scale-95'
+          )}
+          style={
+            showPlus
+              ? {
+                  background: 'linear-gradient(135deg, #FF8C69 0%, #FF6B6B 100%)',
+                  color: '#FFFFFF',
+                  boxShadow: '0 4px 12px rgba(255, 107, 107, 0.3)',
+                }
+              : {
+                  background: 'rgba(255, 255, 255, 0.7)',
+                  WebkitBackdropFilter: 'blur(10px)',
+                  backdropFilter: 'blur(10px)',
+                  color: '#FF8C69',
+                  border: '1px solid rgba(255, 140, 105, 0.25)',
+                }
+          }
+          aria-label="更多"
+        >
+          <Plus size={20} />
+        </button>
 
         <textarea
           value={text}
@@ -404,8 +369,19 @@ export default function ChatInput({ bindingId, receiverUserId, onMessageSent }: 
           onKeyDown={handleKeyDown}
           placeholder="说点什么..."
           rows={1}
-          className="flex-1 px-4 text-sm resize-none focus:outline-none transition-all placeholder:text-muted-foreground max-h-32 glass-input"
-          style={{ minHeight: 44, height: 44, paddingTop: 12, paddingBottom: 12, borderRadius: 22 }}
+          className="flex-1 px-4 text-base resize-none focus:outline-none transition-all placeholder:text-[#999] max-h-32"
+          style={{
+            minHeight: 44,
+            height: 44,
+            paddingTop: 12,
+            paddingBottom: 12,
+            borderRadius: 22,
+            background: 'rgba(255, 255, 255, 0.6)',
+            WebkitBackdropFilter: 'blur(10px)',
+            backdropFilter: 'blur(10px)',
+            border: '1px solid rgba(255, 140, 105, 0.2)',
+            color: '#333',
+          }}
           onInput={(e) => {
             const target = e.target as HTMLTextAreaElement;
             target.style.height = 'auto';
@@ -417,58 +393,48 @@ export default function ChatInput({ bindingId, receiverUserId, onMessageSent }: 
           <button
             onClick={handleSendText}
             disabled={sending}
-             className="w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0 active:scale-95 transition-all disabled:opacity-50"
-             style={{
-               background: 'linear-gradient(135deg, #FF8C69 0%, #FF6B6B 100%)',
-               color: '#FFFFFF',
-               boxShadow: '0 4px 12px rgba(255, 107, 107, 0.3)',
-             }}
-             aria-label="发送"
-           >
-              <Send size={18} />
-           </button>
-         ) : (
-           <button
-              className={cn(
-                'w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0 active:scale-95 transition-all select-none',
-              )}
-              style={recordingState !== 'idle' ? {
-                background: '#FF6B6B',
-                color: '#FFFFFF',
-                boxShadow: '0 4px 12px rgba(255, 107, 107, 0.3)',
-              } : {
-                background: 'linear-gradient(135deg, #FF8C69 0%, #FF6B6B 100%)',
-                color: '#FFFFFF',
-                boxShadow: '0 4px 12px rgba(255, 107, 107, 0.3)',
-              }}
-              aria-label="语音"
-              onTouchStart={handleTouchStart}
-              onTouchMove={handleTouchMove}
-              onTouchEnd={handleTouchEnd}
-              onMouseDown={handleMouseDown}
-              onMouseMove={handleMouseMove}
-              onMouseUp={handleMouseUp}
-              onMouseLeave={handleMouseLeave}
-            >
-              {recordingState !== 'idle' ? <X size={20} /> : <Mic size={20} />}
-           </button>
-         )}
-       </div>
-
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept="image/*"
-        className="hidden"
-        onChange={(e) => handleFileSelect(e, 'image')}
-      />
-      <input
-        ref={videoInputRef}
-        type="file"
-        accept="video/*"
-        className="hidden"
-        onChange={(e) => handleFileSelect(e, 'video')}
-      />
+            className="w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0 active:scale-95 transition-all disabled:opacity-50"
+            style={{
+              background: 'linear-gradient(135deg, #FF8C69 0%, #FF6B6B 100%)',
+              color: '#FFFFFF',
+              boxShadow: '0 4px 12px rgba(255, 107, 107, 0.3)',
+              border: 'none',
+            }}
+            aria-label="发送"
+          >
+            <Send size={18} />
+          </button>
+        ) : (
+          <button
+            className={cn(
+              'w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0 active:scale-95 transition-all select-none'
+            )}
+            style={
+              recordingState !== 'idle'
+                ? {
+                    background: '#FF6B6B',
+                    color: '#FFFFFF',
+                    boxShadow: '0 4px 12px rgba(255, 107, 107, 0.3)',
+                  }
+                : {
+                    background: 'linear-gradient(135deg, #FF8C69 0%, #FF6B6B 100%)',
+                    color: '#FFFFFF',
+                    boxShadow: '0 4px 12px rgba(255, 107, 107, 0.3)',
+                  }
+            }
+            aria-label="语音"
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+            onMouseDown={handleMouseDown}
+            onMouseMove={handleMouseMove}
+            onMouseUp={handleMouseUp}
+            onMouseLeave={handleMouseLeave}
+          >
+            {recordingState !== 'idle' ? <X size={20} /> : <Mic size={20} />}
+          </button>
+        )}
+      </div>
     </div>
   );
 }

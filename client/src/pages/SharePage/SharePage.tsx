@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   ArrowLeft,
@@ -9,13 +9,14 @@ import {
   Loader2,
   MessageCircle,
   QrCode,
+  Download,
+  MessageSquare,
+  Link2,
 } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 import { toast } from 'sonner';
 import { useUser } from '@client/src/hooks/useUser';
 import { familyApi } from '@client/src/api';
-
-const APP_SHARE_URL = 'https://miaoda.feishu.cn/app/app_17duygeccfn';
 
 export default function SharePage() {
   const navigate = useNavigate();
@@ -23,7 +24,7 @@ export default function SharePage() {
   const [inviteCode, setInviteCode] = useState('');
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
-  const [linkCopied, setLinkCopied] = useState(false);
+  const qrRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     loadInviteCode();
@@ -47,48 +48,117 @@ export default function SharePage() {
     }
   };
 
+  const getShareUrl = (code: string): string => {
+    const origin = window.location.origin;
+    return `${origin}/share?code=${code}`;
+  };
+
+  const getShareText = (code: string): string => {
+    const shareUrl = getShareUrl(code);
+    return (
+      '我正在用「心系」——AI每天帮我播报家人的生活状态，用温暖的声音传递关心。\n' +
+      `下载后输入我的邀请码【${code}】就能和我绑定，让陪伴不缺席~\n` +
+      `${shareUrl}`
+    );
+  };
+
+  const copyToClipboard = async (text: string): Promise<boolean> => {
+    // 方案1: navigator.clipboard
+    if (navigator.clipboard && window.isSecureContext) {
+      try {
+        await navigator.clipboard.writeText(text);
+        return true;
+      } catch {
+        // fallback to execCommand
+      }
+    }
+
+    // 方案2: document.execCommand('copy') fallback
+    try {
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.style.position = 'fixed';
+      textarea.style.top = '0';
+      textarea.style.left = '0';
+      textarea.style.opacity = '0';
+      textarea.style.pointerEvents = 'none';
+      textarea.setAttribute('readonly', '');
+      document.body.appendChild(textarea);
+      textarea.select();
+      textarea.setSelectionRange(0, text.length);
+      const success = document.execCommand('copy');
+      document.body.removeChild(textarea);
+      return success;
+    } catch {
+      return false;
+    }
+  };
+
   const handleCopyCode = async () => {
     if (!inviteCode) return;
-    try {
-      await navigator.clipboard.writeText(inviteCode);
+    const success = await copyToClipboard(inviteCode);
+    if (success) {
       setCopied(true);
       toast.success('邀请码已复制');
       setTimeout(() => setCopied(false), 2000);
-    } catch {
-      toast.error('复制失败，请手动复制');
+    } else {
+      toast.error('复制失败，请手动长按复制');
+    }
+  };
+
+  const handleShareWechat = async () => {
+    if (!inviteCode) return;
+    const shareUrl = getShareUrl(inviteCode);
+    const success = await copyToClipboard(shareUrl);
+    if (success) {
+      toast.success('链接已复制，请打开微信粘贴分享');
+    } else {
+      toast.error('复制失败，请手动长按复制');
     }
   };
 
   const handleShareLink = async () => {
-    const shareText = `${user?.nickname || '我'}邀请你使用「心系」——用AI把每天的生活变成温暖的语音，让陪伴不缺席。\n\n下载/打开心系，输入我的邀请码即可绑定：${inviteCode}\n\n${APP_SHARE_URL}`;
-
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: '心系 - 让陪伴不缺席',
-          text: shareText,
-          url: APP_SHARE_URL,
-        });
-        return;
-      } catch {
-        // 用户取消分享，fallback到复制
-      }
-    }
-
-    try {
-      await navigator.clipboard.writeText(shareText);
-      setLinkCopied(true);
-      toast.success('分享链接已复制，快去发给家人吧');
-      setTimeout(() => setLinkCopied(false), 2000);
-    } catch {
-      toast.error('复制失败，请手动复制');
+    if (!inviteCode) return;
+    const shareText = getShareText(inviteCode);
+    const success = await copyToClipboard(shareText);
+    if (success) {
+      toast.success('链接已复制，快去发给家人吧');
+    } else {
+      toast.error('复制失败，请手动长按复制');
     }
   };
+
+  const handleShareQQ = async () => {
+    if (!inviteCode) return;
+    const shareUrl = getShareUrl(inviteCode);
+    const success = await copyToClipboard(shareUrl);
+    if (success) {
+      toast.success('链接已复制，请打开QQ粘贴分享');
+    } else {
+      toast.error('复制失败，请手动长按复制');
+    }
+  };
+
+  const handleShareSms = () => {
+    if (!inviteCode) return;
+    const shareText = getShareText(inviteCode);
+    window.open(`sms:?body=${encodeURIComponent(shareText)}`, '_self');
+  };
+
+  const handleScrollToQr = () => {
+    qrRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  };
+
+  const handleSaveQr = () => {
+    toast.info('长按图片保存到相册');
+  };
+
+  const shareUrl = inviteCode ? getShareUrl(inviteCode) : '';
 
   return (
     <div className="min-h-screen w-full max-w-[480px] mx-auto">
       {/* 顶部导航 */}
-      <div className="sticky top-0 z-10 px-5 pt-10 pb-3 flex items-center">
+      <div className="sticky top-0 z-10 px-5 pt-6 pb-3 flex items-center">
         <button
           onClick={() => navigate(-1)}
           className="w-10 h-10 -ml-2 flex items-center justify-center rounded-full active:bg-white/30 transition-colors"
@@ -100,7 +170,7 @@ export default function SharePage() {
         </h1>
       </div>
 
-      <div className="p-5 pb-10 space-y-5 animate-fade-in-up">
+      <div className="px-5 pb-32 space-y-5 animate-fade-in-up">
         {/* 邀请码卡片 */}
         <div className="glass-card p-6 text-center">
           <div className="flex items-center justify-center gap-2 mb-4">
@@ -145,14 +215,14 @@ export default function SharePage() {
         </div>
 
         {/* 二维码卡片 */}
-        <div className="glass-card p-6">
+        <div ref={qrRef} className="glass-card p-6">
           <h3 className="text-xl font-bold text-[#333] mb-5 text-center">
-            扫码下载心系
+            扫码分享给家人
           </h3>
           <div className="flex justify-center mb-4">
             <div className="p-4 bg-white rounded-2xl shadow-inner border border-white/80">
               <QRCodeSVG
-                value={APP_SHARE_URL}
+                value={shareUrl}
                 size={180}
                 level="H"
                 fgColor="#FF6B6B"
@@ -160,16 +230,78 @@ export default function SharePage() {
               />
             </div>
           </div>
-          <p className="text-center text-sm text-[#999]">
-            用手机浏览器扫描二维码即可打开
+          <p className="text-center text-sm text-[#999] mb-4">
+            让家人扫码打开，输入邀请码即可绑定
           </p>
+          <button
+            onClick={handleSaveQr}
+            className="w-full h-11 rounded-2xl bg-gradient-to-r from-[#FF8C69]/10 to-[#FF6B6B]/10 text-[#FF8C69] text-sm font-medium active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+          >
+            <Download size={18} />
+            保存二维码
+          </button>
+        </div>
+
+        {/* 分享方式 */}
+        <div className="glass-card p-6">
+          <h3 className="text-xl font-bold text-[#333] mb-5 text-center">
+            分享方式
+          </h3>
+          <div className="grid grid-cols-5 gap-2">
+            <button
+              onClick={handleShareWechat}
+              className="flex flex-col items-center gap-2 active:scale-[0.95] transition-transform"
+            >
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#FF8C69]/10 to-[#FF6B6B]/10 flex items-center justify-center">
+                <MessageCircle size={22} className="text-[#FF8C69]" />
+              </div>
+              <span className="text-xs text-[#333]">微信分享</span>
+            </button>
+            <button
+              onClick={handleShareLink}
+              disabled={!inviteCode}
+              className="flex flex-col items-center gap-2 active:scale-[0.95] transition-transform disabled:opacity-50"
+            >
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#FF8C69]/10 to-[#FF6B6B]/10 flex items-center justify-center">
+                <Link2 size={22} className="text-[#FF8C69]" />
+              </div>
+              <span className="text-xs text-[#333]">复制链接</span>
+            </button>
+            <button
+              onClick={handleScrollToQr}
+              className="flex flex-col items-center gap-2 active:scale-[0.95] transition-transform"
+            >
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#FF8C69]/10 to-[#FF6B6B]/10 flex items-center justify-center">
+                <QrCode size={22} className="text-[#FF8C69]" />
+              </div>
+              <span className="text-xs text-[#333]">二维码</span>
+            </button>
+            <button
+              onClick={handleShareQQ}
+              disabled={!inviteCode}
+              className="flex flex-col items-center gap-2 active:scale-[0.95] transition-transform disabled:opacity-50"
+            >
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#FF8C69]/10 to-[#FF6B6B]/10 flex items-center justify-center">
+                <MessageSquare size={22} className="text-[#FF8C69]" />
+              </div>
+              <span className="text-xs text-[#333]">QQ分享</span>
+            </button>
+            <button
+              onClick={handleShareSms}
+              disabled={!inviteCode}
+              className="flex flex-col items-center gap-2 active:scale-[0.95] transition-transform disabled:opacity-50"
+            >
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#FF8C69]/10 to-[#FF6B6B]/10 flex items-center justify-center">
+                <Share2 size={22} className="text-[#FF8C69]" />
+              </div>
+              <span className="text-xs text-[#333]">短信分享</span>
+            </button>
+          </div>
         </div>
 
         {/* 操作指引 */}
         <div className="glass-card p-6">
-          <h3 className="text-xl font-bold text-[#333] mb-5">
-            绑定步骤
-          </h3>
+          <h3 className="text-xl font-bold text-[#333] mb-5">绑定步骤</h3>
           <div className="space-y-5">
             {[
               { step: 1, text: '把邀请码发给家人' },
@@ -185,43 +317,6 @@ export default function SharePage() {
                 <p className="text-base text-[#333] pt-1">{item.text}</p>
               </div>
             ))}
-          </div>
-        </div>
-
-        {/* 其他分享方式 */}
-        <div className="glass-card p-6">
-          <h3 className="text-xl font-bold text-[#333] mb-5 text-center">
-            分享方式
-          </h3>
-          <div className="flex justify-center gap-8 mb-5">
-            <button
-              onClick={handleShareLink}
-              className="flex flex-col items-center gap-2 active:scale-[0.95] transition-transform"
-            >
-              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#FF8C69]/10 to-[#FF6B6B]/10 flex items-center justify-center">
-                <MessageCircle size={24} className="text-[#FF8C69]" />
-              </div>
-              <span className="text-sm text-[#333]">微信分享</span>
-            </button>
-            <button
-              onClick={handleCopyCode}
-              disabled={!inviteCode}
-              className="flex flex-col items-center gap-2 active:scale-[0.95] transition-transform disabled:opacity-50"
-            >
-              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#FF8C69]/10 to-[#FF6B6B]/10 flex items-center justify-center">
-                <Copy size={24} className="text-[#FF8C69]" />
-              </div>
-              <span className="text-sm text-[#333]">复制邀请码</span>
-            </button>
-            <button
-              onClick={handleShareLink}
-              className="flex flex-col items-center gap-2 active:scale-[0.95] transition-transform"
-            >
-              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#FF8C69]/10 to-[#FF6B6B]/10 flex items-center justify-center">
-                <QrCode size={24} className="text-[#FF8C69]" />
-              </div>
-              <span className="text-sm text-[#333]">二维码</span>
-            </button>
           </div>
         </div>
 
@@ -242,19 +337,11 @@ export default function SharePage() {
         <div className="space-y-3 pt-2">
           <button
             onClick={handleShareLink}
-            className="btn-gradient w-full text-base flex items-center justify-center gap-2"
+            disabled={!inviteCode}
+            className="btn-gradient w-full text-base flex items-center justify-center gap-2 disabled:opacity-50"
           >
-            {linkCopied ? (
-              <>
-                <Check size={20} />
-                已复制分享内容
-              </>
-            ) : (
-              <>
-                <Share2 size={20} />
-                分享链接给家人
-              </>
-            )}
+            <Share2 size={20} />
+            分享链接给家人
           </button>
           <button
             onClick={handleCopyCode}

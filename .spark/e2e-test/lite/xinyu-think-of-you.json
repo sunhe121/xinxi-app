@@ -1,0 +1,14 @@
+{
+  "cases": [
+    {
+      "id": 1,
+      "priority": "p0",
+      "description": "打开登录页，验证改版后的登录页UI正常渲染（Logo、Tab、卡片、输入框、按钮）"
+    },
+    {
+      "id": 2,
+      "priority": "p1",
+      "description": "登录后首页能正常加载，有想TA了按钮、有播报卡片、有数据概览"
+    }
+  ]
+}

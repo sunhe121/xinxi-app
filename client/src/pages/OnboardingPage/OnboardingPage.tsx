@@ -115,7 +115,7 @@ export default function OnboardingPage() {
   };
 
   return (
-    <div className="min-h-screen w-full max-w-[480px] mx-auto px-5 pt-10 pb-10 flex flex-col animate-fade-in-up">
+      <div className="min-h-screen w-full max-w-[480px] mx-auto px-5 pt-10 pb-32 flex flex-col animate-fade-in-up">
       {/* Logo / 标题区 */}
       <div className="text-center mb-10">
         <div className="w-16 h-16 mx-auto mb-5 rounded-full bg-gradient-to-br from-[#FF8C69] to-[#FF6B6B] flex items-center justify-center shadow-lg shadow-[#FF6B6B]/25">
@@ -241,7 +241,7 @@ export default function OnboardingPage() {
       {/* 输入邀请码 */}
       {pairTab === 'redeem' && (
         <div className="flex-1 flex flex-col">
-          <div className="space-y-6">
+          <div className="space-y-5">
             <div>
               <label className="text-base font-medium text-[#333] mb-3 block">
                 输入6位邀请码
@@ -258,7 +258,7 @@ export default function OnboardingPage() {
                 value={redeemCode}
                 onChange={(e) => handleRedeemCodeChange(e.target.value)}
                 placeholder="请输入6位邀请码"
-                className="glass-input h-13 w-full px-4 text-center text-[24px] font-bold tracking-[0.2em] text-[#333] placeholder:text-[#999] placeholder:font-normal placeholder:tracking-normal uppercase"
+                 className="glass-input h-[52px] w-full px-4 text-center text-[24px] font-bold tracking-[0.2em] text-[#333] placeholder:text-[#999] placeholder:font-normal placeholder:tracking-normal uppercase"
               />
             </div>
 

@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Play, Pause, X, Image as ImageIcon, Video } from 'lucide-react';
 import { Image } from '@client/src/components/ui/image';
-import { cn } from '@client/src/utils/cn';
 import type { XinyuMessage } from '@shared/api.interface';
 import { logger } from '@lark-apaas/client-toolkit/logger';
 
@@ -68,43 +67,53 @@ export default function MessageItem({
 
   const renderContent = () => {
     switch (message.messageType) {
-       case 'text':
-         return (
-           <p className="text-sm leading-relaxed whitespace-pre-wrap break-words">
-             {message.content}
-           </p>
-         );
+      case 'text':
+        return (
+          <p className="text-base whitespace-pre-wrap break-words" style={{ lineHeight: 1.7 }}>
+            {message.content}
+          </p>
+        );
       case 'image':
         return (
           <div
-            className="relative cursor-pointer overflow-hidden rounded-2xl"
+            className="relative cursor-pointer overflow-hidden"
+            style={{ borderRadius: '16px' }}
             onClick={() => setShowImage(true)}
           >
             <Image
               src={message.fileUrl}
               alt="图片消息"
-              className="max-w-[220px] max-h-[280px] object-cover rounded-2xl"
+              className="max-w-[220px] max-h-[280px] object-cover"
+              style={{ borderRadius: '16px' }}
             />
           </div>
         );
       case 'video':
         return (
           <div
-            className="relative cursor-pointer overflow-hidden rounded-2xl"
+            className="relative cursor-pointer overflow-hidden"
+            style={{ borderRadius: '16px' }}
             onClick={() => setShowImage(true)}
           >
             <Image
               src={message.fileUrl}
               alt="视频消息"
-              className="max-w-[220px] max-h-[280px] object-cover rounded-2xl"
+              className="max-w-[220px] max-h-[280px] object-cover"
+              style={{ borderRadius: '16px' }}
             />
-            <div className="absolute inset-0 flex items-center justify-center bg-black/20">
-              <div className="w-12 h-12 rounded-full bg-white/80 flex items-center justify-center">
-                <Play size={20} className="text-primary ml-0.5" fill="currentColor" />
+            <div className="absolute inset-0 flex items-center justify-center" style={{ background: 'rgba(0,0,0,0.2)' }}>
+              <div
+                className="w-12 h-12 rounded-full flex items-center justify-center"
+                style={{ background: 'rgba(255, 255, 255, 0.8)' }}
+              >
+                <Play size={20} style={{ color: '#FF8C69' }} fill="currentColor" className="ml-0.5" />
               </div>
             </div>
             {message.duration > 0 && (
-              <span className="absolute bottom-2 right-2 text-xs text-white bg-black/50 px-2 py-0.5 rounded-full">
+              <span
+                className="absolute bottom-2 right-2 text-xs text-white px-2 py-0.5 rounded-full"
+                style={{ background: 'rgba(0,0,0,0.5)' }}
+              >
                 {formatDuration(message.duration)}
               </span>
             )}
@@ -114,45 +123,48 @@ export default function MessageItem({
         return (
           <button
             onClick={handlePlayVoice}
-             className="flex items-center gap-3 min-w-[120px] active:scale-95 transition-transform"
-           >
-              <div
-                className={cn(
-                  'w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0',
-                )}
-                style={isMine
+            className="flex items-center gap-3 min-w-[120px] active:scale-95 transition-transform"
+          >
+            <div
+              className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0"
+              style={
+                isMine
                   ? { background: 'rgba(255, 255, 255, 0.25)' }
                   : { background: 'rgba(255, 140, 105, 0.15)' }
-                }
-              >
-                {playing ? (
-                  <Pause size={16} fill="currentColor" style={{ color: isMine ? '#FFFFFF' : '#FF8C69' }} />
-                ) : (
-                  <Play size={16} fill="currentColor" style={{
+              }
+            >
+              {playing ? (
+                <Pause size={16} fill="currentColor" style={{ color: isMine ? '#FFFFFF' : '#FF8C69' }} />
+              ) : (
+                <Play
+                  size={16}
+                  fill="currentColor"
+                  style={{
                     color: isMine ? '#FFFFFF' : '#FF8C69',
                     marginLeft: '2px',
-                  }} />
-               )}
-             </div>
-              <div className="flex items-center gap-1 flex-1">
-                {[...Array(Math.min(5, Math.max(2, Math.ceil(message.duration / 3))))].map((_, i) => (
-                  <div
-                    key={i}
-                    className={cn('rounded-full', playing ? 'animate-pulse' : '')}
-                    style={{
-                      width: 3,
-                      height: 12 + (i % 3) * 4,
-                      backgroundColor: isMine ? 'rgba(255, 255, 255, 0.7)' : 'rgba(255, 140, 105, 0.5)',
-                    }}
-                  />
-                ))}
-              </div>
-              <span
-                className="text-xs flex-shrink-0"
-                style={{ color: isMine ? 'rgba(255, 255, 255, 0.85)' : '#999999' }}
-              >
-               {formatDuration(message.duration)}
-             </span>
+                  }}
+                />
+              )}
+            </div>
+            <div className="flex items-center gap-1 flex-1">
+              {[...Array(Math.min(5, Math.max(2, Math.ceil(message.duration / 3))))].map((_, i) => (
+                <div
+                  key={i}
+                  className={'rounded-full ' + (playing ? 'animate-pulse' : '')}
+                  style={{
+                    width: 3,
+                    height: 12 + (i % 3) * 4,
+                    backgroundColor: isMine ? 'rgba(255, 255, 255, 0.7)' : 'rgba(255, 140, 105, 0.5)',
+                  }}
+                />
+              ))}
+            </div>
+            <span
+              className="text-xs flex-shrink-0"
+              style={{ color: isMine ? 'rgba(255, 255, 255, 0.85)' : '#999999' }}
+            >
+              {formatDuration(message.duration)}
+            </span>
           </button>
         );
       default:
@@ -162,11 +174,14 @@ export default function MessageItem({
 
   return (
     <>
-      <div className={cn('flex gap-2', isMine ? 'flex-row-reverse' : 'flex-row')}>
+      <div className={'flex gap-2 ' + (isMine ? 'flex-row-reverse' : 'flex-row')}>
         {!isMine && (
           <div
-            className="w-7 h-7 rounded-full flex-shrink-0 flex items-center justify-center overflow-hidden"
-            style={{ boxShadow: '0 2px 6px rgba(255, 107, 107, 0.12)' }}
+            className="w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center overflow-hidden"
+            style={{
+              background: 'rgba(255, 140, 105, 0.1)',
+              boxShadow: '0 2px 6px rgba(255, 107, 107, 0.12)',
+            }}
           >
             {avatarUrl ? (
               <Image src={avatarUrl} alt={partnerName} className="w-full h-full object-cover" />
@@ -175,24 +190,32 @@ export default function MessageItem({
             )}
           </div>
         )}
-        <div className={cn('flex flex-col max-w-[78%] gap-1', isMine ? 'items-end' : 'items-start')}>
+        <div
+          className={
+            'flex flex-col max-w-[78%] gap-1 ' + (isMine ? 'items-end' : 'items-start')
+          }
+        >
           <div
-            className={cn('p-4')}
-            style={isMine ? {
-              background: 'linear-gradient(135deg, #FF8C69 0%, #FF6B6B 100%)',
-              color: '#FFFFFF',
-              borderRadius: '20px',
-              borderTopRightRadius: '8px',
-              boxShadow: '0 4px 12px rgba(255, 107, 107, 0.2)',
-            } : {
-              background: 'rgba(255, 255, 255, 0.8)',
-              WebkitBackdropFilter: 'blur(10px)',
-              backdropFilter: 'blur(10px)',
-              color: '#333333',
-              borderRadius: '20px',
-              borderTopLeftRadius: '8px',
-              border: '1px solid rgba(255, 255, 255, 0.9)',
-            }}
+            className="px-4 py-3"
+            style={
+              isMine
+                ? {
+                    background: 'linear-gradient(135deg, #FF8C69 0%, #FF6B6B 100%)',
+                    color: '#FFFFFF',
+                    borderRadius: '20px',
+                    borderTopRightRadius: '8px',
+                    boxShadow: '0 4px 12px rgba(255, 107, 107, 0.2)',
+                  }
+                : {
+                    background: 'rgba(255, 255, 255, 0.85)',
+                    WebkitBackdropFilter: 'blur(20px)',
+                    backdropFilter: 'blur(20px)',
+                    color: '#333333',
+                    borderRadius: '20px',
+                    borderTopLeftRadius: '8px',
+                    border: '1px solid rgba(255, 255, 255, 0.9)',
+                  }
+            }
           >
             {renderContent()}
           </div>
@@ -205,15 +228,17 @@ export default function MessageItem({
       {/* 图片/视频大图查看 */}
       {showImage && (message.messageType === 'image' || message.messageType === 'video') && (
         <div
-          className="fixed inset-0 z-[100] bg-black flex items-center justify-center"
+          className="fixed inset-0 z-[100] flex items-center justify-center"
+          style={{ background: 'rgba(0, 0, 0, 0.9)' }}
           onClick={() => setShowImage(false)}
         >
           <button
-             className="absolute top-6 right-6 w-11 h-11 rounded-full bg-white/20 flex items-center justify-center text-white z-10"
+            className="absolute top-6 right-6 w-11 h-11 rounded-full flex items-center justify-center text-white z-10"
+            style={{ background: 'rgba(255, 255, 255, 0.2)' }}
             onClick={() => setShowImage(false)}
             aria-label="关闭"
           >
-             <X size={24} />
+            <X size={24} />
           </button>
           {message.messageType === 'image' ? (
             <Image

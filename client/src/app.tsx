@@ -17,6 +17,9 @@ import SharePage from './pages/SharePage/SharePage';
 import LandingPage from './pages/LandingPage/LandingPage';
 import ChatPage from './pages/ChatPage/ChatPage';
 import LanguageStylePage from './pages/LanguageStylePage/LanguageStylePage';
+import PushSettingsPage from './pages/PushSettingsPage/PushSettingsPage';
+import FestivalReminderPage from './pages/FestivalReminderPage/FestivalReminderPage';
+import AboutPage from './pages/AboutPage/AboutPage';
 import { UserProvider } from './hooks/useUser';
 
 const RoutesComponent = () => {
@@ -111,6 +114,30 @@ const RoutesComponent = () => {
             element={
               <RequireAuth>
                 <LanguageStylePage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="push-settings"
+            element={
+              <RequireAuth>
+                <PushSettingsPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="festival-reminder"
+            element={
+              <RequireAuth>
+                <FestivalReminderPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="about"
+            element={
+              <RequireAuth>
+                <AboutPage />
               </RequireAuth>
             }
           />

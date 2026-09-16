@@ -1,0 +1,39 @@
+{
+  "cases": [
+    {
+      "id": 1,
+      "priority": "p0",
+      "description": "打开 /share 分享页，验证5种分享方式图标+邀请码大字体+二维码卡片完整展示"
+    },
+    {
+      "id": 2,
+      "priority": "p0",
+      "description": "打开 /privacy 隐私设置页，验证开关列表+数据管理+清除缓存/退出登录按钮完整展示"
+    },
+    {
+      "id": 3,
+      "priority": "p1",
+      "description": "打开 /push-settings 推送设置页，验证总开关+时间设置+频率+声音+语速+保存按钮"
+    },
+    {
+      "id": 4,
+      "priority": "p1",
+      "description": "打开 /festival-reminder 节日提醒页，验证内置节日列表+添加自定义+提醒时间"
+    },
+    {
+      "id": 5,
+      "priority": "p1",
+      "description": "打开 /about 关于页，验证Logo+功能介绍列表+设置入口+版权信息"
+    },
+    {
+      "id": 6,
+      "priority": "p1",
+      "description": "打开 /language-style 语言风格页，验证风格选项+样本列表+录制引导+分析按钮"
+    },
+    {
+      "id": 7,
+      "priority": "p2",
+      "description": "打开 /profile-edit 个人信息编辑页，验证头像+昵称+性别+生日+城市+称呼+签名+保存"
+    }
+  ]
+}

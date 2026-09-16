@@ -6,6 +6,9 @@ import {
   User,
   X,
   ChevronRight,
+  MapPin,
+  Calendar,
+  Mic,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useUser } from '@client/src/hooks/useUser';
@@ -32,6 +35,7 @@ const TITLE_OPTIONS = [
 ];
 
 const AVATAR_URL_PREFIX = 'preset:';
+const BIRTHDAY_STORAGE_KEY = 'xinyu_user_birthday';
 
 function getAvatarUrl(id: string): string {
   return `${AVATAR_URL_PREFIX}${id}`;
@@ -66,6 +70,8 @@ export default function ProfileEditPage() {
   const [customTitle, setCustomTitle] = useState('');
   const [bio, setBio] = useState('');
   const [avatarUrl, setAvatarUrl] = useState('');
+  const [city, setCity] = useState('');
+  const [birthday, setBirthday] = useState('');
   const [showAvatarSheet, setShowAvatarSheet] = useState(false);
   const [saving, setSaving] = useState(false);
 
@@ -76,6 +82,14 @@ export default function ProfileEditPage() {
       setMyTitle(user.myTitle || '');
       setBio(user.bio || '');
       setAvatarUrl(user.avatarUrl || '');
+      setCity(user.city || '');
+    }
+    // 从 localStorage 读取生日
+    try {
+      const savedBirthday = localStorage.getItem(BIRTHDAY_STORAGE_KEY);
+      if (savedBirthday) setBirthday(savedBirthday);
+    } catch {
+      // ignore
     }
   }, [user]);
 
@@ -109,7 +123,18 @@ export default function ProfileEditPage() {
         myTitle,
         bio: bio.trim(),
         avatarUrl,
+        city: city.trim(),
       });
+      // 保存生日到 localStorage
+      try {
+        if (birthday) {
+          localStorage.setItem(BIRTHDAY_STORAGE_KEY, birthday);
+        } else {
+          localStorage.removeItem(BIRTHDAY_STORAGE_KEY);
+        }
+      } catch {
+        // ignore
+      }
       toast.success('已保存');
       navigate(-1);
     } catch {
@@ -125,15 +150,15 @@ export default function ProfileEditPage() {
 
   return (
     <>
-      <div className="min-h-screen bg-transparent px-5 pt-4 pb-6">
+      <div className="min-h-screen bg-transparent px-5 pt-6 pb-32 max-w-[480px] mx-auto animate-fade-in-up">
         {/* 顶部导航栏 */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between mb-5">
           <button
             onClick={() => navigate(-1)}
-            className="w-10 h-10 rounded-full flex items-center justify-center text-[#FF8C69] active:scale-95 transition-transform"
+            className="w-10 h-10 rounded-full bg-white/60 flex items-center justify-center active:scale-95 transition-transform"
             aria-label="返回"
           >
-            <ArrowLeft size={22} strokeWidth={2.5} />
+            <ArrowLeft size={20} className="text-[#333]" />
           </button>
           <h1 className="text-lg font-semibold text-[#333333]">编辑资料</h1>
           <button
@@ -182,31 +207,33 @@ export default function ProfileEditPage() {
           </div>
 
           {/* 基本资料卡片 */}
-          <div className="glass-card overflow-hidden">
+          <div className="glass-card p-6 space-y-5">
             {/* 昵称 */}
-            <div className="h-16 px-5 flex flex-col justify-center border-b border-white/30">
-              <label className="text-xs text-[#999999] mb-1">昵称</label>
-              <input
-                type="text"
-                value={nickname}
-                onChange={(e) => setNickname(e.target.value)}
-                placeholder="请输入昵称"
-                maxLength={20}
-                className="text-base text-[#333333] placeholder:text-[#999999] bg-transparent focus:outline-none w-full"
-              />
+            <div>
+              <label className="text-sm font-medium text-[#333333] mb-2 block">昵称</label>
+              <div className="glass-input h-[52px] px-4 flex items-center">
+                <input
+                  type="text"
+                  value={nickname}
+                  onChange={(e) => setNickname(e.target.value)}
+                  placeholder="请输入昵称"
+                  maxLength={20}
+                  className="w-full bg-transparent text-base text-[#333333] placeholder:text-[#999999] focus:outline-none"
+                />
+              </div>
             </div>
 
             {/* 性别 */}
-            <div className="h-16 px-5 flex items-center justify-between border-b border-white/30">
-              <span className="text-xs text-[#999999]">性别</span>
-              <div className="flex gap-2">
+            <div>
+              <label className="text-sm font-medium text-[#333333] mb-2 block">性别</label>
+              <div className="flex gap-3">
                 <button
                   onClick={() => setGender('male')}
                   className={cn(
-                    'px-5 h-9 rounded-full text-sm font-medium transition-all active:scale-95',
+                    'flex-1 h-[52px] rounded-2xl text-base font-medium transition-all active:scale-[0.98]',
                     gender === 'male'
                       ? 'bg-gradient-to-r from-[#FF8C69] to-[#FF6B6B] text-white shadow-md shadow-[#FF6B6B]/30'
-                      : 'bg-white/60 text-[#999999] border border-white/80'
+                      : 'bg-white/60 backdrop-blur-sm text-[#333333] border border-white/80'
                   )}
                 >
                   男
@@ -214,10 +241,10 @@ export default function ProfileEditPage() {
                 <button
                   onClick={() => setGender('female')}
                   className={cn(
-                    'px-5 h-9 rounded-full text-sm font-medium transition-all active:scale-95',
+                    'flex-1 h-[52px] rounded-2xl text-base font-medium transition-all active:scale-[0.98]',
                     gender === 'female'
                       ? 'bg-gradient-to-r from-[#FF8C69] to-[#FF6B6B] text-white shadow-md shadow-[#FF6B6B]/30'
-                      : 'bg-white/60 text-[#999999] border border-white/80'
+                      : 'bg-white/60 backdrop-blur-sm text-[#333333] border border-white/80'
                   )}
                 >
                   女
@@ -225,19 +252,58 @@ export default function ProfileEditPage() {
               </div>
             </div>
 
+            {/* 生日 */}
+            <div>
+              <label className="text-sm font-medium text-[#333333] mb-2 block">
+                生日
+              </label>
+              <div className="glass-input h-[52px] px-4 flex items-center">
+                <Calendar size={18} className="text-[#FF8C69] mr-3 flex-shrink-0" />
+                <input
+                  type="date"
+                  value={birthday}
+                  onChange={(e) => setBirthday(e.target.value)}
+                  className="w-full bg-transparent text-base text-[#333333] placeholder:text-[#999999] focus:outline-none"
+                  style={{
+                    WebkitAppearance: 'none',
+                    appearance: 'none',
+                    colorScheme: 'light',
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* 所在城市 */}
+            <div>
+              <label className="text-sm font-medium text-[#333333] mb-2 block">
+                所在城市
+              </label>
+              <div className="glass-input h-[52px] px-4 flex items-center">
+                <MapPin size={18} className="text-[#FF8C69] mr-3 flex-shrink-0" />
+                <input
+                  type="text"
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                  placeholder="请输入所在城市"
+                  maxLength={20}
+                  className="w-full bg-transparent text-base text-[#333333] placeholder:text-[#999999] focus:outline-none"
+                />
+              </div>
+            </div>
+
             {/* 我的称呼 */}
-            <div className="px-5 py-4 border-b border-white/30">
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-xs text-[#999999]">我的称呼</span>
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-medium text-[#333333]">我的称呼</span>
                 <span className="text-xs text-[#FF8C69]">家人怎么称呼你</span>
               </div>
-              <div className="flex gap-2 overflow-x-auto scrollbar-hide -mx-5 px-5 pb-1">
+              <div className="flex gap-2 overflow-x-auto scrollbar-hide -mx-6 px-6 pb-1">
                 {TITLE_OPTIONS.map((title) => (
                   <button
                     key={title}
                     onClick={() => handleSelectPreset(title)}
                     className={cn(
-                      'px-4 min-h-9 py-2 rounded-full whitespace-nowrap flex-shrink-0 text-sm font-medium transition-all active:scale-95',
+                      'px-4 h-9 rounded-full whitespace-nowrap flex-shrink-0 text-sm font-medium transition-all active:scale-95',
                       myTitle === title && !customTitle
                         ? 'bg-gradient-to-r from-[#FF8C69] to-[#FF6B6B] text-white shadow-md shadow-[#FF6B6B]/25'
                         : 'bg-white/60 text-[#333333] border border-white/80'
@@ -247,7 +313,7 @@ export default function ProfileEditPage() {
                   </button>
                 ))}
               </div>
-              <div className="glass-input mt-3 h-11 px-4 flex items-center">
+              <div className="glass-input h-[52px] px-4 flex items-center mt-3">
                 <input
                   type="text"
                   value={customTitle}
@@ -261,24 +327,46 @@ export default function ProfileEditPage() {
           </div>
 
           {/* 关于我卡片 */}
-          <div className="glass-card p-5">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-xs text-[#999999]">个性签名</span>
+          <div className="glass-card p-6">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-sm font-medium text-[#333333]">个性签名</span>
               <span className="text-xs text-[#999999]">{bio.length}/50</span>
             </div>
             <textarea
               value={bio}
               onChange={(e) => setBio(e.target.value.slice(0, 50))}
               placeholder="一句话介绍自己"
-              className="glass-input w-full h-24 p-3 text-sm text-[#333333] resize-none placeholder:text-[#999999] focus:outline-none"
+              className="glass-input w-full h-24 p-4 text-base text-[#333333] resize-none placeholder:text-[#999999] focus:outline-none leading-[1.7]"
             />
+          </div>
+
+          {/* 声音设置入口 */}
+          <div className="glass-card overflow-hidden">
+            <button
+              onClick={() => navigate('/language-style')}
+              className="w-full h-16 px-5 flex items-center justify-between active:bg-white/30 transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-[#FF8C69]/15 flex items-center justify-center">
+                  <Mic size={20} className="text-[#FF8C69]" />
+                </div>
+                <div className="text-left">
+                  <p className="text-base text-[#333]">我的声音风格</p>
+                  <p className="text-xs text-[#999]">定制专属你的语言风格</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-1">
+                <span className="text-xs text-[#FF8C69]">去设置</span>
+                <ChevronRight size={16} className="text-[#999]" />
+              </div>
+            </button>
           </div>
 
           {/* 底部保存按钮 */}
           <button
             onClick={handleSave}
             disabled={saving}
-            className="btn-gradient w-full mt-6 text-base"
+            className="btn-gradient w-full text-base"
           >
             {saving ? '保存中...' : '保存'}
           </button>

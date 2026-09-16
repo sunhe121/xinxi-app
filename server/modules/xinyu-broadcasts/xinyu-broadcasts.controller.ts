@@ -8,6 +8,17 @@ import type {
   ReplyBroadcastRequest,
 } from '@shared/api.interface';
 
+interface DailyReportRequest {
+  targetUserId: string;
+  direction?: 'to_partner' | 'from_partner';
+  toneStyle?: 'warm_chatter' | 'warm_concise' | 'humorous' | 'gentle';
+}
+
+interface DailyReportResponse {
+  broadcastId: string;
+  content: string;
+}
+
 interface BroadcastListResponse {
   items: Broadcast[];
   total: number;
@@ -54,6 +65,19 @@ export class XinyuBroadcastsController {
       body.relation,
       body.direction ?? 'to_partner',
       body.toneStyle,
+    );
+  }
+
+  @Post('daily-report')
+  async generateDailyReport(
+    @CurrentUser() user: JwtPayload,
+    @Body() body: DailyReportRequest,
+  ): Promise<DailyReportResponse> {
+    return this.broadcastsService.generateDailyReport(
+      user.userId,
+      body.targetUserId,
+      body.direction ?? 'to_partner',
+      body.toneStyle ?? 'warm_chatter',
     );
   }
 
