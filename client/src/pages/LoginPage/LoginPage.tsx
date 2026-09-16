@@ -1,6 +1,6 @@
-import { useState, useRef, useEffect } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Heart, Eye, EyeOff, ArrowLeft } from 'lucide-react';
+import { Heart, Eye, EyeOff, ArrowLeft, Phone, Lock, User, Sparkles } from 'lucide-react';
 import { toast } from 'sonner';
 import { authApi, setToken } from '@client/src/api';
 
@@ -178,13 +178,11 @@ export default function LoginPage() {
     setShowConfirmPassword(false);
   };
 
-  const inputClass =
-    'glass-input w-full h-13 px-4 text-base text-[#333] placeholder:text-[#999]';
-
-  const passwordInputClass =
-    'glass-input w-full h-13 pl-4 pr-12 text-base text-[#333] placeholder:text-[#999]';
-
-  const labelClass = 'block text-sm font-medium text-[#333] mb-2';
+  const modeTitle: Record<Mode, string> = {
+    login: '登 录',
+    register: '注 册',
+    forgot: '重置密码',
+  };
 
   const renderSendCodeButton = (scene: 'register' | 'reset_password') => {
     const countdown = scene === 'register' ? registerCountdown : forgotCountdown;
@@ -195,55 +193,41 @@ export default function LoginPage() {
         type="button"
         onClick={() => handleSendCode(scene)}
         disabled={disabled}
-        className="shrink-0 h-13 px-4 text-sm text-[#FF8C69] bg-[#FF8C69]/10 rounded-xl font-medium disabled:text-[#999] disabled:bg-white/40 disabled:cursor-not-allowed transition-all"
+        className="login-code-btn"
       >
         {countdown > 0 ? `${countdown}s后重发` : '获取验证码'}
       </button>
     );
   };
 
-  const modeTitle: Record<Mode, string> = {
-    login: '登 录',
-    register: '注 册',
-    forgot: '重置密码',
-  };
-
   return (
-    <div className="min-h-screen w-full flex items-center justify-center">
-      <div className="w-full max-w-md mx-auto px-5 py-8">
+    <div className="login-page">
+      <div className="login-container">
         {/* Logo 区域 */}
-        <div className="text-center mb-10">
-          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-[#FF8C69] to-[#FF6B6B] mb-5 shadow-lg shadow-[#FF6B6B]/30">
-            <Heart className="w-10 h-10 text-white fill-white" />
+        <div className="text-center">
+          <div className="login-logo-wrap">
+            <Heart className="login-logo-icon fill-white" strokeWidth={2.5} />
           </div>
-          <h1 className="text-[28px] font-bold text-[#333] mb-2">心系</h1>
-          <p className="text-base text-[#999]">让陪伴不缺席</p>
+          <h1 className="login-title">心系</h1>
+          <p className="login-subtitle">让陪伴不缺席</p>
         </div>
 
         {/* 登录/注册卡片 */}
-        <div className="glass-card p-7">
+        <div className="login-card">
           {/* Tab 切换（登录/注册） */}
           {mode !== 'forgot' && (
-            <div className="flex mb-6 bg-white/40 rounded-2xl p-1 h-12">
+            <div className="login-tabs">
               <button
                 type="button"
                 onClick={() => switchMode('login')}
-                className={`flex-1 text-base rounded-xl transition-all duration-300 ${
-                  mode === 'login'
-                    ? 'bg-white text-[#FF8C69] shadow-sm font-semibold'
-                    : 'text-[#999] font-medium'
-                }`}
+                className={`login-tab ${mode === 'login' ? 'login-tab-active' : ''}`}
               >
                 登录
               </button>
               <button
                 type="button"
                 onClick={() => switchMode('register')}
-                className={`flex-1 text-base rounded-xl transition-all duration-300 ${
-                  mode === 'register'
-                    ? 'bg-white text-[#FF8C69] shadow-sm font-semibold'
-                    : 'text-[#999] font-medium'
-                }`}
+                className={`login-tab ${mode === 'register' ? 'login-tab-active' : ''}`}
               >
                 注册
               </button>
@@ -252,48 +236,55 @@ export default function LoginPage() {
 
           {/* 忘记密码模式标题 + 返回 */}
           {mode === 'forgot' && (
-            <div className="mb-8">
+            <div>
               <button
                 type="button"
                 onClick={() => switchMode('login')}
-                className="text-[#FF8C69] mb-4 flex items-center gap-1 text-sm font-medium"
+                className="login-back-btn"
               >
                 <ArrowLeft size={16} />
                 返回登录
               </button>
-              <h2 className="text-2xl font-bold text-[#333]">忘记密码</h2>
+              <h2 className="login-forgot-title">忘记密码</h2>
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit}>
+            {/* 手机号 */}
             <div>
-              <label className={labelClass}>手机号</label>
-              <input
-                ref={phoneInputRef}
-                type="tel"
-                inputMode="numeric"
-                maxLength={11}
-                value={phone}
-                onChange={(e) => handlePhoneChange(e.target.value)}
-                placeholder="请输入手机号"
-                className={inputClass}
-                autoFocus
-              />
+              <label className="login-label">手机号</label>
+              <div className="login-input-wrap">
+                <Phone className="login-input-icon" size={20} strokeWidth={2} />
+                <input
+                  ref={phoneInputRef}
+                  type="tel"
+                  inputMode="numeric"
+                  maxLength={11}
+                  value={phone}
+                  onChange={(e) => handlePhoneChange(e.target.value)}
+                  placeholder="请输入手机号"
+                  className="login-input"
+                />
+              </div>
             </div>
 
+            {/* 验证码 */}
             {(mode === 'register' || mode === 'forgot') && (
               <div>
-                <label className={labelClass}>验证码</label>
+                <label className="login-label">验证码</label>
                 <div className="flex gap-3">
-                  <input
-                    type="text"
-                    inputMode="numeric"
-                    maxLength={6}
-                    value={code}
-                    onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))}
-                    placeholder="请输入验证码"
-                    className={`${inputClass} flex-1`}
-                  />
+                  <div className="login-input-wrap" style={{ marginBottom: 0 }}>
+                    <Sparkles className="login-input-icon" size={20} strokeWidth={2} />
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      maxLength={6}
+                      value={code}
+                      onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))}
+                      placeholder="请输入验证码"
+                      className="login-input"
+                    />
+                  </div>
                   {renderSendCodeButton(
                     mode === 'register' ? 'register' : 'reset_password',
                   )}
@@ -306,25 +297,31 @@ export default function LoginPage() {
               </div>
             )}
 
+            {/* 昵称 */}
             {mode === 'register' && (
               <div>
-                <label className={labelClass}>昵称</label>
-                <input
-                  type="text"
-                  maxLength={20}
-                  value={nickname}
-                  onChange={(e) => setNickname(e.target.value)}
-                  placeholder="请输入昵称（2-20字）"
-                  className={inputClass}
-                />
+                <label className="login-label">昵称</label>
+                <div className="login-input-wrap">
+                  <User className="login-input-icon" size={20} strokeWidth={2} />
+                  <input
+                    type="text"
+                    maxLength={20}
+                    value={nickname}
+                    onChange={(e) => setNickname(e.target.value)}
+                    placeholder="请输入昵称（2-20字）"
+                    className="login-input"
+                  />
+                </div>
               </div>
             )}
 
+            {/* 密码 */}
             <div>
-              <label className={labelClass}>
+              <label className="login-label">
                 {mode === 'forgot' ? '新密码' : '密码'}
               </label>
-              <div className="relative">
+              <div className="login-input-wrap">
+                <Lock className="login-input-icon" size={20} strokeWidth={2} />
                 <input
                   type={showPassword ? 'text' : 'password'}
                   value={password}
@@ -334,12 +331,13 @@ export default function LoginPage() {
                       ? '请输入新密码（至少6位）'
                       : '请输入密码（至少6位）'
                   }
-                  className={passwordInputClass}
+                  className="login-input"
+                  style={{ paddingRight: '52px' }}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center text-[#999] hover:text-[#333] transition-colors"
+                  className="login-password-toggle"
                   aria-label={showPassword ? '隐藏密码' : '显示密码'}
                 >
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
@@ -347,21 +345,24 @@ export default function LoginPage() {
               </div>
             </div>
 
+            {/* 确认密码 */}
             {(mode === 'register' || mode === 'forgot') && (
               <div>
-                <label className={labelClass}>确认密码</label>
-                <div className="relative">
+                <label className="login-label">确认密码</label>
+                <div className="login-input-wrap">
+                  <Lock className="login-input-icon" size={20} strokeWidth={2} />
                   <input
                     type={showConfirmPassword ? 'text' : 'password'}
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="请再次输入密码"
-                    className={passwordInputClass}
+                    className="login-input"
+                    style={{ paddingRight: '52px' }}
                   />
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center text-[#999] hover:text-[#333] transition-colors"
+                    className="login-password-toggle"
                     aria-label={showConfirmPassword ? '隐藏密码' : '显示密码'}
                   >
                     {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
@@ -370,22 +371,22 @@ export default function LoginPage() {
               </div>
             )}
 
+            {/* 忘记密码 */}
             {mode === 'login' && (
-              <div className="text-right mt-3">
-                <button
-                  type="button"
-                  onClick={() => switchMode('forgot')}
-                  className="text-sm text-[#999]"
-                >
-                  忘记密码？
-                </button>
-              </div>
+              <button
+                type="button"
+                onClick={() => switchMode('forgot')}
+                className="login-forgot-link"
+              >
+                忘记密码？
+              </button>
             )}
 
+            {/* 提交按钮 */}
             <button
               type="submit"
               disabled={loading}
-              className="btn-gradient w-full mt-7 text-base font-semibold disabled:opacity-50"
+              className="login-submit-btn"
             >
               {loading ? '处理中...' : modeTitle[mode]}
             </button>
@@ -393,12 +394,12 @@ export default function LoginPage() {
 
           {/* 辅助切换链接 */}
           {mode === 'login' && (
-            <p className="text-center text-sm text-[#999] mt-6">
+            <p className="login-switch-text">
               还没有账号？
               <button
                 type="button"
                 onClick={() => switchMode('register')}
-                className="text-[#FF8C69] font-medium ml-1"
+                className="login-switch-link"
               >
                 立即注册
               </button>
@@ -406,12 +407,12 @@ export default function LoginPage() {
           )}
 
           {mode === 'register' && (
-            <p className="text-center text-sm text-[#999] mt-6">
+            <p className="login-switch-text">
               已有账号？
               <button
                 type="button"
                 onClick={() => switchMode('login')}
-                className="text-[#FF8C69] font-medium ml-1"
+                className="login-switch-link"
               >
                 去登录
               </button>
@@ -420,14 +421,14 @@ export default function LoginPage() {
 
           {/* 协议文字 */}
           {mode !== 'forgot' && (
-            <p className="text-xs text-[#999] text-center mt-6 leading-relaxed">
+            <p className="login-agreement-text">
               登录即表示同意《用户协议》和《隐私政策》
             </p>
           )}
         </div>
 
         {/* 底部品牌 */}
-        <p className="text-xs text-[#999] text-center mt-10">
+        <p className="login-brand-text">
           心系 · 为异地家人搭建温暖的情感桥梁
         </p>
       </div>
