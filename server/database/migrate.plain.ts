@@ -6,6 +6,30 @@ const logger = new Logger('Migrate');
 
 const MIGRATION_STATEMENTS: Array<{ name: string; sql: string }> = [
   {
+    name: 'ensure anon role exists',
+    sql: `DO $$
+BEGIN
+  IF NOT EXISTS (SELECT FROM pg_catalog.pg_roles WHERE rolname = 'anon') THEN
+    CREATE ROLE anon NOLOGIN;
+  END IF;
+EXCEPTION
+  WHEN insufficient_privilege THEN
+    RAISE NOTICE 'Skipping anon role creation: insufficient privilege';
+END$$;`,
+  },
+  {
+    name: 'ensure authenticated role exists',
+    sql: `DO $$
+BEGIN
+  IF NOT EXISTS (SELECT FROM pg_catalog.pg_roles WHERE rolname = 'authenticated') THEN
+    CREATE ROLE authenticated NOLOGIN;
+  END IF;
+EXCEPTION
+  WHEN insufficient_privilege THEN
+    RAISE NOTICE 'Skipping authenticated role creation: insufficient privilege';
+END$$;`,
+  },
+  {
     name: 'pgcrypto extension',
     sql: 'CREATE EXTENSION IF NOT EXISTS "pgcrypto";',
   },
@@ -246,37 +270,46 @@ END$$;`,
 DECLARE
   rec record;
   policy_name text;
+  anon_exists boolean;
+  auth_exists boolean;
 BEGIN
+  SELECT EXISTS (SELECT 1 FROM pg_catalog.pg_roles WHERE rolname = 'anon') INTO anon_exists;
+  SELECT EXISTS (SELECT 1 FROM pg_catalog.pg_roles WHERE rolname = 'authenticated') INTO auth_exists;
+
   FOR rec IN
     SELECT tablename FROM pg_tables
     WHERE schemaname = 'public' AND tablename LIKE 'xinyu_%'
   LOOP
     EXECUTE format('ALTER TABLE %I ENABLE ROW LEVEL SECURITY', rec.tablename);
 
-    policy_name := 'anon_all_policy_' || rec.tablename;
-    IF NOT EXISTS (
-      SELECT 1 FROM pg_policies
-      WHERE schemaname = 'public'
-        AND tablename = rec.tablename
-        AND policyname = policy_name
-    ) THEN
-      EXECUTE format(
-        'CREATE POLICY %I ON %I AS PERMISSIVE FOR ALL TO anon USING (true) WITH CHECK (true)',
-        policy_name, rec.tablename
-      );
+    IF anon_exists THEN
+      policy_name := 'anon_all_policy_' || rec.tablename;
+      IF NOT EXISTS (
+        SELECT 1 FROM pg_policies
+        WHERE schemaname = 'public'
+          AND tablename = rec.tablename
+          AND policyname = policy_name
+      ) THEN
+        EXECUTE format(
+          'CREATE POLICY %I ON %I AS PERMISSIVE FOR ALL TO anon USING (true) WITH CHECK (true)',
+          policy_name, rec.tablename
+        );
+      END IF;
     END IF;
 
-    policy_name := 'authenticated_all_policy_' || rec.tablename;
-    IF NOT EXISTS (
-      SELECT 1 FROM pg_policies
-      WHERE schemaname = 'public'
-        AND tablename = rec.tablename
-        AND policyname = policy_name
-    ) THEN
-      EXECUTE format(
-        'CREATE POLICY %I ON %I AS PERMISSIVE FOR ALL TO authenticated USING (true) WITH CHECK (true)',
-        policy_name, rec.tablename
-      );
+    IF auth_exists THEN
+      policy_name := 'authenticated_all_policy_' || rec.tablename;
+      IF NOT EXISTS (
+        SELECT 1 FROM pg_policies
+        WHERE schemaname = 'public'
+          AND tablename = rec.tablename
+          AND policyname = policy_name
+      ) THEN
+        EXECUTE format(
+          'CREATE POLICY %I ON %I AS PERMISSIVE FOR ALL TO authenticated USING (true) WITH CHECK (true)',
+          policy_name, rec.tablename
+        );
+      END IF;
     END IF;
   END LOOP;
 END$$;`,
