@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Heart,
@@ -39,6 +39,7 @@ export default function OnboardingPage() {
   const [redeemCode, setRedeemCode] = useState('');
   const [redeemRelation, setRedeemRelation] = useState<FamilyRelation>('son');
   const [redeeming, setRedeeming] = useState(false);
+  const hasSubmittedRef = useRef(false);
 
   const handleGenerateCode = async () => {
     setGenerating(true);
@@ -59,20 +60,39 @@ export default function OnboardingPage() {
   const handleCopyCode = async () => {
     if (!inviteCode) return;
     try {
-      await navigator.clipboard.writeText(inviteCode);
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(inviteCode);
+      } else {
+        const textarea = document.createElement('textarea');
+        textarea.value = inviteCode;
+        textarea.style.position = 'fixed';
+        textarea.style.left = '-9999px';
+        textarea.style.top = '-9999px';
+        textarea.setAttribute('readonly', '');
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+      }
       setCodeCopied(true);
-      toast.success('已复制邀请码');
+      toast.success('邀请码已复制，快去发给家人吧');
       setTimeout(() => setCodeCopied(false), 2000);
     } catch {
-      toast.error('复制失败');
+      toast.error('复制失败，请长按手动复制');
     }
   };
 
   const handleRedeemCodeChange = (value: string) => {
     const clean = value.replace(/[^0-9a-zA-Z]/g, '').toUpperCase().slice(0, 6);
     setRedeemCode(clean);
-    if (clean.length === 6 && !redeeming) {
-      setTimeout(() => handleRedeem(), 200);
+    if (clean.length === 6 && !redeeming && !hasSubmittedRef.current) {
+      hasSubmittedRef.current = true;
+      setTimeout(() => {
+        handleRedeem();
+        setTimeout(() => {
+          hasSubmittedRef.current = false;
+        }, 1500);
+      }, 300);
     }
   };
 
@@ -105,10 +125,12 @@ export default function OnboardingPage() {
   };
 
   const getTimeRemaining = (): string => {
-    if (!expiresAt) return '24小时';
+    if (!expiresAt) return '7天';
     const diff = new Date(expiresAt).getTime() - Date.now();
     if (diff <= 0) return '已过期';
-    const hours = Math.floor(diff / (1000 * 60 * 60));
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    if (days > 0) return `${days}天${hours}小时`;
     const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
     if (hours > 0) return `${hours}小时${minutes}分钟`;
     return `${minutes}分钟`;

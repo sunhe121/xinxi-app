@@ -1,4 +1,4 @@
-import { BadRequestException, ForbiddenException, Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Inject, Injectable, Logger, NotFoundException, ConflictException } from '@nestjs/common';
 import { DRIZZLE_DATABASE, type PostgresJsDatabase } from '@lark-apaas/fullstack-nestjs-core';
 import { xinyuBindings, xinyuInviteCodes, xinyuBroadcasts, xinyuDailyData } from '@server/database/schema';
 import { eq, or, and, desc, sql } from 'drizzle-orm';
@@ -174,8 +174,9 @@ export class XinyuBindingsService {
     userId: string,
     relation: FamilyRelation,
   ): Promise<{ code: string; expiresAt: string; relation: FamilyRelation }> {
-    const code = this.generateSixDigitCode();
-    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+    this.logger.log(`[createInviteCode] userId=${userId}, relation=${relation}`);
+
+    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 
     const existingActive = await this.db
       .select({ id: xinyuInviteCodes.id })
@@ -189,20 +190,43 @@ export class XinyuBindingsService {
       .limit(1);
 
     if (existingActive.length > 0) {
+      this.logger.log(`[createInviteCode] 作废旧邀请码: userId=${userId}, oldId=${existingActive[0].id}`);
       await this.db
         .update(xinyuInviteCodes)
         .set({ status: 'expired' })
         .where(eq(xinyuInviteCodes.id, existingActive[0].id));
     }
 
-    await this.db.insert(xinyuInviteCodes).values({
-      userId,
-      code,
-      relation,
-      expiresAt,
-      status: 'active',
-    });
+    let code = '';
+    let inserted = false;
+    for (let attempt = 0; attempt < 10 && !inserted; attempt += 1) {
+      code = this.generateSixDigitCode();
+      try {
+        await this.db.insert(xinyuInviteCodes).values({
+          userId,
+          code,
+          relation,
+          expiresAt,
+          status: 'active',
+        });
+        inserted = true;
+      } catch (error: unknown) {
+        const errCode = this.extractPostgresErrorCode(error);
+        if (errCode === '23505') {
+          this.logger.warn(`[createInviteCode] 邀请码碰撞，重试: code=${code}, attempt=${attempt + 1}`);
+          continue;
+        }
+        this.logger.error(`[createInviteCode] 写入失败: ${JSON.stringify(error)}`);
+        throw error;
+      }
+    }
 
+    if (!inserted) {
+      this.logger.error(`[createInviteCode] 生成邀请码失败，重试10次全部碰撞`);
+      throw new ConflictException('生成邀请码失败，请重试');
+    }
+
+    this.logger.log(`[createInviteCode] 成功: userId=${userId}, code=${code}, expiresAt=${expiresAt.toISOString()}`);
     return { code, expiresAt: expiresAt.toISOString(), relation };
   }
 
@@ -211,26 +235,55 @@ export class XinyuBindingsService {
     code: string,
     myRelation: FamilyRelation,
   ): Promise<FamilyMember> {
+    const trimmedCode = code.trim().toUpperCase();
+    this.logger.log(`[redeemInviteCode] userId=${userId}, code=${trimmedCode}, myRelation=${myRelation}`);
+
+    if (trimmedCode.length !== 6) {
+      throw new BadRequestException('请输入6位邀请码');
+    }
+
     const rows = await this.db
       .select()
       .from(xinyuInviteCodes)
-      .where(and(eq(xinyuInviteCodes.code, code.toUpperCase()), eq(xinyuInviteCodes.status, 'active')))
+      .where(eq(xinyuInviteCodes.code, trimmedCode))
       .limit(1);
 
-    if (rows.length === 0) throw new NotFoundException('邀请码无效或已过期');
+    if (rows.length === 0) {
+      this.logger.warn(`[redeemInviteCode] 邀请码不存在: code=${trimmedCode}`);
+      throw new NotFoundException('邀请码不存在，请检查后重试');
+    }
 
     const invite = rows[0];
     const creatorId = invite.userId;
 
-    if (creatorId === userId) throw new BadRequestException('不能绑定自己');
+    if (creatorId === userId) {
+      this.logger.warn(`[redeemInviteCode] 不能绑定自己: userId=${userId}, code=${trimmedCode}`);
+      throw new BadRequestException('不能绑定自己的邀请码');
+    }
+
+    if (invite.status === 'used') {
+      this.logger.warn(`[redeemInviteCode] 邀请码已被使用: code=${trimmedCode}`);
+      throw new BadRequestException('邀请码已被使用');
+    }
+
+    if (invite.status === 'expired') {
+      this.logger.warn(`[redeemInviteCode] 邀请码已过期: code=${trimmedCode}`);
+      throw new BadRequestException('邀请码已过期，请重新生成');
+    }
+
+    if (invite.status !== 'active') {
+      this.logger.warn(`[redeemInviteCode] 邀请码状态无效: code=${trimmedCode}, status=${invite.status}`);
+      throw new BadRequestException('邀请码无效');
+    }
 
     const now = new Date();
     if (invite.expiresAt && new Date(invite.expiresAt) < now) {
+      this.logger.warn(`[redeemInviteCode] 邀请码已过期: code=${trimmedCode}, expiresAt=${invite.expiresAt}`);
       await this.db
         .update(xinyuInviteCodes)
         .set({ status: 'expired' })
         .where(eq(xinyuInviteCodes.id, invite.id));
-      throw new BadRequestException('邀请码已过期');
+      throw new BadRequestException('邀请码已过期，请重新生成');
     }
 
     const alreadyBound = await this.db
@@ -248,42 +301,81 @@ export class XinyuBindingsService {
       .limit(1);
 
     if (alreadyBound.length > 0) {
+      this.logger.warn(`[redeemInviteCode] 已经是家人: userId=${userId}, creatorId=${creatorId}`);
       throw new BadRequestException('你们已经是家人啦');
     }
 
-    // 检查当前用户已绑定家人数量
     const myBoundCount = await this.countBindings(userId);
     if (myBoundCount >= 10) {
+      this.logger.warn(`[redeemInviteCode] 已达家人上限: userId=${userId}, count=${myBoundCount}`);
       throw new BadRequestException('最多只能配对10位家人');
     }
     const creatorBoundCount = await this.countBindings(creatorId);
     if (creatorBoundCount >= 10) {
+      this.logger.warn(`[redeemInviteCode] 对方已达家人上限: creatorId=${creatorId}, count=${creatorBoundCount}`);
       throw new BadRequestException('对方已达到家人数量上限');
     }
 
     const creatorRelation = (invite.relation as FamilyRelation) || 'other';
-    const inserted = await this.db
-      .insert(xinyuBindings)
-      .values({
-        userIdA: userId,
-        userIdB: creatorId,
-        relationAToB: myRelation,
-        relationBToA: creatorRelation,
-        status: 'bound',
-      })
-      .returning();
+    let insertedId = '';
+    let boundAtIso = '';
 
-    await this.db
-      .update(xinyuInviteCodes)
-      .set({ status: 'used' })
-      .where(eq(xinyuInviteCodes.id, invite.id));
+    try {
+      await this.db.transaction(async (tx) => {
+        const inserted = await tx
+          .insert(xinyuBindings)
+          .values({
+            userIdA: userId,
+            userIdB: creatorId,
+            relationAToB: myRelation,
+            relationBToA: creatorRelation,
+            status: 'bound',
+          })
+          .returning();
+
+        if (inserted.length === 0) {
+          throw new Error('创建绑定关系失败');
+        }
+
+        insertedId = inserted[0].id;
+        boundAtIso = inserted[0].boundAt
+          ? new Date(inserted[0].boundAt).toISOString()
+          : '';
+
+        const updated = await tx
+          .update(xinyuInviteCodes)
+          .set({ status: 'used' })
+          .where(
+            and(
+              eq(xinyuInviteCodes.id, invite.id),
+              eq(xinyuInviteCodes.status, 'active'),
+            ),
+          )
+          .returning({ id: xinyuInviteCodes.id });
+
+        if (updated.length === 0) {
+          throw new ConflictException('邀请码已被使用，请刷新后重试');
+        }
+      });
+    } catch (error: unknown) {
+      if (error instanceof ConflictException || error instanceof BadRequestException) {
+        throw error;
+      }
+      this.logger.error(`[redeemInviteCode] 事务失败: ${JSON.stringify(error)}`);
+      throw new BadRequestException('配对失败，请稍后重试');
+    }
 
     const creator = await this.usersService.findByUserId(creatorId);
-    if (!creator) throw new NotFoundException('邀请发起人不存在');
+    if (!creator) {
+      this.logger.error(`[redeemInviteCode] 邀请发起人不存在: creatorId=${creatorId}`);
+      throw new NotFoundException('邀请发起人不存在');
+    }
+
+    this.logger.log(`[redeemInviteCode] 配对成功: userId=${userId}, creatorId=${creatorId}, bindingId=${insertedId}`);
 
     return {
       id: creator.id,
-      bindingId: inserted[0].id,
+      bindingId: insertedId,
       userId: creator.userId,
       nickname: creator.nickname,
       avatarUrl: creator.avatarUrl,
@@ -292,7 +384,7 @@ export class XinyuBindingsService {
       relation: myRelation,
       relationLabel: RELATION_LABELS[myRelation],
       remarkName: '',
-      boundAt: inserted[0].boundAt ? inserted[0].boundAt.toISOString() : '',
+      boundAt: boundAtIso,
       hasUnread: false,
       lastActiveAt: '',
       lastBroadcastAt: '',
@@ -343,6 +435,7 @@ export class XinyuBindingsService {
   }
 
   async getActiveInviteCode(userId: string): Promise<{ code: string; expiresAt: string; relation: FamilyRelation } | null> {
+    this.logger.log(`[getActiveInviteCode] userId=${userId}`);
     const rows = await this.db
       .select()
       .from(xinyuInviteCodes)
@@ -354,16 +447,21 @@ export class XinyuBindingsService {
       )
       .orderBy(desc(xinyuInviteCodes.createdAt))
       .limit(1);
-    if (rows.length === 0) return null;
+    if (rows.length === 0) {
+      this.logger.log(`[getActiveInviteCode] 无有效邀请码: userId=${userId}`);
+      return null;
+    }
     const invite = rows[0];
     const now = new Date();
     if (invite.expiresAt && new Date(invite.expiresAt) < now) {
+      this.logger.log(`[getActiveInviteCode] 邀请码已过期: userId=${userId}, code=${invite.code}`);
       await this.db
         .update(xinyuInviteCodes)
         .set({ status: 'expired' })
         .where(eq(xinyuInviteCodes.id, invite.id));
       return null;
     }
+    this.logger.log(`[getActiveInviteCode] 找到有效邀请码: userId=${userId}, code=${invite.code}`);
     return {
       code: invite.code,
       expiresAt: invite.expiresAt ? invite.expiresAt.toISOString() : '',
@@ -398,6 +496,21 @@ export class XinyuBindingsService {
   }
 
   private generateSixDigitCode(): string {
-    return Math.floor(100000 + Math.random() * 900000).toString();
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    let result = '';
+    for (let i = 0; i < 6; i += 1) {
+      result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return result;
+  }
+
+  private extractPostgresErrorCode(error: unknown): string | undefined {
+    let current: unknown = error;
+    for (let depth = 0; depth < 4 && current && typeof current === 'object'; depth += 1) {
+      const { code, cause } = current as { code?: unknown; cause?: unknown };
+      if (typeof code === 'string') return code;
+      current = cause;
+    }
+    return undefined;
   }
 }

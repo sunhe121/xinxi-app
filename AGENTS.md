@@ -107,6 +107,9 @@
 
 ## 数据模型
 
+### 重要说明
+应用使用自建 JWT 鉴权体系（手机号+密码登录），而非平台用户体系。因此数据库层面所有连接在 RLS 视角下均为 `anon` 角色。所有业务表均已给 `anon` 角色开放 ALL 权限（USING=true, WITH CHECK=true），鉴权由应用层 JWT Guard 负责。
+
 ### 用户表 (xinyu_users)
 - id (uuid, PK)
 - userId (user_profile, 唯一索引)
