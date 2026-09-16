@@ -1,0 +1,24 @@
+{
+  "cases": [
+    {
+      "id": 1,
+      "priority": "p0",
+      "description": "打开登录页/login，验证：非白屏、左右有留白不贴边、毛玻璃半透明卡片、橙粉渐变背景、橙色渐变按钮"
+    },
+    {
+      "id": 2,
+      "priority": "p0",
+      "description": "打开落地页/landing，验证：非白屏、全屏渐变背景、居中毛玻璃卡片、橙色渐变按钮"
+    },
+    {
+      "id": 3,
+      "priority": "p1",
+      "description": "打开分享页/share，验证：非白屏、毛玻璃卡片、邀请码区域、渐变背景、左右不贴边"
+    },
+    {
+      "id": 4,
+      "priority": "p1",
+      "description": "打开404页/notfound-test，验证：非白屏、温暖治愈风、橙色主题"
+    }
+  ]
+}

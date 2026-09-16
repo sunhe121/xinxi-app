@@ -353,3 +353,86 @@ button, input, textarea, select {
   -webkit-animation: fadeIn 0.3s ease-out;
   animation: fadeIn 0.3s ease-out;
 }
+
+/* ========== 强制样式：确保手机端不贴边 + 毛玻璃生效 ========== */
+
+html, body, #root {
+  background: #FFF0E6 !important;
+  background: -webkit-linear-gradient(135deg, #FFF0E6 0%, #FFE4E1 50%, #FFE8DC 100%) !important;
+  background: linear-gradient(135deg, #FFF0E6 0%, #FFE4E1 50%, #FFE8DC 100%) !important;
+  background-attachment: fixed !important;
+}
+
+body {
+  padding-left: calc(env(safe-area-inset-left) + 0px) !important;
+  padding-right: calc(env(safe-area-inset-right) + 0px) !important;
+}
+
+#root {
+  padding-left: 20px !important;
+  padding-right: 20px !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* 毛玻璃卡片 - 强制半透明 + backdrop-filter */
+.glass-card {
+  background: rgba(255, 255, 255, 0.7) !important;
+  background-color: rgba(255, 255, 255, 0.7) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.8) !important;
+  border-radius: 24px !important;
+  box-shadow: 0 8px 32px rgba(255, 107, 107, 0.1) !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* 毛玻璃输入框 */
+.glass-input {
+  background: rgba(255, 255, 255, 0.6) !important;
+  background-color: rgba(255, 255, 255, 0.6) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  backdrop-filter: blur(10px) !important;
+  border: 1px solid rgba(255, 140, 105, 0.2) !important;
+  border-radius: 16px !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.glass-input:focus {
+  border-color: #FF8C69 !important;
+  box-shadow: 0 0 0 3px rgba(255, 140, 105, 0.15) !important;
+  outline: none !important;
+}
+
+/* 渐变按钮 */
+.btn-gradient {
+  background: -webkit-linear-gradient(135deg, #FF8C69 0%, #FF6B6B 100%) !important;
+  background: linear-gradient(135deg, #FF8C69 0%, #FF6B6B 100%) !important;
+  color: #FFFFFF !important;
+  font-weight: 600 !important;
+  border-radius: 16px !important;
+  height: 52px !important;
+  box-shadow: 0 8px 24px rgba(255, 107, 107, 0.3) !important;
+  border: none !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* 所有按钮、输入、卡片最大宽度限制，防止贴边溢出 */
+button, input, textarea, select, .card, [class*="card"] {
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* 底部导航毛玻璃 */
+.bottom-nav,
+[class*="bottom-nav"] {
+  -webkit-backdrop-filter: blur(20px) !important;
+  backdrop-filter: blur(20px) !important;
+}
