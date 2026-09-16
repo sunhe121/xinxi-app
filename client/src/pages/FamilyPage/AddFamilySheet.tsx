@@ -88,19 +88,35 @@ export function AddFamilySheet({ open, onClose, onSuccess }: AddFamilySheetProps
   };
 
   const handleCodeInput = (index: number, value: string) => {
-    const clean = value.replace(/[^0-9a-zA-Z]/g, '').slice(0, 1).toUpperCase();
-    const newCode = redeemCode.split('');
-    newCode[index] = clean;
-    const result = newCode.join('').padEnd(6, ' ').trim();
-    setRedeemCode(result);
-    if (clean && index < 5) {
-      inputRefs.current[index + 1]?.focus();
+    const clean = value.replace(/[^0-9a-zA-Z]/g, '').toUpperCase();
+    const chars = redeemCode.padEnd(6, ' ').split('').map((c: string) => (c === ' ' ? '' : c));
+    if (clean.length === 1) {
+      chars[index] = clean;
+      if (index < 5) {
+        setTimeout(() => inputRefs.current[index + 1]?.focus(), 0);
+      }
+    } else if (clean.length > 1) {
+      const pasted = clean.slice(0, 6 - index);
+      for (let i = 0; i < pasted.length; i++) {
+        chars[index + i] = pasted[i];
+      }
+      const nextIndex = index + pasted.length;
+      if (nextIndex < 6) {
+        setTimeout(() => inputRefs.current[nextIndex]?.focus(), 0);
+      }
     }
+    const result = chars.join('');
+    setRedeemCode(result);
   };
 
   const handleCodeKeyDown = (index: number, e: React.KeyboardEvent) => {
-    if (e.key === 'Backspace' && !redeemCode[index] && index > 0) {
-      inputRefs.current[index - 1]?.focus();
+    if (e.key === 'Backspace') {
+      const chars = redeemCode.padEnd(6, ' ').split('').map((c: string) => (c === ' ' ? '' : c));
+      if (!chars[index] && index > 0) {
+        chars[index - 1] = '';
+        setRedeemCode(chars.join(''));
+        setTimeout(() => inputRefs.current[index - 1]?.focus(), 0);
+      }
     }
   };
 

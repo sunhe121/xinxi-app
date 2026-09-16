@@ -88,7 +88,7 @@ export default function OnboardingPage() {
     if (clean.length === 6 && !redeeming && !hasSubmittedRef.current) {
       hasSubmittedRef.current = true;
       setTimeout(() => {
-        handleRedeem();
+        submitRedeem(clean);
         setTimeout(() => {
           hasSubmittedRef.current = false;
         }, 1500);
@@ -96,15 +96,15 @@ export default function OnboardingPage() {
     }
   };
 
-  const handleRedeem = async () => {
-    if (redeemCode.length !== 6) {
+  const submitRedeem = async (code: string) => {
+    if (code.length !== 6) {
       toast.error('请输入6位邀请码');
       return;
     }
     setRedeeming(true);
     try {
       await familyApi.redeemInviteCode({
-        code: redeemCode,
+        code,
         relation: redeemRelation,
       });
       toast.success('配对成功！');
@@ -117,6 +117,10 @@ export default function OnboardingPage() {
     } finally {
       setRedeeming(false);
     }
+  };
+
+  const handleRedeem = () => {
+    submitRedeem(redeemCode);
   };
 
   const handleSkip = () => {
