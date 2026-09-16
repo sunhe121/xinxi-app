@@ -10,17 +10,6 @@ const MIGRATION_STATEMENTS: Array<{ name: string; sql: string }> = [
     sql: 'CREATE EXTENSION IF NOT EXISTS "pgcrypto";',
   },
   {
-    name: 'user_profile custom type',
-    sql: `DO $$
-BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'user_profile') THEN
-    CREATE TYPE user_profile AS (
-      user_id character varying
-    );
-  END IF;
-END$$;`,
-  },
-  {
     name: 'file_attachment custom type',
     sql: `DO $$
 BEGIN
@@ -36,11 +25,11 @@ END$$;`,
     name: 'xinyu_users table',
     sql: `CREATE TABLE IF NOT EXISTS xinyu_users (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id VARCHAR(100) NOT NULL UNIQUE,
+  user_id VARCHAR(100) NOT NULL,
   nickname VARCHAR(100) NOT NULL,
   avatar_url TEXT,
   role VARCHAR(20) NOT NULL DEFAULT 'child',
-  invite_code VARCHAR(20) NOT NULL UNIQUE,
+  invite_code VARCHAR(20) NOT NULL,
   city VARCHAR(100) DEFAULT '北京',
   push_time VARCHAR(50) DEFAULT '08:00,20:00',
   voice_type VARCHAR(50) DEFAULT 'female_warm',
@@ -52,13 +41,19 @@ END$$;`,
   my_title VARCHAR(30),
   bio VARCHAR(100),
   password_hash VARCHAR(255),
-  phone VARCHAR(20) UNIQUE,
+  phone VARCHAR(20),
   language_profile TEXT,
   _created_at TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
   _created_by VARCHAR(100),
   _updated_at TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
   _updated_by VARCHAR(100)
 );`,
+  },
+  {
+    name: 'xinyu_users unique indexes',
+    sql: `CREATE UNIQUE INDEX IF NOT EXISTS xinyu_users_user_id_key ON xinyu_users (user_id);
+CREATE UNIQUE INDEX IF NOT EXISTS xinyu_users_invite_code_key ON xinyu_users (invite_code);
+CREATE UNIQUE INDEX IF NOT EXISTS xinyu_users_phone_idx ON xinyu_users (phone);`,
   },
   {
     name: 'xinyu_bindings table',
@@ -97,8 +92,9 @@ END$$;`,
 );`,
   },
   {
-    name: 'idx_messages_binding_created index',
-    sql: 'CREATE INDEX IF NOT EXISTS idx_messages_binding_created ON xinyu_messages (binding_id, _created_at DESC);',
+    name: 'xinyu_messages indexes',
+    sql: `CREATE INDEX IF NOT EXISTS idx_messages_binding_created ON xinyu_messages (binding_id, _created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_messages_receiver_reported ON xinyu_messages (receiver_user_id, is_reported);`,
   },
   {
     name: 'xinyu_broadcasts table',
@@ -126,6 +122,10 @@ END$$;`,
 );`,
   },
   {
+    name: 'xinyu_broadcasts indexes',
+    sql: 'CREATE INDEX IF NOT EXISTS idx_broadcasts_target_direction ON xinyu_broadcasts (target_user_id, direction);',
+  },
+  {
     name: 'xinyu_recordings table',
     sql: `CREATE TABLE IF NOT EXISTS xinyu_recordings (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -142,6 +142,10 @@ END$$;`,
   _updated_at TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
   _updated_by VARCHAR(100)
 );`,
+  },
+  {
+    name: 'xinyu_recordings indexes',
+    sql: 'CREATE INDEX IF NOT EXISTS idx_recordings_user_synced ON xinyu_recordings (user_id, synced_to_family);',
   },
   {
     name: 'xinyu_daily_data table',
@@ -163,10 +167,14 @@ END$$;`,
 );`,
   },
   {
+    name: 'xinyu_daily_data unique index',
+    sql: 'CREATE UNIQUE INDEX IF NOT EXISTS xinyu_daily_data_user_id_data_date_key ON xinyu_daily_data (user_id, data_date);',
+  },
+  {
     name: 'xinyu_privacy_settings table',
     sql: `CREATE TABLE IF NOT EXISTS xinyu_privacy_settings (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id VARCHAR(100) NOT NULL UNIQUE,
+  user_id VARCHAR(100) NOT NULL,
   steps_enabled BOOLEAN NOT NULL DEFAULT TRUE,
   sleep_enabled BOOLEAN NOT NULL DEFAULT TRUE,
   location_enabled BOOLEAN NOT NULL DEFAULT TRUE,
@@ -180,11 +188,15 @@ END$$;`,
 );`,
   },
   {
+    name: 'xinyu_privacy_settings unique index',
+    sql: 'CREATE UNIQUE INDEX IF NOT EXISTS xinyu_privacy_settings_user_id_key ON xinyu_privacy_settings (user_id);',
+  },
+  {
     name: 'xinyu_invite_codes table',
     sql: `CREATE TABLE IF NOT EXISTS xinyu_invite_codes (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id VARCHAR(100) NOT NULL,
-  code VARCHAR(6) NOT NULL UNIQUE,
+  code VARCHAR(6) NOT NULL,
   relation VARCHAR(20) NOT NULL DEFAULT 'other',
   expires_at TIMESTAMPTZ(6) NOT NULL,
   status VARCHAR(20) NOT NULL DEFAULT 'active',
@@ -195,18 +207,9 @@ END$$;`,
 );`,
   },
   {
-    name: 'xinyu_invite_codes_code_idx index',
-    sql: 'CREATE INDEX IF NOT EXISTS xinyu_invite_codes_code_idx ON xinyu_invite_codes (code);',
-  },
-  {
-    name: 'xinyu_users_phone column',
-    sql: `DO $$
-BEGIN
-  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'xinyu_users' AND column_name = 'phone') THEN
-    ALTER TABLE xinyu_users ADD COLUMN phone VARCHAR(20);
-    CREATE UNIQUE INDEX IF NOT EXISTS xinyu_users_phone_idx ON xinyu_users (phone);
-  END IF;
-END$$;`,
+    name: 'xinyu_invite_codes indexes',
+    sql: `CREATE UNIQUE INDEX IF NOT EXISTS xinyu_invite_codes_code_idx ON xinyu_invite_codes (code);
+CREATE INDEX IF NOT EXISTS xinyu_invite_codes_user_id_idx ON xinyu_invite_codes (user_id);`,
   },
   {
     name: 'xinyu_users_language_profile column',
@@ -234,187 +237,8 @@ END$$;`,
 );`,
   },
   {
-    name: 'xinyu_language_samples_user_idx index',
+    name: 'xinyu_language_samples index',
     sql: 'CREATE INDEX IF NOT EXISTS xinyu_language_samples_user_idx ON xinyu_language_samples (user_id);',
-  },
-  {
-    name: 'xinyu_users user_id column type migration',
-    sql: `DO $$
-DECLARE
-  col_type text;
-BEGIN
-  SELECT data_type INTO col_type FROM information_schema.columns
-  WHERE table_name = 'xinyu_users' AND column_name = 'user_id';
-  IF col_type = 'character varying' THEN
-    ALTER TABLE xinyu_users ALTER COLUMN user_id TYPE user_profile
-    USING CASE WHEN user_id IS NULL THEN NULL ELSE ROW(user_id)::user_profile END;
-  END IF;
-END$$;`,
-  },
-  {
-    name: 'xinyu_bindings user_id columns type migration',
-    sql: `DO $$
-DECLARE
-  col_type text;
-BEGIN
-  SELECT data_type INTO col_type FROM information_schema.columns
-  WHERE table_name = 'xinyu_bindings' AND column_name = 'user_id_a';
-  IF col_type = 'character varying' THEN
-    ALTER TABLE xinyu_bindings ALTER COLUMN user_id_a TYPE user_profile
-    USING CASE WHEN user_id_a IS NULL THEN NULL ELSE ROW(user_id_a)::user_profile END;
-    ALTER TABLE xinyu_bindings ALTER COLUMN user_id_b TYPE user_profile
-    USING CASE WHEN user_id_b IS NULL THEN NULL ELSE ROW(user_id_b)::user_profile END;
-  END IF;
-END$$;`,
-  },
-  {
-    name: 'xinyu_messages user_id columns type migration',
-    sql: `DO $$
-DECLARE
-  col_type text;
-BEGIN
-  SELECT data_type INTO col_type FROM information_schema.columns
-  WHERE table_name = 'xinyu_messages' AND column_name = 'sender_user_id';
-  IF col_type = 'character varying' THEN
-    ALTER TABLE xinyu_messages ALTER COLUMN sender_user_id TYPE user_profile
-    USING CASE WHEN sender_user_id IS NULL THEN NULL ELSE ROW(sender_user_id)::user_profile END;
-    ALTER TABLE xinyu_messages ALTER COLUMN receiver_user_id TYPE user_profile
-    USING CASE WHEN receiver_user_id IS NULL THEN NULL ELSE ROW(receiver_user_id)::user_profile END;
-  END IF;
-END$$;`,
-  },
-  {
-    name: 'xinyu_broadcasts user_id columns type migration',
-    sql: `DO $$
-DECLARE
-  col_type text;
-  has_user_id boolean;
-BEGIN
-  SELECT data_type INTO col_type FROM information_schema.columns
-  WHERE table_name = 'xinyu_broadcasts' AND column_name = 'target_user_id';
-  IF col_type = 'character varying' THEN
-    ALTER TABLE xinyu_broadcasts ALTER COLUMN target_user_id TYPE user_profile
-    USING CASE WHEN target_user_id IS NULL THEN NULL ELSE ROW(target_user_id)::user_profile END;
-  END IF;
-
-  SELECT EXISTS (
-    SELECT 1 FROM information_schema.columns
-    WHERE table_name = 'xinyu_broadcasts' AND column_name = 'user_id'
-  ) INTO has_user_id;
-  IF NOT has_user_id THEN
-    ALTER TABLE xinyu_broadcasts ADD COLUMN user_id user_profile;
-    UPDATE xinyu_broadcasts SET user_id = ROW('')::user_profile WHERE user_id IS NULL;
-    ALTER TABLE xinyu_broadcasts ALTER COLUMN user_id SET NOT NULL;
-    ALTER TABLE xinyu_broadcasts ALTER COLUMN user_id SET DEFAULT ROW('')::user_profile;
-  END IF;
-END$$;`,
-  },
-  {
-    name: 'xinyu_recordings user_id type migration',
-    sql: `DO $$
-DECLARE
-  col_type text;
-BEGIN
-  SELECT data_type INTO col_type FROM information_schema.columns
-  WHERE table_name = 'xinyu_recordings' AND column_name = 'user_id';
-  IF col_type = 'character varying' THEN
-    ALTER TABLE xinyu_recordings ALTER COLUMN user_id TYPE user_profile
-    USING CASE WHEN user_id IS NULL THEN NULL ELSE ROW(user_id)::user_profile END;
-  END IF;
-END$$;`,
-  },
-  {
-    name: 'xinyu_daily_data user_id type migration',
-    sql: `DO $$
-DECLARE
-  col_type text;
-BEGIN
-  SELECT data_type INTO col_type FROM information_schema.columns
-  WHERE table_name = 'xinyu_daily_data' AND column_name = 'user_id';
-  IF col_type = 'character varying' THEN
-    ALTER TABLE xinyu_daily_data ALTER COLUMN user_id TYPE user_profile
-    USING CASE WHEN user_id IS NULL THEN NULL ELSE ROW(user_id)::user_profile END;
-  END IF;
-END$$;`,
-  },
-  {
-    name: 'xinyu_privacy_settings user_id type migration',
-    sql: `DO $$
-DECLARE
-  col_type text;
-BEGIN
-  SELECT data_type INTO col_type FROM information_schema.columns
-  WHERE table_name = 'xinyu_privacy_settings' AND column_name = 'user_id';
-  IF col_type = 'character varying' THEN
-    ALTER TABLE xinyu_privacy_settings ALTER COLUMN user_id TYPE user_profile
-    USING CASE WHEN user_id IS NULL THEN NULL ELSE ROW(user_id)::user_profile END;
-  END IF;
-END$$;`,
-  },
-  {
-    name: 'xinyu_invite_codes user_id type migration',
-    sql: `DO $$
-DECLARE
-  col_type text;
-BEGIN
-  SELECT data_type INTO col_type FROM information_schema.columns
-  WHERE table_name = 'xinyu_invite_codes' AND column_name = 'user_id';
-  IF col_type = 'character varying' THEN
-    ALTER TABLE xinyu_invite_codes ALTER COLUMN user_id TYPE user_profile
-    USING CASE WHEN user_id IS NULL THEN NULL ELSE ROW(user_id)::user_profile END;
-  END IF;
-END$$;`,
-  },
-  {
-    name: 'xinyu_language_samples user_id type migration',
-    sql: `DO $$
-DECLARE
-  col_type text;
-BEGIN
-  SELECT data_type INTO col_type FROM information_schema.columns
-  WHERE table_name = 'xinyu_language_samples' AND column_name = 'user_id';
-  IF col_type = 'character varying' THEN
-    ALTER TABLE xinyu_language_samples ALTER COLUMN user_id TYPE user_profile
-    USING CASE WHEN user_id IS NULL THEN NULL ELSE ROW(user_id)::user_profile END;
-  END IF;
-END$$;`,
-  },
-  {
-    name: 'xinyu_audit_columns type migration',
-    sql: `DO $$
-DECLARE
-  rec record;
-BEGIN
-  FOR rec IN
-    SELECT table_name, column_name
-    FROM information_schema.columns
-    WHERE table_schema = 'public'
-      AND table_name LIKE 'xinyu_%'
-      AND column_name IN ('_created_by', '_updated_by')
-      AND data_type = 'character varying'
-  LOOP
-    EXECUTE format(
-      'ALTER TABLE %I ALTER COLUMN %I TYPE user_profile USING CASE WHEN %I IS NULL THEN NULL ELSE ROW(%I)::user_profile END',
-      rec.table_name, rec.column_name, rec.column_name, rec.column_name
-    );
-  END LOOP;
-END$$;`,
-  },
-  {
-    name: 'idx_messages_receiver_reported index',
-    sql: 'CREATE INDEX IF NOT EXISTS idx_messages_receiver_reported ON xinyu_messages (((receiver_user_id).user_id), is_reported);',
-  },
-  {
-    name: 'idx_broadcasts_target_direction index',
-    sql: 'CREATE INDEX IF NOT EXISTS idx_broadcasts_target_direction ON xinyu_broadcasts (((target_user_id).user_id), direction);',
-  },
-  {
-    name: 'idx_recordings_user_synced index',
-    sql: 'CREATE INDEX IF NOT EXISTS idx_recordings_user_synced ON xinyu_recordings (((user_id).user_id), synced_to_family);',
-  },
-  {
-    name: 'xinyu_daily_data unique index',
-    sql: 'CREATE UNIQUE INDEX IF NOT EXISTS xinyu_daily_data_user_date_idx ON xinyu_daily_data (((user_id).user_id), data_date);',
   },
   {
     name: 'RLS enable and anon policy for all xinyu tables',
