@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { drizzle, type PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import postgres from 'postgres';
-import * as schema from './schema.plain';
+import * as schema from './schema';
 
 export const DB = 'DB';
 export const DRIZZLE_DATABASE = 'DRIZZLE_DATABASE';
