@@ -77,6 +77,10 @@ request.interceptors.response.use(
         window.location.assign('/login');
       }
     }
+    if (error.response?.data?.message) {
+      const msg = error.response.data.message;
+      error.message = Array.isArray(msg) ? msg[0] : msg;
+    }
     return Promise.reject(error);
   },
 );

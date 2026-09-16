@@ -236,9 +236,14 @@ export class XinyuBindingsService {
     myRelation: FamilyRelation,
   ): Promise<FamilyMember> {
     const trimmedCode = code.trim().toUpperCase();
-    this.logger.log(`[redeemInviteCode] userId=${userId}, code=${trimmedCode}, myRelation=${myRelation}`);
+    this.logger.log(`[redeemInviteCode] === 开始兑换 ===`);
+    this.logger.log(`[redeemInviteCode] 原始输入: "${code}"`);
+    this.logger.log(`[redeemInviteCode] 处理后: "${trimmedCode}", 长度=${trimmedCode.length}`);
+    this.logger.log(`[redeemInviteCode] 当前用户ID: ${userId}`);
+    this.logger.log(`[redeemInviteCode] 我的关系: ${myRelation}`);
 
     if (trimmedCode.length !== 6) {
+      this.logger.warn(`[redeemInviteCode] 邀请码长度不对: ${trimmedCode.length}`);
       throw new BadRequestException('请输入6位邀请码');
     }
 
@@ -248,6 +253,8 @@ export class XinyuBindingsService {
       .where(eq(xinyuInviteCodes.code, trimmedCode))
       .limit(1);
 
+    this.logger.log(`[redeemInviteCode] 查询结果数量: ${rows.length}`);
+
     if (rows.length === 0) {
       this.logger.warn(`[redeemInviteCode] 邀请码不存在: code=${trimmedCode}`);
       throw new NotFoundException('邀请码不存在，请检查后重试');
@@ -255,6 +262,11 @@ export class XinyuBindingsService {
 
     const invite = rows[0];
     const creatorId = invite.userId;
+    this.logger.log(`[redeemInviteCode] 邀请码ID: ${invite.id}`);
+    this.logger.log(`[redeemInviteCode] 生成者ID: ${creatorId}`);
+    this.logger.log(`[redeemInviteCode] 邀请码状态: ${invite.status}`);
+    this.logger.log(`[redeemInviteCode] 过期时间: ${invite.expiresAt ? invite.expiresAt.toISOString() : 'null'}`);
+    this.logger.log(`[redeemInviteCode] 生成者关系: ${invite.relation}`);
 
     if (creatorId === userId) {
       this.logger.warn(`[redeemInviteCode] 不能绑定自己: userId=${userId}, code=${trimmedCode}`);
@@ -277,14 +289,16 @@ export class XinyuBindingsService {
     }
 
     const now = new Date();
+    this.logger.log(`[redeemInviteCode] 当前时间: ${now.toISOString()}`);
     if (invite.expiresAt && new Date(invite.expiresAt) < now) {
-      this.logger.warn(`[redeemInviteCode] 邀请码已过期: code=${trimmedCode}, expiresAt=${invite.expiresAt}`);
+      this.logger.warn(`[redeemInviteCode] 邀请码已过期: code=${trimmedCode}, expiresAt=${invite.expiresAt.toISOString()}`);
       await this.db
         .update(xinyuInviteCodes)
         .set({ status: 'expired' })
         .where(eq(xinyuInviteCodes.id, invite.id));
       throw new BadRequestException('邀请码已过期，请重新生成');
     }
+    this.logger.log(`[redeemInviteCode] 过期检查通过`);
 
     const alreadyBound = await this.db
       .select({ id: xinyuBindings.id })
@@ -320,8 +334,13 @@ export class XinyuBindingsService {
     let insertedId = '';
     let boundAtIso = '';
 
+    this.logger.log(`[redeemInviteCode] 开始事务：创建绑定关系`);
+    this.logger.log(`[redeemInviteCode] userIdA=${userId}, userIdB=${creatorId}`);
+    this.logger.log(`[redeemInviteCode] relationAToB=${myRelation}, relationBToA=${creatorRelation}`);
+
     try {
       await this.db.transaction(async (tx) => {
+        this.logger.log(`[redeemInviteCode] 执行 INSERT xinyu_bindings ...`);
         const inserted = await tx
           .insert(xinyuBindings)
           .values({
@@ -333,14 +352,19 @@ export class XinyuBindingsService {
           })
           .returning();
 
+        this.logger.log(`[redeemInviteCode] INSERT 结果: ${inserted.length} 行`);
+
         if (inserted.length === 0) {
-          throw new Error('创建绑定关系失败');
+          throw new Error('创建绑定关系失败：返回0行');
         }
 
         insertedId = inserted[0].id;
         boundAtIso = inserted[0].boundAt
           ? new Date(inserted[0].boundAt).toISOString()
           : '';
+
+        this.logger.log(`[redeemInviteCode] 绑定ID: ${insertedId}, boundAt: ${boundAtIso}`);
+        this.logger.log(`[redeemInviteCode] 执行 UPDATE xinyu_invite_codes 标记为已使用...`);
 
         const updated = await tx
           .update(xinyuInviteCodes)
@@ -353,16 +377,40 @@ export class XinyuBindingsService {
           )
           .returning({ id: xinyuInviteCodes.id });
 
+        this.logger.log(`[redeemInviteCode] UPDATE 结果: ${updated.length} 行`);
+
         if (updated.length === 0) {
           throw new ConflictException('邀请码已被使用，请刷新后重试');
         }
+
+        this.logger.log(`[redeemInviteCode] 事务成功`);
       });
     } catch (error: unknown) {
-      if (error instanceof ConflictException || error instanceof BadRequestException) {
+      if (error instanceof ConflictException || error instanceof BadRequestException || error instanceof NotFoundException) {
         throw error;
       }
-      this.logger.error(`[redeemInviteCode] 事务失败: ${JSON.stringify(error)}`);
-      throw new BadRequestException('配对失败，请稍后重试');
+      const pgCode = this.extractPostgresErrorCode(error);
+      const errMsg = error instanceof Error ? error.message : String(error);
+      const errStack = error instanceof Error ? error.stack : '';
+      this.logger.error(`[redeemInviteCode] 事务失败!`);
+      this.logger.error(`[redeemInviteCode] Postgres 错误码: ${pgCode ?? 'unknown'}`);
+      this.logger.error(`[redeemInviteCode] 错误消息: ${errMsg}`);
+      if (errStack) {
+        this.logger.error(`[redeemInviteCode] 错误栈: ${errStack}`);
+      }
+      if (pgCode === '42501') {
+        this.logger.error(`[redeemInviteCode] RLS 权限不足！anon 角色缺少 INSERT 权限`);
+        throw new BadRequestException('系统权限配置异常，请联系管理员');
+      }
+      if (pgCode === '23505') {
+        this.logger.error(`[redeemInviteCode] 唯一约束冲突`);
+        throw new BadRequestException('你们已经是家人啦');
+      }
+      if (pgCode === '42883') {
+        this.logger.error(`[redeemInviteCode] 操作符不存在 - 可能是类型不匹配`);
+        throw new BadRequestException('数据类型不匹配，请联系管理员');
+      }
+      throw new BadRequestException(`配对失败：${errMsg}`);
     }
 
     const creator = await this.usersService.findByUserId(creatorId);
