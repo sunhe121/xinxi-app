@@ -77,13 +77,40 @@ export function AddFamilySheet({ open, onClose, onSuccess }: AddFamilySheetProps
 
   const handleCopyCode = async () => {
     if (!inviteCode) return;
-    try {
-      await navigator.clipboard.writeText(inviteCode);
+    let success = false;
+    if (navigator.clipboard && window.isSecureContext) {
+      try {
+        await navigator.clipboard.writeText(inviteCode);
+        success = true;
+      } catch {
+        // fallback
+      }
+    }
+    if (!success) {
+      try {
+        const textarea = document.createElement('textarea');
+        textarea.value = inviteCode;
+        textarea.style.position = 'fixed';
+        textarea.style.top = '0';
+        textarea.style.left = '0';
+        textarea.style.opacity = '0';
+        textarea.style.pointerEvents = 'none';
+        textarea.setAttribute('readonly', '');
+        document.body.appendChild(textarea);
+        textarea.select();
+        textarea.setSelectionRange(0, inviteCode.length);
+        success = document.execCommand('copy');
+        document.body.removeChild(textarea);
+      } catch {
+        success = false;
+      }
+    }
+    if (success) {
       setCopied(true);
       toast.success('邀请码已复制');
       setTimeout(() => setCopied(false), 2000);
-    } catch {
-      toast.error('复制失败');
+    } else {
+      toast.error('复制失败，请手动长按复制');
     }
   };
 
@@ -144,7 +171,7 @@ export function AddFamilySheet({ open, onClose, onSuccess }: AddFamilySheetProps
   };
 
   const getTimeRemaining = (): string => {
-    if (!expiresAt) return '24小时';
+    if (!expiresAt) return '7天';
     const diff = new Date(expiresAt).getTime() - Date.now();
     if (diff <= 0) return '已过期';
     const hours = Math.floor(diff / (1000 * 60 * 60));

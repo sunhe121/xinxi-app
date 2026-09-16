@@ -68,6 +68,7 @@ export const xinyuInviteCodes = pgTable('xinyu_invite_codes', {
   updatedBy: varchar('_updated_by', { length: 100 }),
 }, (table) => [
   uniqueIndex('xinyu_invite_codes_code_idx').on(table.code),
+  index('xinyu_invite_codes_user_id_idx').on(table.userId),
 ]);
 
 export const xinyuDailyData = pgTable('xinyu_daily_data', {
@@ -121,7 +122,10 @@ export const xinyuMessages = pgTable('xinyu_messages', {
   createdBy: varchar('_created_by', { length: 100 }),
   updatedAt: customTimestamptz('_updated_at', { precision: 3 }).notNull().default(sql`CURRENT_TIMESTAMP`),
   updatedBy: varchar('_updated_by', { length: 100 }),
-});
+}, (table) => [
+  index('idx_messages_binding_created').on(table.bindingId, table.createdAt),
+  index('idx_messages_receiver_reported').on(table.receiverUserId, table.isReported),
+]);
 
 export const xinyuBroadcasts = pgTable('xinyu_broadcasts', {
   id: uuid('id').primaryKey().defaultRandom(),

@@ -31,7 +31,13 @@ END$$;`,
   },
   {
     name: 'pgcrypto extension',
-    sql: 'CREATE EXTENSION IF NOT EXISTS "pgcrypto";',
+    sql: `DO $$
+BEGIN
+  CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+EXCEPTION
+  WHEN insufficient_privilege THEN
+    RAISE NOTICE 'Skipping pgcrypto extension: insufficient privilege (gen_random_uuid() is built-in in PG13+)';
+END$$;`,
   },
   {
     name: 'file_attachment custom type',

@@ -6,7 +6,7 @@ import postgres from 'postgres';
 import * as schema from './schema.plain';
 
 export const DB = 'DB';
-export const DRIZZLE_DATABASE = 'DB';
+export const DRIZZLE_DATABASE = 'DRIZZLE_DATABASE';
 export type DbInstance = PostgresJsDatabase<typeof schema>;
 
 @Global()
@@ -24,7 +24,11 @@ export type DbInstance = PostgresJsDatabase<typeof schema>;
         return drizzle(queryClient, { schema });
       },
     },
-  ],
-  exports: [DB, DRIZZLE_DATABASE],
+      {
+        provide: DRIZZLE_DATABASE,
+        useExisting: DB,
+      },
+    ],
+    exports: [DB, DRIZZLE_DATABASE],
 })
 export class DatabaseModule {}

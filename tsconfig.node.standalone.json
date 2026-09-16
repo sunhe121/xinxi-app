@@ -23,6 +23,7 @@
     "baseUrl": "./",
     "paths": {
       "@server/*": ["server/*"],
+      "@server/database/schema": ["server/database/schema.plain.ts"],
       "@shared/*": ["shared/*"]
     }
   },
