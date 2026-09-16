@@ -5,6 +5,7 @@ import {
   Camera,
   User,
   X,
+  ChevronRight,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useUser } from '@client/src/hooks/useUser';
@@ -123,162 +124,161 @@ export default function ProfileEditPage() {
     : null;
 
   return (
-<>
-      <div className="min-h-screen bg-background pb-24">
+    <>
+      <div className="min-h-screen bg-transparent px-5 pt-4 pb-6">
         {/* 顶部导航栏 */}
-        <div className="sticky top-0 z-40 bg-background/90 backdrop-blur-sm border-b border-border/50">
-          <div className="max-w-[480px] mx-auto flex items-center justify-between px-5 h-14">
-            <button
-              onClick={() => navigate(-1)}
-              className="w-11 h-11 rounded-full flex items-center justify-center text-foreground active:scale-95 transition-transform"
-              aria-label="返回"
-            >
-              <ArrowLeft size={22} />
-            </button>
-            <h1 className="text-lg font-semibold text-foreground">编辑资料</h1>
-            <button
-              onClick={handleSave}
-              disabled={saving}
-              className="px-4 h-11 rounded-full bg-gradient-to-r from-primary to-secondary text-white font-medium text-base shadow-md shadow-primary/25 active:scale-95 transition-all disabled:opacity-60"
-            >
-              保存
-            </button>
-          </div>
+        <div className="flex items-center justify-between mb-6">
+          <button
+            onClick={() => navigate(-1)}
+            className="w-10 h-10 rounded-full flex items-center justify-center text-[#FF8C69] active:scale-95 transition-transform"
+            aria-label="返回"
+          >
+            <ArrowLeft size={22} strokeWidth={2.5} />
+          </button>
+          <h1 className="text-lg font-semibold text-[#333333]">编辑资料</h1>
+          <button
+            onClick={handleSave}
+            disabled={saving}
+            className="px-3 h-10 text-[#FF8C69] font-medium text-base active:scale-95 transition-transform disabled:opacity-50"
+          >
+            保存
+          </button>
         </div>
 
-        <div className="max-w-[480px] mx-auto px-5 pt-6 space-y-5">
+        <div className="space-y-5">
           {/* 头像区域 */}
-          <div className="flex flex-col items-center">
+          <div className="glass-card p-6 flex flex-col items-center">
             <button
               onClick={() => setShowAvatarSheet(true)}
               className="relative group active:scale-95 transition-transform"
             >
-              <div className="w-20 h-20 rounded-full overflow-hidden ring-4 ring-primary/20 bg-secondary flex items-center justify-center">
-                {avatarUrl && !isPresetAvatar(avatarUrl) ? (
-                  <Image
-                    src={avatarUrl}
-                    alt="头像"
-                    className="w-full h-full object-cover"
-                  />
-                ) : avatarOption ? (
-                  <div
-                    className={cn(
-                      'w-full h-full bg-gradient-to-br flex items-center justify-center text-4xl',
-                      avatarOption.bg
-                    )}
-                  >
-                    {avatarOption.emoji}
-                  </div>
-                ) : (
-                  <User size={36} className="text-muted-foreground" />
-                )}
+              <div className="w-24 h-24 rounded-full p-[3px] bg-gradient-to-br from-[#FF8C69] to-[#FF6B6B] shadow-lg shadow-[#FF6B6B]/20">
+                <div className="w-full h-full rounded-full overflow-hidden bg-white/80 backdrop-blur-sm flex items-center justify-center">
+                  {avatarUrl && !isPresetAvatar(avatarUrl) ? (
+                    <Image
+                      src={avatarUrl}
+                      alt="头像"
+                      className="w-full h-full object-cover"
+                    />
+                  ) : avatarOption ? (
+                    <div
+                      className={cn(
+                        'w-full h-full bg-gradient-to-br flex items-center justify-center text-4xl',
+                        avatarOption.bg
+                      )}
+                    >
+                      {avatarOption.emoji}
+                    </div>
+                  ) : (
+                    <User size={40} className="text-[#999999]" />
+                  )}
+                </div>
               </div>
-              <div className="absolute -bottom-1 -right-1 w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center shadow-lg ring-2 ring-card">
+              <div className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-gradient-to-br from-[#FF8C69] to-[#FF6B6B] text-white flex items-center justify-center shadow-md ring-2 ring-white/80">
                 <Camera size={16} />
               </div>
             </button>
-            <p className="text-sm text-muted-foreground mt-3">点击更换头像</p>
+            <p className="text-sm text-[#FF8C69] mt-3 font-medium">更换头像</p>
           </div>
 
-          {/* 昵称 */}
-  <div className="space-y-2.5">
-             <label className="text-sm font-medium text-foreground">昵称</label>
-             <input
-              type="text"
-              value={nickname}
-              onChange={(e) => setNickname(e.target.value)}
-              placeholder="请输入昵称"
-              maxLength={20}
-              className="w-full h-12 px-4 bg-card border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-base"
-            />
-            <p className="text-xs text-muted-foreground">家人会看到这个名字</p>
-          </div>
-
-          {/* 性别 */}
-  <div className="space-y-2.5">
-             <label className="text-sm font-medium text-foreground">性别</label>
-            <div className="flex gap-3">
-              <button
-                onClick={() => setGender('male')}
-                className={cn(
-                  'flex-1 py-3.5 rounded-2xl font-medium transition-all active:scale-95',
-                  gender === 'male'
-                    ? 'bg-primary text-white shadow-md shadow-primary/30'
-                    : 'bg-secondary text-muted-foreground'
-                )}
-              >
-                男
-              </button>
-              <button
-                onClick={() => setGender('female')}
-                className={cn(
-                  'flex-1 py-3.5 rounded-2xl font-medium transition-all active:scale-95',
-                  gender === 'female'
-                    ? 'bg-primary text-white shadow-md shadow-primary/30'
-                    : 'bg-secondary text-muted-foreground'
-                )}
-              >
-                女
-              </button>
+          {/* 基本资料卡片 */}
+          <div className="glass-card overflow-hidden">
+            {/* 昵称 */}
+            <div className="h-16 px-5 flex flex-col justify-center border-b border-white/30">
+              <label className="text-xs text-[#999999] mb-1">昵称</label>
+              <input
+                type="text"
+                value={nickname}
+                onChange={(e) => setNickname(e.target.value)}
+                placeholder="请输入昵称"
+                maxLength={20}
+                className="text-base text-[#333333] placeholder:text-[#999999] bg-transparent focus:outline-none w-full"
+              />
             </div>
-          </div>
 
-          {/* 我的称呼 */}
-  <div className="space-y-2.5">
-             <div>
-               <label className="text-sm font-medium text-foreground">我的称呼</label>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                家人怎么称呼你，会出现在播报里
-              </p>
-            </div>
-            <div className="flex gap-2 overflow-x-auto scrollbar-hide -mx-5 px-5 pb-1">
-              {TITLE_OPTIONS.map((title) => (
+            {/* 性别 */}
+            <div className="h-16 px-5 flex items-center justify-between border-b border-white/30">
+              <span className="text-xs text-[#999999]">性别</span>
+              <div className="flex gap-2">
                 <button
-                  key={title}
-                  onClick={() => handleSelectPreset(title)}
+                  onClick={() => setGender('male')}
                   className={cn(
-                    'px-4 min-h-10 py-2.5 rounded-full whitespace-nowrap flex-shrink-0 text-sm font-medium transition-all active:scale-95',
-                    myTitle === title && !customTitle
-                      ? 'bg-primary text-white shadow-md shadow-primary/25'
-                      : 'bg-secondary text-foreground'
+                    'px-5 h-9 rounded-full text-sm font-medium transition-all active:scale-95',
+                    gender === 'male'
+                      ? 'bg-gradient-to-r from-[#FF8C69] to-[#FF6B6B] text-white shadow-md shadow-[#FF6B6B]/30'
+                      : 'bg-white/60 text-[#999999] border border-white/80'
                   )}
                 >
-                  {title}
+                  男
                 </button>
-              ))}
+                <button
+                  onClick={() => setGender('female')}
+                  className={cn(
+                    'px-5 h-9 rounded-full text-sm font-medium transition-all active:scale-95',
+                    gender === 'female'
+                      ? 'bg-gradient-to-r from-[#FF8C69] to-[#FF6B6B] text-white shadow-md shadow-[#FF6B6B]/30'
+                      : 'bg-white/60 text-[#999999] border border-white/80'
+                  )}
+                >
+                  女
+                </button>
+              </div>
             </div>
-            <input
-              type="text"
-              value={customTitle}
-              onChange={(e) => handleCustomTitleChange(e.target.value)}
-              placeholder="自定义称呼"
-              maxLength={10}
-              className="w-full h-12 px-4 bg-card border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-base"
-            />
+
+            {/* 我的称呼 */}
+            <div className="px-5 py-4 border-b border-white/30">
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-xs text-[#999999]">我的称呼</span>
+                <span className="text-xs text-[#FF8C69]">家人怎么称呼你</span>
+              </div>
+              <div className="flex gap-2 overflow-x-auto scrollbar-hide -mx-5 px-5 pb-1">
+                {TITLE_OPTIONS.map((title) => (
+                  <button
+                    key={title}
+                    onClick={() => handleSelectPreset(title)}
+                    className={cn(
+                      'px-4 min-h-9 py-2 rounded-full whitespace-nowrap flex-shrink-0 text-sm font-medium transition-all active:scale-95',
+                      myTitle === title && !customTitle
+                        ? 'bg-gradient-to-r from-[#FF8C69] to-[#FF6B6B] text-white shadow-md shadow-[#FF6B6B]/25'
+                        : 'bg-white/60 text-[#333333] border border-white/80'
+                    )}
+                  >
+                    {title}
+                  </button>
+                ))}
+              </div>
+              <div className="glass-input mt-3 h-11 px-4 flex items-center">
+                <input
+                  type="text"
+                  value={customTitle}
+                  onChange={(e) => handleCustomTitleChange(e.target.value)}
+                  placeholder="自定义称呼"
+                  maxLength={10}
+                  className="w-full bg-transparent text-base text-[#333333] placeholder:text-[#999999] focus:outline-none"
+                />
+              </div>
+            </div>
           </div>
 
-          {/* 个性签名 */}
-  <div className="space-y-2.5">
-             <div className="flex items-center justify-between">
-               <label className="text-sm font-medium text-foreground">个性签名</label>
-              <span className="text-xs text-muted-foreground">{bio.length}/50</span>
+          {/* 关于我卡片 */}
+          <div className="glass-card p-5">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs text-[#999999]">个性签名</span>
+              <span className="text-xs text-[#999999]">{bio.length}/50</span>
             </div>
             <textarea
               value={bio}
               onChange={(e) => setBio(e.target.value.slice(0, 50))}
               placeholder="一句话介绍自己"
-              rows={3}
-              className="w-full px-4 py-3 bg-card border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-base resize-none"
+              className="glass-input w-full h-24 p-3 text-sm text-[#333333] resize-none placeholder:text-[#999999] focus:outline-none"
             />
           </div>
-        </div>
 
-        {/* 底部保存按钮 */}
-        <div className="fixed bottom-0 left-0 right-0 p-5 pb-6 bg-gradient-to-t from-background via-background/95 to-transparent max-w-[480px] mx-auto">
+          {/* 底部保存按钮 */}
           <button
             onClick={handleSave}
             disabled={saving}
-            className="w-full h-12 bg-gradient-to-r from-primary to-secondary text-white rounded-xl font-semibold text-base shadow-lg shadow-primary/30 active:scale-[0.98] transition-all disabled:opacity-60"
+            className="btn-gradient w-full mt-6 text-base"
           >
             {saving ? '保存中...' : '保存'}
           </button>
@@ -291,14 +291,14 @@ export default function ProfileEditPage() {
               className="absolute inset-0 bg-black/40 animate-fadeIn"
               onClick={() => setShowAvatarSheet(false)}
             />
-            <div className="absolute bottom-0 left-0 right-0 bg-card rounded-t-3xl max-w-[480px] mx-auto animate-slideUp">
-              <div className="w-10 h-1 bg-border rounded-full mx-auto mt-3" />
+            <div className="absolute bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl rounded-t-3xl max-w-[480px] mx-auto animate-slideUp border-t border-white/80">
+              <div className="w-10 h-1 bg-[#FF8C69]/20 rounded-full mx-auto mt-3" />
               <div className="p-6 pb-8">
                 <div className="flex items-center justify-between mb-5">
-                  <h2 className="text-xl font-semibold text-foreground">选择头像</h2>
+                  <h2 className="text-xl font-semibold text-[#333333]">选择头像</h2>
                   <button
                     onClick={() => setShowAvatarSheet(false)}
-                    className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center text-muted-foreground active:scale-95 transition-transform"
+                    className="w-10 h-10 rounded-full bg-white/60 flex items-center justify-center text-[#999999] active:scale-95 transition-transform border border-white/80"
                     aria-label="关闭"
                   >
                     <X size={20} />
@@ -316,13 +316,13 @@ export default function ProfileEditPage() {
                           'w-14 h-14 rounded-full bg-gradient-to-br flex items-center justify-center text-2xl ring-2 transition-all',
                           opt.bg,
                           getPresetAvatarId(avatarUrl) === opt.id
-                            ? 'ring-primary ring-offset-2 ring-offset-card'
+                            ? 'ring-[#FF8C69] ring-offset-2 ring-offset-white'
                             : 'ring-transparent'
                         )}
                       >
                         {opt.emoji}
                       </div>
-                      <span className="text-xs text-muted-foreground">{opt.name}</span>
+                      <span className="text-xs text-[#999999]">{opt.name}</span>
                     </button>
                   ))}
                 </div>
@@ -343,6 +343,6 @@ export default function ProfileEditPage() {
           </div>
         )}
       </div>
-</>
-);
+    </>
+  );
 }

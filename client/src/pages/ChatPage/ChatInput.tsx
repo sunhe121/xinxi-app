@@ -21,6 +21,16 @@ export default function ChatInput({ bindingId, receiverUserId, onMessageSent }: 
   const [recordDuration, setRecordDuration] = useState(0);
   const [sending, setSending] = useState(false);
 
+  // 监听快捷短语事件
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const customEvent = e as CustomEvent<string>;
+      setText(customEvent.detail);
+    };
+    window.addEventListener('chat-quick-phrase', handler);
+    return () => window.removeEventListener('chat-quick-phrase', handler);
+  }, []);
+
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const timerRef = useRef<number | null>(null);
@@ -291,25 +301,45 @@ export default function ChatInput({ bindingId, receiverUserId, onMessageSent }: 
     <div className="relative">
       {/* + 号展开面板 */}
       {showPlus && (
-        <div className="absolute bottom-full left-0 right-0 bg-card border-t border-border p-4 space-y-3 animate-fadeIn">
-          <div className="flex gap-6">
+        <div
+          className="absolute bottom-full left-0 right-0 p-4 animate-fadeIn"
+          style={{
+            background: 'rgba(255, 255, 255, 0.85)',
+            WebkitBackdropFilter: 'blur(20px)',
+            backdropFilter: 'blur(20px)',
+            borderTop: '1px solid rgba(255, 255, 255, 0.6)',
+          }}
+        >
+          <div className="flex gap-8">
             <button
               onClick={() => fileInputRef.current?.click()}
               className="flex flex-col items-center gap-2 active:scale-95 transition-transform"
             >
-              <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center">
-                <ImageIcon size={24} className="text-primary" />
+              <div
+                className="w-14 h-14 rounded-2xl flex items-center justify-center"
+                style={{
+                  background: 'rgba(255, 140, 105, 0.12)',
+                  border: '1px solid rgba(255, 140, 105, 0.2)',
+                }}
+              >
+                <ImageIcon size={24} style={{ color: '#FF8C69' }} />
               </div>
-              <span className="text-sm text-muted-foreground">图片</span>
+              <span className="text-sm" style={{ color: '#999999' }}>图片</span>
             </button>
             <button
               onClick={() => videoInputRef.current?.click()}
               className="flex flex-col items-center gap-2 active:scale-95 transition-transform"
             >
-              <div className="w-14 h-14 rounded-2xl bg-secondary flex items-center justify-center">
-                <Video size={24} className="text-primary" />
+              <div
+                className="w-14 h-14 rounded-2xl flex items-center justify-center"
+                style={{
+                  background: 'rgba(255, 140, 105, 0.12)',
+                  border: '1px solid rgba(255, 140, 105, 0.2)',
+                }}
+              >
+                <Video size={24} style={{ color: '#FF8C69' }} />
               </div>
-              <span className="text-sm text-muted-foreground">视频</span>
+              <span className="text-sm" style={{ color: '#999999' }}>视频</span>
             </button>
           </div>
         </div>
@@ -336,17 +366,37 @@ export default function ChatInput({ bindingId, receiverUserId, onMessageSent }: 
       )}
 
       {/* 输入栏 */}
-      <div className="flex items-end gap-3 p-4 bg-card border-t border-border">
+      <div
+        className="flex items-end gap-3"
+        style={{
+          padding: '12px 16px',
+          paddingBottom: `calc(12px + env(safe-area-inset-bottom))`,
+          background: 'rgba(255, 255, 255, 0.9)',
+          WebkitBackdropFilter: 'blur(20px)',
+          backdropFilter: 'blur(20px)',
+          borderTop: '1px solid rgba(255, 255, 255, 0.7)',
+        }}
+      >
         <button
           onClick={() => setShowPlus((s) => !s)}
            className={cn(
              'w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0 transition-all active:scale-95',
-             showPlus ? 'bg-primary text-white' : 'bg-secondary text-foreground'
            )}
+           style={showPlus ? {
+             background: 'linear-gradient(135deg, #FF8C69 0%, #FF6B6B 100%)',
+             color: '#FFFFFF',
+             boxShadow: '0 4px 12px rgba(255, 107, 107, 0.3)',
+           } : {
+             background: 'rgba(255, 255, 255, 0.7)',
+             WebkitBackdropFilter: 'blur(10px)',
+             backdropFilter: 'blur(10px)',
+             color: '#FF8C69',
+             border: '1px solid rgba(255, 140, 105, 0.25)',
+           }}
            aria-label="更多"
          >
-           <Plus size={22} />
-        </button>
+           <Plus size={20} />
+         </button>
 
         <textarea
           value={text}
@@ -354,8 +404,8 @@ export default function ChatInput({ bindingId, receiverUserId, onMessageSent }: 
           onKeyDown={handleKeyDown}
           placeholder="说点什么..."
           rows={1}
-          className="flex-1 px-4 py-3 rounded-xl bg-secondary text-foreground text-base resize-none focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all placeholder:text-muted-foreground max-h-32"
-          style={{ minHeight: 44 }}
+          className="flex-1 px-4 text-sm resize-none focus:outline-none transition-all placeholder:text-muted-foreground max-h-32 glass-input"
+          style={{ minHeight: 44, height: 44, paddingTop: 12, paddingBottom: 12, borderRadius: 22 }}
           onInput={(e) => {
             const target = e.target as HTMLTextAreaElement;
             target.style.height = 'auto';
@@ -367,32 +417,43 @@ export default function ChatInput({ bindingId, receiverUserId, onMessageSent }: 
           <button
             onClick={handleSendText}
             disabled={sending}
-             className="w-11 h-11 rounded-full bg-gradient-to-br from-primary to-secondary text-white flex items-center justify-center flex-shrink-0 shadow-md active:scale-95 transition-all disabled:opacity-50"
+             className="w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0 active:scale-95 transition-all disabled:opacity-50"
+             style={{
+               background: 'linear-gradient(135deg, #FF8C69 0%, #FF6B6B 100%)',
+               color: '#FFFFFF',
+               boxShadow: '0 4px 12px rgba(255, 107, 107, 0.3)',
+             }}
              aria-label="发送"
            >
-             <Send size={20} />
-          </button>
-        ) : (
-          <button
-             className={cn(
-               'w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0 active:scale-95 transition-all select-none',
-               recordingState !== 'idle'
-                 ? 'bg-destructive text-white'
-                 : 'bg-gradient-to-br from-primary to-secondary text-white shadow-md'
-             )}
-             aria-label="语音"
-             onTouchStart={handleTouchStart}
-             onTouchMove={handleTouchMove}
-             onTouchEnd={handleTouchEnd}
-             onMouseDown={handleMouseDown}
-             onMouseMove={handleMouseMove}
-             onMouseUp={handleMouseUp}
-             onMouseLeave={handleMouseLeave}
-           >
-             {recordingState !== 'idle' ? <X size={22} /> : <Mic size={22} />}
-          </button>
-        )}
-      </div>
+              <Send size={18} />
+           </button>
+         ) : (
+           <button
+              className={cn(
+                'w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0 active:scale-95 transition-all select-none',
+              )}
+              style={recordingState !== 'idle' ? {
+                background: '#FF6B6B',
+                color: '#FFFFFF',
+                boxShadow: '0 4px 12px rgba(255, 107, 107, 0.3)',
+              } : {
+                background: 'linear-gradient(135deg, #FF8C69 0%, #FF6B6B 100%)',
+                color: '#FFFFFF',
+                boxShadow: '0 4px 12px rgba(255, 107, 107, 0.3)',
+              }}
+              aria-label="语音"
+              onTouchStart={handleTouchStart}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handleTouchEnd}
+              onMouseDown={handleMouseDown}
+              onMouseMove={handleMouseMove}
+              onMouseUp={handleMouseUp}
+              onMouseLeave={handleMouseLeave}
+            >
+              {recordingState !== 'idle' ? <X size={20} /> : <Mic size={20} />}
+           </button>
+         )}
+       </div>
 
       <input
         ref={fileInputRef}

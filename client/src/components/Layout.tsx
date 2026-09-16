@@ -14,11 +14,11 @@ const Layout = () => {
   }, []);
 
   return (
-    <div className="min-h-screen w-full bg-background flex justify-center">
+    <div className="min-h-screen w-full flex justify-center">
       <div
         className={cn(
-          'w-full max-w-[480px] min-h-screen bg-background relative',
-          showNav ? 'pb-[72px]' : ''
+          'w-full max-w-[480px] mx-auto min-h-screen bg-transparent relative',
+          showNav ? 'pb-[80px]' : ''
         )}
       >
         <Outlet />

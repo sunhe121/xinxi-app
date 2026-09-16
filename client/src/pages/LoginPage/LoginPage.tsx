@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Heart, Eye, EyeOff } from 'lucide-react';
+import { Heart, Eye, EyeOff, ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
 import { authApi, setToken } from '@client/src/api';
 
@@ -179,12 +179,12 @@ export default function LoginPage() {
   };
 
   const inputClass =
-    'w-full h-12 px-4 border border-border rounded-xl text-base text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all bg-card';
+    'glass-input w-full h-13 px-4 text-base text-[#333] placeholder:text-[#999]';
 
   const passwordInputClass =
-    'w-full h-12 pl-4 pr-12 border border-border rounded-xl text-base text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all bg-card';
+    'glass-input w-full h-13 pl-4 pr-12 text-base text-[#333] placeholder:text-[#999]';
 
-  const labelClass = 'block text-foreground text-base font-medium mb-2';
+  const labelClass = 'block text-sm font-medium text-[#333] mb-2';
 
   const renderSendCodeButton = (scene: 'register' | 'reset_password') => {
     const countdown = scene === 'register' ? registerCountdown : forgotCountdown;
@@ -195,7 +195,7 @@ export default function LoginPage() {
         type="button"
         onClick={() => handleSendCode(scene)}
         disabled={disabled}
-        className="shrink-0 h-12 px-4 text-sm font-medium text-primary bg-primary/10 border border-border rounded-xl hover:bg-primary/15 disabled:text-muted-foreground disabled:bg-muted disabled:cursor-not-allowed transition-all"
+        className="shrink-0 h-13 px-4 text-sm text-[#FF8C69] bg-[#FF8C69]/10 rounded-xl font-medium disabled:text-[#999] disabled:bg-white/40 disabled:cursor-not-allowed transition-all"
       >
         {countdown > 0 ? `${countdown}s后重发` : '获取验证码'}
       </button>
@@ -209,26 +209,29 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen w-full bg-background flex items-center justify-center">
+    <div className="min-h-screen w-full flex items-center justify-center">
       <div className="w-full max-w-md mx-auto px-5 py-8">
+        {/* Logo 区域 */}
         <div className="text-center mb-10">
-          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-primary to-orange-300 mb-5 shadow-lg shadow-primary/30">
+          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-[#FF8C69] to-[#FF6B6B] mb-5 shadow-lg shadow-[#FF6B6B]/30">
             <Heart className="w-10 h-10 text-white fill-white" />
           </div>
-          <h1 className="text-3xl font-bold text-foreground mb-2">心系</h1>
-          <p className="text-muted-foreground text-lg leading-relaxed">让陪伴不缺席</p>
+          <h1 className="text-[28px] font-bold text-[#333] mb-2">心系</h1>
+          <p className="text-base text-[#999]">让陪伴不缺席</p>
         </div>
 
-        <div className="bg-card rounded-3xl shadow-lg shadow-primary/10 p-8 border border-border/50">
+        {/* 登录/注册卡片 */}
+        <div className="glass-card p-7">
+          {/* Tab 切换（登录/注册） */}
           {mode !== 'forgot' && (
-            <div className="flex mb-8 bg-secondary rounded-2xl p-1 h-12">
+            <div className="flex mb-6 bg-white/40 rounded-2xl p-1 h-12">
               <button
                 type="button"
                 onClick={() => switchMode('login')}
-                className={`flex-1 text-base font-medium rounded-xl transition-all ${
+                className={`flex-1 text-base rounded-xl transition-all duration-300 ${
                   mode === 'login'
-                    ? 'bg-card text-primary shadow-md shadow-primary/10'
-                    : 'text-muted-foreground'
+                    ? 'bg-white text-[#FF8C69] shadow-sm font-semibold'
+                    : 'text-[#999] font-medium'
                 }`}
               >
                 登录
@@ -236,10 +239,10 @@ export default function LoginPage() {
               <button
                 type="button"
                 onClick={() => switchMode('register')}
-                className={`flex-1 text-base font-medium rounded-xl transition-all ${
+                className={`flex-1 text-base rounded-xl transition-all duration-300 ${
                   mode === 'register'
-                    ? 'bg-card text-primary shadow-md shadow-primary/10'
-                    : 'text-muted-foreground'
+                    ? 'bg-white text-[#FF8C69] shadow-sm font-semibold'
+                    : 'text-[#999] font-medium'
                 }`}
               >
                 注册
@@ -247,8 +250,19 @@ export default function LoginPage() {
             </div>
           )}
 
+          {/* 忘记密码模式标题 + 返回 */}
           {mode === 'forgot' && (
-            <h2 className="text-xl font-semibold text-foreground mb-8">忘记密码</h2>
+            <div className="mb-8">
+              <button
+                type="button"
+                onClick={() => switchMode('login')}
+                className="text-[#FF8C69] mb-4 flex items-center gap-1 text-sm font-medium"
+              >
+                <ArrowLeft size={16} />
+                返回登录
+              </button>
+              <h2 className="text-2xl font-bold text-[#333]">忘记密码</h2>
+            </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-5">
@@ -325,7 +339,7 @@ export default function LoginPage() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center text-[#999] hover:text-[#333] transition-colors"
                   aria-label={showPassword ? '隐藏密码' : '显示密码'}
                 >
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
@@ -347,7 +361,7 @@ export default function LoginPage() {
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center text-[#999] hover:text-[#333] transition-colors"
                     aria-label={showConfirmPassword ? '隐藏密码' : '显示密码'}
                   >
                     {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
@@ -357,11 +371,11 @@ export default function LoginPage() {
             )}
 
             {mode === 'login' && (
-              <div className="text-right">
+              <div className="text-right mt-3">
                 <button
                   type="button"
                   onClick={() => switchMode('forgot')}
-                  className="text-sm text-primary font-medium"
+                  className="text-sm text-[#999]"
                 >
                   忘记密码？
                 </button>
@@ -371,19 +385,20 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full h-12 bg-gradient-to-r from-primary to-orange-400 text-white text-lg font-semibold rounded-xl shadow-md shadow-primary/30 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed mt-6"
+              className="btn-gradient w-full mt-7 text-base font-semibold disabled:opacity-50"
             >
               {loading ? '处理中...' : modeTitle[mode]}
             </button>
           </form>
 
+          {/* 辅助切换链接 */}
           {mode === 'login' && (
-            <p className="text-center text-sm text-muted-foreground mt-6">
+            <p className="text-center text-sm text-[#999] mt-6">
               还没有账号？
               <button
                 type="button"
                 onClick={() => switchMode('register')}
-                className="text-primary font-medium ml-1"
+                className="text-[#FF8C69] font-medium ml-1"
               >
                 立即注册
               </button>
@@ -391,33 +406,28 @@ export default function LoginPage() {
           )}
 
           {mode === 'register' && (
-            <p className="text-center text-sm text-muted-foreground mt-6">
+            <p className="text-center text-sm text-[#999] mt-6">
               已有账号？
               <button
                 type="button"
                 onClick={() => switchMode('login')}
-                className="text-primary font-medium ml-1"
+                className="text-[#FF8C69] font-medium ml-1"
               >
                 去登录
               </button>
             </p>
           )}
 
-          {mode === 'forgot' && (
-            <p className="text-center text-sm text-muted-foreground mt-6">
-              想起来了？
-              <button
-                type="button"
-                onClick={() => switchMode('login')}
-                className="text-primary font-medium ml-1"
-              >
-                去登录
-              </button>
+          {/* 协议文字 */}
+          {mode !== 'forgot' && (
+            <p className="text-xs text-[#999] text-center mt-6 leading-relaxed">
+              登录即表示同意《用户协议》和《隐私政策》
             </p>
           )}
         </div>
 
-        <p className="text-center text-xs text-muted-foreground mt-8">
+        {/* 底部品牌 */}
+        <p className="text-xs text-[#999] text-center mt-10">
           心系 · 为异地家人搭建温暖的情感桥梁
         </p>
       </div>

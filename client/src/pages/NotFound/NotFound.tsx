@@ -5,26 +5,46 @@ const NotFound = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center justify-center p-8">
-      <div className="text-center space-y-6 max-w-sm">
-        <div className="w-24 h-24 mx-auto rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center shadow-lg shadow-primary/30">
-          <Heart size={48} className="text-white" fill="white" />
-        </div>
-        <div className="space-y-2">
-          <h1 className="text-5xl font-bold text-foreground">404</h1>
-          <p className="text-lg text-muted-foreground">页面走丢了</p>
-          <p className="text-sm text-muted-foreground">
-            别担心，让我们回到温暖的地方
-          </p>
-        </div>
-        <button
-          onClick={() => navigate('/')}
-          className="w-full py-4 bg-gradient-to-r from-primary to-secondary text-white rounded-2xl font-semibold text-base shadow-lg shadow-primary/25 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
-        >
-          <Home size={20} />
-          返回首页
-        </button>
+    <div className="min-h-screen w-full flex flex-col items-center justify-center px-5">
+      {/* 大图标 */}
+      <div
+        className="w-24 h-24 rounded-full flex items-center justify-center mb-6"
+        style={{
+          background:
+            'linear-gradient(135deg, #FF8C69 0%, #FF6B6B 100%)',
+          boxShadow: '0 8px 32px rgba(255, 107, 107, 0.3)',
+        }}
+      >
+        <Heart size={48} className="text-white" fill="white" />
       </div>
+
+      {/* 大标题 */}
+      <h1
+        className="text-[80px] font-bold mb-2 leading-none"
+        style={{
+          background:
+            'linear-gradient(135deg, #FF8C69 0%, #FF6B6B 100%)',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          backgroundClip: 'text',
+        }}
+      >
+        404
+      </h1>
+
+      {/* 副标题 */}
+      <p className="text-lg text-[#999] mb-8">
+        页面走丢了，我们回家吧
+      </p>
+
+      {/* 返回按钮 */}
+      <button
+        onClick={() => navigate('/')}
+        className="btn-gradient px-8 flex items-center gap-2"
+      >
+        <Home size={20} />
+        返回首页
+      </button>
     </div>
   );
 };

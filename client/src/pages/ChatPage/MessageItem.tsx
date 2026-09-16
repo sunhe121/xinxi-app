@@ -68,12 +68,12 @@ export default function MessageItem({
 
   const renderContent = () => {
     switch (message.messageType) {
-      case 'text':
-        return (
-          <p className="text-base leading-relaxed whitespace-pre-wrap break-words">
-            {message.content}
-          </p>
-        );
+       case 'text':
+         return (
+           <p className="text-sm leading-relaxed whitespace-pre-wrap break-words">
+             {message.content}
+           </p>
+         );
       case 'image':
         return (
           <div
@@ -116,37 +116,43 @@ export default function MessageItem({
             onClick={handlePlayVoice}
              className="flex items-center gap-3 min-w-[120px] active:scale-95 transition-transform"
            >
-             <div
-               className={cn(
-                 'w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0',
-                 isMine ? 'bg-white/20' : 'bg-primary/10'
+              <div
+                className={cn(
+                  'w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0',
+                )}
+                style={isMine
+                  ? { background: 'rgba(255, 255, 255, 0.25)' }
+                  : { background: 'rgba(255, 140, 105, 0.15)' }
+                }
+              >
+                {playing ? (
+                  <Pause size={16} fill="currentColor" style={{ color: isMine ? '#FFFFFF' : '#FF8C69' }} />
+                ) : (
+                  <Play size={16} fill="currentColor" style={{
+                    color: isMine ? '#FFFFFF' : '#FF8C69',
+                    marginLeft: '2px',
+                  }} />
                )}
-             >
-               {playing ? (
-                 <Pause size={18} className={isMine ? 'text-white' : 'text-primary'} fill="currentColor" />
-               ) : (
-                 <Play size={18} className={isMine ? 'text-white ml-0.5' : 'text-primary ml-0.5'} fill="currentColor" />
-              )}
-            </div>
-             <div className="flex items-center gap-1.5 flex-1">
-               {[...Array(Math.min(5, Math.max(2, Math.ceil(message.duration / 3))))].map((_, i) => (
-                 <div
-                   key={i}
-                   className={cn(
-                     'rounded-full',
-                     isMine ? 'bg-white/60' : 'bg-primary/40',
-                     playing ? 'animate-pulse' : ''
-                   )}
-                   style={{
-                     width: 4,
-                     height: 14 + (i % 3) * 5,
-                   }}
-                 />
-               ))}
              </div>
-             <span className={cn('text-sm flex-shrink-0', isMine ? 'text-white/80' : 'text-muted-foreground')}>
-              {formatDuration(message.duration)}
-            </span>
+              <div className="flex items-center gap-1 flex-1">
+                {[...Array(Math.min(5, Math.max(2, Math.ceil(message.duration / 3))))].map((_, i) => (
+                  <div
+                    key={i}
+                    className={cn('rounded-full', playing ? 'animate-pulse' : '')}
+                    style={{
+                      width: 3,
+                      height: 12 + (i % 3) * 4,
+                      backgroundColor: isMine ? 'rgba(255, 255, 255, 0.7)' : 'rgba(255, 140, 105, 0.5)',
+                    }}
+                  />
+                ))}
+              </div>
+              <span
+                className="text-xs flex-shrink-0"
+                style={{ color: isMine ? 'rgba(255, 255, 255, 0.85)' : '#999999' }}
+              >
+               {formatDuration(message.duration)}
+             </span>
           </button>
         );
       default:
@@ -156,39 +162,44 @@ export default function MessageItem({
 
   return (
     <>
-      <div className={cn('flex gap-2.5', isMine ? 'flex-row-reverse' : 'flex-row')}>
+      <div className={cn('flex gap-2', isMine ? 'flex-row-reverse' : 'flex-row')}>
         {!isMine && (
-          <div className="w-9 h-9 rounded-full bg-primary/10 flex-shrink-0 flex items-center justify-center overflow-hidden shadow-sm shadow-primary/10">
+          <div
+            className="w-7 h-7 rounded-full flex-shrink-0 flex items-center justify-center overflow-hidden"
+            style={{ boxShadow: '0 2px 6px rgba(255, 107, 107, 0.12)' }}
+          >
             {avatarUrl ? (
               <Image src={avatarUrl} alt={partnerName} className="w-full h-full object-cover" />
             ) : (
-              <ImageIcon size={16} className="text-primary" />
+              <ImageIcon size={14} style={{ color: '#FF8C69' }} />
             )}
           </div>
         )}
-        <div className={cn('flex flex-col max-w-[78%] gap-1.5', isMine ? 'items-end' : 'items-start')}>
+        <div className={cn('flex flex-col max-w-[78%] gap-1', isMine ? 'items-end' : 'items-start')}>
           <div
-            className={cn(
-              'px-4.5 py-3 rounded-2xl shadow-sm shadow-primary/10',
-              isMine
-                ? 'bg-gradient-to-br from-primary to-primary/85 text-white rounded-bl-md'
-                : 'bg-card text-foreground rounded-br-md'
-            )}
+            className={cn('p-4')}
+            style={isMine ? {
+              background: 'linear-gradient(135deg, #FF8C69 0%, #FF6B6B 100%)',
+              color: '#FFFFFF',
+              borderRadius: '20px',
+              borderTopRightRadius: '8px',
+              boxShadow: '0 4px 12px rgba(255, 107, 107, 0.2)',
+            } : {
+              background: 'rgba(255, 255, 255, 0.8)',
+              WebkitBackdropFilter: 'blur(10px)',
+              backdropFilter: 'blur(10px)',
+              color: '#333333',
+              borderRadius: '20px',
+              borderTopLeftRadius: '8px',
+              border: '1px solid rgba(255, 255, 255, 0.9)',
+            }}
           >
             {renderContent()}
           </div>
-          <div className={cn('flex items-center gap-1.5', isMine ? 'flex-row-reverse' : 'flex-row')}>
-            <span className="text-[11px] text-muted-foreground/60">
-              {formatTime(message.createdAt)}
-            </span>
-            {isMine && (
-              <span className="text-[11px] text-muted-foreground/50">
-                已收集，将在每日报告中送达
-              </span>
-            )}
-          </div>
+          <span className="text-xs" style={{ color: '#999999' }}>
+            {formatTime(message.createdAt)}
+          </span>
         </div>
-        {isMine && null}
       </div>
 
       {/* 图片/视频大图查看 */}

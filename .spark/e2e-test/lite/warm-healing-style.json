@@ -1,0 +1,29 @@
+{
+  "cases": [
+    {
+      "id": 1,
+      "priority": "p0",
+      "description": "打开登录页/login，验证温暖治愈风：橙粉渐变背景、白色毛玻璃卡片左右有空隙、橙色渐变按钮、圆角24px卡片"
+    },
+    {
+      "id": 2,
+      "priority": "p0",
+      "description": "打开首页/（需登录则跳过），验证：渐变背景透出、毛玻璃卡片、橙色主色调、卡片圆角大"
+    },
+    {
+      "id": 3,
+      "priority": "p0",
+      "description": "打开落地页/landing，验证：全屏渐变背景、居中内容、毛玻璃卡片样式、btn-gradient橙色按钮"
+    },
+    {
+      "id": 4,
+      "priority": "p1",
+      "description": "打开分享页/share，验证：毛玻璃卡片、邀请码区域、渐变背景"
+    },
+    {
+      "id": 5,
+      "priority": "p1",
+      "description": "打开404页/xxx不存在路径，验证：温暖治愈风404页面，橙色渐变主题"
+    }
+  ]
+}

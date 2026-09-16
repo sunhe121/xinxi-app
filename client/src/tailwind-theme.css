@@ -1,50 +1,53 @@
 :root {
-  --button-outline: rgba(255, 140, 105, .15);
+  --button-outline: rgba(255, 107, 107, .15);
   --badge-outline: rgba(255, 140, 105, .08);
 
   --opaque-button-border-intensity: -6;
 
-  --elevate-1: rgba(255, 140, 105, .04);
-  --elevate-2: rgba(255, 140, 105, .08);
+  --elevate-1: rgba(255, 140, 105, .06);
+  --elevate-2: rgba(255, 140, 105, .12);
 
-  --background: hsl(24 60% 97.5%);
-  --foreground: hsl(20 15% 20%);
-  --card: hsl(0 0% 100%);
-  --card-foreground: hsl(20 15% 20%);
-  --popover: hsl(0 0% 100%);
-  --popover-foreground: hsl(20 15% 20%);
-  --primary: hsl(14 100% 66%);
-  --primary-foreground: hsl(0 0% 100%);
-  --secondary: hsl(24 45% 95%);
-  --secondary-foreground: hsl(20 15% 20%);
-  --muted: hsl(24 25% 95%);
-  --muted-foreground: hsl(22 8% 55%);
-  --accent: hsl(160 35% 75%);
-  --accent-foreground: hsl(20 15% 20%);
-  --info: hsl(210 70% 65%);
-  --info-foreground: hsl(0 0% 100%);
-  --destructive: hsl(0 75% 65%);
-  --destructive-foreground: hsl(0 0% 100%);
-  --success: hsl(130 45% 60%);
-  --success-foreground: hsl(0 0% 100%);
-  --warning: hsl(35 90% 65%);
-  --warning-foreground: hsl(0 0% 100%);
-  --border: hsl(24 35% 90%);
-  --input: hsl(24 35% 90%);
-  --ring: hsl(14 100% 66%);
-  --chart-1: hsl(15 100% 70%);
-  --chart-2: hsl(0 100% 85%);
-  --chart-3: hsl(160 40% 75%);
-  --chart-4: hsl(40 90% 70%);
-  --chart-5: hsl(280 40% 80%);
-  --sidebar: hsl(25 50% 95%);
-  --sidebar-foreground: hsl(20 15% 25%);
-  --sidebar-primary: hsl(15 100% 70%);
-  --sidebar-primary-foreground: hsl(0 0% 100%);
-  --sidebar-accent: hsl(25 50% 90%);
-  --sidebar-accent-foreground: hsl(20 15% 25%);
-  --sidebar-border: hsl(25 30% 90%);
-  --sidebar-ring: hsl(15 100% 70%);
+  --background: linear-gradient(135deg, #FFF0E6 0%, #FFE4E1 50%, #FFE8DC 100%);
+  --background-solid: #FFF0E6;
+  --foreground: #333333;
+  --card: rgba(255, 255, 255, 0.75);
+  --card-foreground: #333333;
+  --popover: rgba(255, 255, 255, 0.95);
+  --popover-foreground: #333333;
+  --primary: #FF8C69;
+  --primary-end: #FF6B6B;
+  --primary-foreground: #FFFFFF;
+  --secondary: rgba(255, 140, 105, 0.08);
+  --secondary-foreground: #FF8C69;
+  --muted: rgba(255, 255, 255, 0.5);
+  --muted-foreground: #999999;
+  --accent: #98D8C8;
+  --accent-foreground: #333333;
+  --info: #74B9FF;
+  --info-foreground: #FFFFFF;
+  --destructive: #FF6B6B;
+  --destructive-foreground: #FFFFFF;
+  --success: #6BCB77;
+  --success-foreground: #FFFFFF;
+  --warning: #FFB347;
+  --warning-foreground: #FFFFFF;
+  --border: rgba(255, 255, 255, 0.8);
+  --input: rgba(255, 255, 255, 0.6);
+  --input-border: rgba(255, 140, 105, 0.2);
+  --ring: #FF8C69;
+  --chart-1: #FF8C69;
+  --chart-2: #FFB5B5;
+  --chart-3: #98D8C8;
+  --chart-4: #FFB347;
+  --chart-5: #DDA0DD;
+  --sidebar: rgba(255, 240, 230, 0.95);
+  --sidebar-foreground: #333333;
+  --sidebar-primary: #FF8C69;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: rgba(255, 140, 105, 0.1);
+  --sidebar-accent-foreground: #333333;
+  --sidebar-border: rgba(255, 255, 255, 0.6);
+  --sidebar-ring: #FF8C69;
 
   --primary-border: hsl(from hsl(15 100% 70%) h s calc(l + var(--opaque-button-border-intensity)));
   --secondary-border: hsl(from hsl(25 50% 94%) h s calc(l + var(--opaque-button-border-intensity)));
@@ -60,26 +63,27 @@
   --font-serif:
     ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
   --font-mono: Source Code Pro, monospace;
-  --radius: 1rem;
+  --radius: 1.5rem;
+  --radius-sm: 0.75rem;
+  --radius-md: 1rem;
+  --radius-lg: 1.25rem;
+  --radius-xl: 1.5rem;
+  --radius-2xl: 1.5rem;
+  --radius-3xl: 2rem;
   --shadow-x: 0px;
-  --shadow-y: 2px;
-  --shadow-blur: 16px;
+  --shadow-y: 8px;
+  --shadow-blur: 32px;
   --shadow-spread: 0px;
-  --shadow-opacity: 0.04;
-  --shadow-color: hsl(14 100% 66%);
-  --shadow-2xs: 0px 2px 8px 0px hsl(14 100% 60% / 0.04);
-  --shadow-xs: 0px 4px 16px 0px hsl(14 100% 60% / 0.05);
-  --shadow-sm:
-    0px 4px 20px 0px hsl(14 100% 60% / 0.06), 0px 1px 2px -1px hsl(14 100% 60% / 0.04);
-  --shadow:
-    0px 6px 24px 0px hsl(14 100% 60% / 0.07), 0px 2px 4px -1px hsl(14 100% 60% / 0.05);
-  --shadow-md:
-    0px 8px 30px 0px hsl(14 100% 60% / 0.08), 0px 3px 6px -2px hsl(14 100% 60% / 0.06);
-  --shadow-lg:
-    0px 12px 40px 0px hsl(14 100% 60% / 0.1), 0px 4px 8px -2px hsl(14 100% 60% / 0.07);
-  --shadow-xl:
-    0px 16px 48px 0px hsl(14 100% 60% / 0.12), 0px 6px 12px -3px hsl(14 100% 60% / 0.08);
-  --shadow-2xl: 0px 20px 60px 0px hsl(14 100% 60% / 0.15);
+  --shadow-opacity: 0.1;
+  --shadow-color: #FF6B6B;
+  --shadow-2xs: 0 4px 12px rgba(255, 107, 107, 0.06);
+  --shadow-xs: 0 6px 20px rgba(255, 107, 107, 0.08);
+  --shadow-sm: 0 8px 32px rgba(255, 107, 107, 0.1);
+  --shadow: 0 12px 40px rgba(255, 107, 107, 0.12);
+  --shadow-md: 0 16px 48px rgba(255, 107, 107, 0.14);
+  --shadow-lg: 0 20px 60px rgba(255, 107, 107, 0.16);
+  --shadow-xl: 0 24px 72px rgba(255, 107, 107, 0.18);
+  --shadow-2xl: 0 32px 80px rgba(255, 107, 107, 0.2);
   --tracking-normal: 0em;
   --spacing: 0.25rem;
 }
@@ -220,13 +224,18 @@ html, body, #root {
   height: 100%;
   margin: 0;
   padding: 0;
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-sans);
+  background: #FFF0E6;
+  background: -webkit-linear-gradient(135deg, #FFF0E6 0%, #FFE4E1 50%, #FFE8DC 100%);
+  background: linear-gradient(135deg, #FFF0E6 0%, #FFE4E1 50%, #FFE8DC 100%);
+  background-attachment: fixed;
+  color: #333333;
+  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft Yahei', 'Segoe UI', 'Helvetica Neue', 'Tahoma', 'Hiragino Sans GB', Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   font-size: 16px;
-  line-height: 1.6;
+  line-height: 1.7;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 body {
@@ -235,14 +244,76 @@ body {
   padding-left: env(safe-area-inset-left);
   padding-right: env(safe-area-inset-right);
   min-height: 100dvh;
+  min-height: 100vh;
+  -webkit-overflow-scrolling: touch;
+  overflow-x: hidden;
 }
 
 #root {
   min-height: 100dvh;
+  min-height: 100vh;
 }
 
 * {
   -webkit-tap-highlight-color: transparent;
+  tap-highlight-color: transparent;
+  box-sizing: border-box;
+}
+
+button, input, textarea, select {
+  -webkit-appearance: none;
+  appearance: none;
+  font-family: inherit;
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.75);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  border-radius: 24px;
+  box-shadow: 0 8px 32px rgba(255, 107, 107, 0.1);
+}
+
+.glass-input {
+  background: rgba(255, 255, 255, 0.6);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 140, 105, 0.2);
+  border-radius: 16px;
+  transition: all 0.3s ease;
+}
+
+.glass-input:focus {
+  border-color: #FF8C69;
+  box-shadow: 0 0 0 3px rgba(255, 140, 105, 0.15);
+  outline: none;
+}
+
+.btn-gradient {
+  background: -webkit-linear-gradient(135deg, #FF8C69 0%, #FF6B6B 100%);
+  background: linear-gradient(135deg, #FF8C69 0%, #FF6B6B 100%);
+  color: #FFFFFF;
+  font-weight: 600;
+  border-radius: 16px;
+  height: 52px;
+  box-shadow: 0 8px 24px rgba(255, 107, 107, 0.3);
+  transition: all 0.2s ease;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-gradient:active {
+  -webkit-transform: scale(0.98);
+  transform: scale(0.98);
+  box-shadow: 0 4px 16px rgba(255, 107, 107, 0.25);
+}
+
+.btn-gradient:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  -webkit-transform: none;
+  transform: none;
 }
 
 /* 隐藏滚动条但保持滚动 */
@@ -252,4 +323,33 @@ body {
 .scrollbar-hide {
   -ms-overflow-style: none;
   scrollbar-width: none;
+}
+
+/* 页面进入动画 */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    -webkit-transform: translateY(20px);
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    -webkit-transform: translateY(0);
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  -webkit-animation: fadeInUp 0.4s ease-out;
+  animation: fadeInUp 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-fade-in {
+  -webkit-animation: fadeIn 0.3s ease-out;
+  animation: fadeIn 0.3s ease-out;
 }

@@ -10,6 +10,7 @@ import {
   Sparkles,
   Clock,
   Tag,
+  Check,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -41,6 +42,40 @@ declare global {
 
 type StyleProfile = { profile: string; keywords: string[]; tone: string } | null;
 
+type StyleOption = {
+  id: string;
+  name: string;
+  desc: string;
+  sample: string;
+};
+
+const STYLE_OPTIONS: StyleOption[] = [
+  {
+    id: 'warm',
+    name: '温暖治愈',
+    desc: '语气温柔体贴，像家人一样嘘寒问暖，充满关心和爱意。',
+    sample: '"今天天气真好，出门走走吧，记得多穿点衣服哦~"',
+  },
+  {
+    id: 'cheerful',
+    name: '活泼开朗',
+    desc: '语气明快积极，充满正能量，让人听了心情愉悦。',
+    sample: '"哇！今天走了这么多路，太棒啦！继续保持哦~"',
+  },
+  {
+    id: 'gentle',
+    name: '温柔沉稳',
+    desc: '语气温和舒缓，节奏稍慢，给人安心踏实的感觉。',
+    sample: '"今天休息得还不错，慢慢来，身体最重要。"',
+  },
+  {
+    id: 'humorous',
+    name: '幽默风趣',
+    desc: '语气轻松诙谐，偶尔开开玩笑，让每一天都充满欢笑。',
+    sample: '"哟，今天步数破万啦，这是要去拿奥运冠军的节奏呀！"',
+  },
+];
+
 function formatDuration(seconds: number): string {
   const m = Math.floor(seconds / 60).toString().padStart(2, '0');
   const s = (seconds % 60).toString().padStart(2, '0');
@@ -58,6 +93,7 @@ export default function LanguageStylePage() {
   const [profile, setProfile] = useState<StyleProfile>(null);
   const [loading, setLoading] = useState(true);
   const [analyzing, setAnalyzing] = useState(false);
+  const [selectedStyle, setSelectedStyle] = useState('warm');
 
   // 录制弹层
   const [showRecorder, setShowRecorder] = useState(false);
@@ -322,169 +358,223 @@ export default function LanguageStylePage() {
     }
   };
 
+  const handlePreview = () => {
+    const style = STYLE_OPTIONS.find((s) => s.id === selectedStyle);
+    toast.info(`正在试听「${style?.name}」风格...`);
+  };
+
+  const handleSaveStyle = () => {
+    const style = STYLE_OPTIONS.find((s) => s.id === selectedStyle);
+    toast.success(`已保存为「${style?.name}」风格`);
+  };
+
   const canAnalyze = samples.length >= 3;
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-muted-foreground">加载中...</div>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-[#999]">加载中...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background pb-[120px]">
+    <div className="px-5 pt-6 pb-6 max-w-[480px] mx-auto">
       {/* 顶部导航 */}
-      <div className="max-w-[480px] mx-auto bg-background sticky top-0 z-10 px-5 py-4 flex items-center gap-3">
+      <div className="flex items-center gap-3 mb-6">
         <button
           onClick={() => navigate(-1)}
-          className="w-11 h-11 rounded-full bg-secondary flex items-center justify-center text-foreground transition-colors"
+          className="w-10 h-10 rounded-full bg-white/60 flex items-center justify-center active:scale-95 transition-transform"
           aria-label="返回"
         >
-          <ArrowLeft size={20} />
+          <ArrowLeft size={20} className="text-[#333]" />
         </button>
-        <h1 className="text-xl font-semibold text-foreground">语言风格学习</h1>
+        <h1 className="text-lg font-semibold text-[#333]">语言风格</h1>
       </div>
 
-      <div className="max-w-[480px] mx-auto px-5 space-y-5">
-        {/* 风格画像展示区 */}
-        <div className="bg-card rounded-2xl shadow-sm p-6">
+      {/* 说明区 */}
+      <div className="glass-card p-6 mb-5">
+        <div className="flex items-center gap-2 mb-2">
+          <Sparkles size={20} className="text-[#FF8C69]" />
+          <h2 className="text-lg font-semibold text-[#333]">选择播报风格</h2>
+        </div>
+        <p className="text-sm text-[#999] leading-relaxed">
+          选择你喜欢的语言风格，每日播报将以这种语气生成，
+          让每一句问候都充满你想要的温度。
+        </p>
+      </div>
+
+      {/* 风格选项列表 */}
+      <div className="space-y-4 mb-5">
+        {STYLE_OPTIONS.map((style) => (
+          <div
+            key={style.id}
+            onClick={() => setSelectedStyle(style.id)}
+            className={cn(
+              'glass-card p-5 cursor-pointer transition-all active:scale-[0.99]',
+              selectedStyle === style.id
+                ? 'border-[#FF8C69]/60 shadow-lg shadow-[#FF6B6B]/15'
+                : ''
+            )}
+          >
+            <div className="flex items-start justify-between">
+              <h3 className="text-base font-semibold text-[#333]">{style.name}</h3>
+              <div
+                className={cn(
+                  'w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 transition-all',
+                  selectedStyle === style.id
+                    ? 'bg-gradient-to-br from-[#FF8C69] to-[#FF6B6B] shadow-md shadow-[#FF6B6B]/30'
+                    : 'bg-white/60 border border-white/80'
+                )}
+              >
+                {selectedStyle === style.id && (
+                  <Check size={14} className="text-white" />
+                )}
+              </div>
+            </div>
+            <p className="text-sm text-[#999] mt-2 leading-relaxed">
+              {style.desc}
+            </p>
+            <p className="text-sm text-[#FF8C69] italic mt-3">
+              {style.sample}
+            </p>
+          </div>
+        ))}
+      </div>
+
+      {/* 预览/试听按钮 */}
+      <button
+        onClick={handlePreview}
+        className="btn-gradient w-full mt-6 flex items-center justify-center gap-2"
+      >
+        <Mic size={18} />
+        试听效果
+      </button>
+
+      {/* 保存按钮 */}
+      <button
+        onClick={handleSaveStyle}
+        className="btn-gradient w-full mt-4"
+      >
+        保存设置
+      </button>
+
+      {/* 我的语音样本 */}
+      <div className="mt-8 mb-4">
+        <div className="flex items-center gap-2 mb-4">
+          <Tag size={18} className="text-[#FF8C69]" />
+          <h2 className="text-base font-semibold text-[#333]">我的语音样本</h2>
+          <span className="text-xs text-[#999]">
+            {samples.length}/3
+          </span>
+        </div>
+
+        {samples.length === 0 ? (
+          <div className="glass-card p-6 text-center">
+            <p className="text-[#999] text-sm">还没有语音样本</p>
+            <p className="text-[#999]/60 text-xs mt-1">
+              录制样本让AI学习你的说话方式
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {samples.map((sample) => (
+              <div
+                key={sample.id}
+                className="glass-card p-4"
+              >
+                <div className="flex items-start justify-between mb-2">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <h3 className="font-medium text-[#333] truncate text-sm">
+                        {sample.title}
+                      </h3>
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-[#FF8C69]/15 text-[#FF8C69] shrink-0">
+                        {getCategoryLabel(sample.category)}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1 text-xs text-[#999]">
+                      <Clock size={12} />
+                      <span>{formatDuration(sample.duration)}</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1 ml-2 shrink-0">
+                    <button
+                      onClick={() => openRecorder(sample)}
+                      className="w-9 h-9 rounded-full flex items-center justify-center text-[#999] hover:bg-white/60 hover:text-[#333] transition-colors"
+                      aria-label="编辑"
+                    >
+                      <Edit3 size={16} />
+                    </button>
+                    <button
+                      onClick={() => handleDelete(sample.id)}
+                      className="w-9 h-9 rounded-full flex items-center justify-center text-[#999] hover:bg-[#FF6B6B]/10 hover:text-[#FF6B6B] transition-colors"
+                      aria-label="删除"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+                </div>
+                <p className="text-xs text-[#999] line-clamp-2 leading-relaxed">
+                  {sample.transcript}
+                </p>
+              </div>
+            ))}
+          </div>
+        )}
+
+        <button
+          onClick={() => openRecorder()}
+          className={cn(
+            'w-full mt-4 h-12 rounded-2xl flex items-center justify-center gap-2 font-medium transition-all active:scale-[0.98]',
+            samples.length < 3
+              ? 'bg-white/60 border border-white/80 text-[#FF8C69]'
+              : 'bg-white/30 border border-white/50 text-[#999] cursor-not-allowed'
+          )}
+          disabled={samples.length >= 3}
+        >
+          <Plus size={18} />
+          录制新样本
+        </button>
+      </div>
+
+      {/* 风格画像 */}
+      {profile && (
+        <div className="glass-card p-5 mt-5">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
-              <Sparkles size={20} className="text-primary" />
-              <h2 className="text-lg font-semibold text-foreground">我的语言风格</h2>
+              <Sparkles size={18} className="text-[#FF8C69]" />
+              <h3 className="text-base font-semibold text-[#333]">我的语言风格</h3>
             </div>
             <button
               onClick={handleAnalyze}
               disabled={analyzing || !canAnalyze}
               className={cn(
-                'flex items-center gap-1.5 px-4 py-2.5 rounded-full text-base font-medium min-h-11 transition-all',
+                'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all',
                 canAnalyze
-                  ? 'bg-gradient-to-r from-primary to-warning text-white shadow-md shadow-primary/20 active:scale-95'
-                   : 'bg-muted text-muted-foreground cursor-not-allowed',
+                  ? 'bg-gradient-to-r from-[#FF8C69] to-[#FF6B6B] text-white active:scale-95'
+                  : 'bg-white/40 text-[#999] cursor-not-allowed',
               )}
-              title={canAnalyze ? '重新分析' : '请先录制至少 3 段语音样本'}
             >
-              <RefreshCw size={18} className={analyzing ? 'animate-spin' : ''} />
-              {analyzing ? '分析中...' : profile ? '重新分析' : '分析风格'}
+              <RefreshCw size={14} className={analyzing ? 'animate-spin' : ''} />
+              {analyzing ? '分析中' : '重新分析'}
             </button>
           </div>
-
-          {profile ? (
-            <div className="space-y-4">
-              <div>
-                <div className="text-sm text-muted-foreground mb-1">风格画像</div>
-                <p className="text-foreground leading-relaxed">{profile.profile}</p>
-              </div>
-
-              <div>
-                <div className="text-sm text-muted-foreground mb-2">关键词</div>
-                <div className="flex flex-wrap gap-2">
-                  {profile.keywords.map((kw: string, idx: number) => (
-                    <span
-                      key={idx}
-                      className="px-3.5 py-1.5 rounded-full bg-primary/10 text-primary text-sm"
-                    >
-                      {kw}
-                    </span>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <div className="text-sm text-muted-foreground mb-1">语气特点</div>
-                <p className="text-foreground">{profile.tone}</p>
-              </div>
-            </div>
-          ) : (
-            <div className="text-center py-8">
-              <div className="w-16 h-16 mx-auto mb-3 rounded-full bg-primary/10 flex items-center justify-center">
-                <Mic size={28} className="text-primary" />
-              </div>
-              <p className="text-muted-foreground text-sm">
-                录制至少 3 段语音，AI 将分析你的语言风格
-              </p>
-              <p className="text-muted-foreground/70 text-xs mt-1">
-                当前样本数：{samples.length}/3
-              </p>
-            </div>
-          )}
-        </div>
-
-        {/* 语音样本列表 */}
-        <div className="bg-card rounded-2xl shadow-sm p-6">
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-2">
-              <Tag size={18} className="text-primary" />
-              <h2 className="text-lg font-semibold text-foreground">语音样本</h2>
-              <span className="text-sm text-muted-foreground">
-                样本数：{samples.length}/3
-              </span>
-            </div>
-            <button
-              onClick={() => openRecorder()}
-              className="flex items-center gap-1.5 px-4 py-2.5 rounded-full bg-gradient-to-r from-primary to-warning text-white text-base font-medium min-h-11 shadow-md shadow-primary/20 active:scale-95 transition-all"
-            >
-              <Plus size={18} />
-              录制新样本
-            </button>
-          </div>
-
-          {samples.length === 0 ? (
-            <div className="text-center py-8">
-              <p className="text-muted-foreground text-sm">还没有语音样本</p>
-              <p className="text-muted-foreground/60 text-xs mt-1">
-                点击"录制新样本"开始录制
-              </p>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {samples.map((sample) => (
-                <div
-                  key={sample.id}
-                  className="p-4 rounded-xl bg-secondary/50 border border-border min-h-16"
+          <div className="space-y-3">
+            <p className="text-sm text-[#333] leading-relaxed">{profile.profile}</p>
+            <div className="flex flex-wrap gap-2">
+              {profile.keywords.map((kw: string, idx: number) => (
+                <span
+                  key={idx}
+                  className="px-3 py-1 rounded-full bg-[#FF8C69]/15 text-[#FF8C69] text-xs"
                 >
-                  <div className="flex items-start justify-between mb-2">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <h3 className="font-medium text-foreground truncate">
-                          {sample.title}
-                        </h3>
-                        <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary shrink-0">
-                          {getCategoryLabel(sample.category)}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                        <Clock size={12} />
-                        <span>{formatDuration(sample.duration)}</span>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-1 ml-2 shrink-0">
-                      <button
-                        onClick={() => openRecorder(sample)}
-                          className="w-11 h-11 rounded-full flex items-center justify-center text-muted-foreground hover:bg-secondary hover:text-foreground transition-colors"
-                        aria-label="编辑"
-                      >
-                        <Edit3 size={18} />
-                      </button>
-                      <button
-                        onClick={() => handleDelete(sample.id)}
-                          className="w-11 h-11 rounded-full flex items-center justify-center text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
-                        aria-label="删除"
-                      >
-                        <Trash2 size={18} />
-                      </button>
-                    </div>
-                  </div>
-                  <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
-                    {sample.transcript}
-                  </p>
-                </div>
+                  {kw}
+                </span>
               ))}
             </div>
-          )}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* 录制弹层 */}
       {showRecorder && (
@@ -493,27 +583,27 @@ export default function LanguageStylePage() {
             className="absolute inset-0 bg-black/40 backdrop-blur-sm"
             onClick={closeRecorder}
           />
-          <div className="relative w-full max-w-[480px] bg-card rounded-t-3xl shadow-2xl max-h-[90vh] overflow-hidden animate-slide-up">
+          <div className="relative w-full max-w-[480px] bg-white/90 backdrop-blur-2xl rounded-t-3xl shadow-2xl max-h-[90vh] overflow-hidden animate-slide-up border-t border-white/80">
             {/* 弹层头部 */}
-            <div className="sticky top-0 bg-card px-5 py-4 flex items-center justify-between border-b border-border z-10">
+            <div className="sticky top-0 bg-white/70 backdrop-blur-xl px-5 py-4 flex items-center justify-between border-b border-white/60 z-10">
               <button
                 onClick={closeRecorder}
-                className="w-11 h-11 rounded-full flex items-center justify-center text-muted-foreground hover:bg-secondary transition-colors"
+                className="w-10 h-10 rounded-full flex items-center justify-center text-[#999] hover:bg-white/60 transition-colors"
                 aria-label="关闭"
               >
                 <X size={20} />
               </button>
-                <h3 className="text-lg font-semibold text-foreground">
+              <h3 className="text-lg font-semibold text-[#333]">
                 {editingSample ? '编辑样本' : '录制新样本'}
               </h3>
               <button
                 onClick={handleSave}
                 disabled={saving || recording}
                 className={cn(
-                  'px-4 py-2.5 rounded-full text-base font-medium min-h-11 transition-all',
+                  'px-4 py-2 rounded-full text-sm font-medium min-h-10 transition-all',
                   saving || recording
-                    ? 'bg-muted text-muted-foreground cursor-not-allowed'
-                    : 'bg-gradient-to-r from-primary to-warning text-white shadow-md shadow-primary/20 active:scale-95',
+                    ? 'bg-white/40 text-[#999] cursor-not-allowed'
+                    : 'bg-gradient-to-r from-[#FF8C69] to-[#FF6B6B] text-white shadow-md shadow-[#FF6B6B]/20 active:scale-95',
                 )}
               >
                 {saving ? '保存中...' : '保存'}
@@ -523,7 +613,7 @@ export default function LanguageStylePage() {
             <div className="p-5 space-y-5 overflow-y-auto">
               {/* 标题输入 */}
               <div>
-                  <label className="block text-sm font-medium text-foreground mb-2">
+                <label className="block text-sm font-medium text-[#333] mb-2">
                   标题
                 </label>
                 <input
@@ -531,13 +621,13 @@ export default function LanguageStylePage() {
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="给这段语音起个名字"
-                  className="w-full px-4 py-3 rounded-xl bg-secondary/50 border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
+                  className="glass-input w-full px-4 py-3 text-[#333] placeholder:text-[#999]"
                 />
               </div>
 
               {/* 分类选择 */}
               <div>
-                  <label className="block text-sm font-medium text-foreground mb-2">
+                <label className="block text-sm font-medium text-[#333] mb-2">
                   分类
                 </label>
                 <div className="flex flex-wrap gap-2">
@@ -549,8 +639,8 @@ export default function LanguageStylePage() {
                       className={cn(
                         'px-3.5 py-2 rounded-full text-sm font-medium min-h-10 transition-all',
                         category === cat.value
-                         ? 'bg-primary text-white'
-                           : 'bg-secondary/50 text-muted-foreground border border-border hover:border-primary/50',
+                          ? 'bg-gradient-to-r from-[#FF8C69] to-[#FF6B6B] text-white'
+                          : 'bg-white/60 text-[#999] border border-white/80 hover:border-[#FF8C69]/50',
                         editingSample && 'opacity-60 cursor-not-allowed',
                       )}
                     >
@@ -562,36 +652,36 @@ export default function LanguageStylePage() {
 
               {/* 录音区域 */}
               <div>
-                  <label className="block text-sm font-medium text-foreground mb-2">
+                <label className="block text-sm font-medium text-[#333] mb-2">
                   录音
                 </label>
-                <div className="p-6 rounded-xl bg-secondary/50 border border-border flex flex-col items-center">
+                <div className="glass-input p-6 flex flex-col items-center">
                   <button
                     onClick={recording ? stopRecording : startRecording}
                     disabled={!mediaRecorderSupported}
                     className={cn(
                       'w-20 h-20 rounded-full flex items-center justify-center transition-all',
                       recording
-                        ? 'bg-destructive text-white shadow-lg shadow-destructive/20 animate-pulse'
-                         : 'bg-gradient-to-br from-primary to-warning text-white shadow-lg shadow-primary/20 hover:shadow-xl active:scale-95',
-                       !mediaRecorderSupported &&
-                         'bg-muted text-muted-foreground cursor-not-allowed shadow-none',
+                        ? 'bg-[#FF6B6B] text-white shadow-lg shadow-[#FF6B6B]/30 animate-pulse'
+                        : 'bg-gradient-to-br from-[#FF8C69] to-[#FF6B6B] text-white shadow-lg shadow-[#FF6B6B]/30 hover:shadow-xl active:scale-95',
+                      !mediaRecorderSupported &&
+                        'bg-white/40 text-[#999] cursor-not-allowed shadow-none',
                     )}
                     aria-label={recording ? '停止录音' : '开始录音'}
                   >
                     <Mic size={32} />
                   </button>
-                   <div className="mt-3 text-lg font-medium text-foreground">
+                  <div className="mt-3 text-lg font-medium text-[#333]">
                     {formatDuration(recording ? recordDuration : duration)}
                   </div>
-                   <div className="mt-1 text-xs text-muted-foreground">
-                     {recording
-                       ? '正在录音... 点击停止'
-                       : duration > 0
-                         ? '已录制完成'
-                         : mediaRecorderSupported
-                           ? '点击麦克风开始录音'
-                           : '你的浏览器不支持录音功能'}
+                  <div className="mt-1 text-xs text-[#999]">
+                    {recording
+                      ? '正在录音... 点击停止'
+                      : duration > 0
+                        ? '已录制完成'
+                        : mediaRecorderSupported
+                          ? '点击麦克风开始录音'
+                          : '你的浏览器不支持录音功能'}
                   </div>
                   {audioUrl && !recording && (
                     <audio
@@ -606,11 +696,11 @@ export default function LanguageStylePage() {
               {/* 转录文字 */}
               <div>
                 <div className="flex items-center justify-between mb-2">
-                    <label className="block text-sm font-medium text-foreground">
+                  <label className="block text-sm font-medium text-[#333]">
                     转录文字
                   </label>
                   {!speechSupported && (
-                    <span className="text-xs text-warning">
+                    <span className="text-xs text-[#FFB347]">
                       请手动输入文字
                     </span>
                   )}
@@ -621,7 +711,7 @@ export default function LanguageStylePage() {
                   onBlur={stopSpeechRecognition}
                   placeholder="录音停止后将自动识别文字，你也可以手动编辑..."
                   rows={5}
-                  className="w-full px-4 py-3 rounded-xl bg-secondary/50 border border-border text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all resize-none"
+                  className="glass-input w-full px-4 py-3 text-[#333] placeholder:text-[#999] resize-none"
                 />
               </div>
             </div>

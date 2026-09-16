@@ -1,0 +1,29 @@
+{
+  "cases": [
+    {
+      "id": 1,
+      "priority": "p0",
+      "description": "打开首页/，验证温暖治愈风：橙粉渐变背景透出、毛玻璃卡片样式、橙色主色调、卡片大圆角"
+    },
+    {
+      "id": 2,
+      "priority": "p0",
+      "description": "打开家人页/family，验证：毛玻璃卡片、橙色渐变元素、渐变背景"
+    },
+    {
+      "id": 3,
+      "priority": "p1",
+      "description": "打开关心话页/voice，验证：分类Tab样式、录音列表毛玻璃卡片"
+    },
+    {
+      "id": 4,
+      "priority": "p1",
+      "description": "打开历史页/history，验证：播报列表毛玻璃卡片、橙色心情标签"
+    },
+    {
+      "id": 5,
+      "priority": "p1",
+      "description": "打开我的页/profile，验证：用户信息毛玻璃卡片、功能列表、橙色渐变元素"
+    }
+  ]
+}

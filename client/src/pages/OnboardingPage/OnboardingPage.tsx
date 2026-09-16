@@ -115,214 +115,204 @@ export default function OnboardingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col max-w-[480px] mx-auto">
-      <div className="flex-1 px-5 pt-6">
-        <div className="bg-card rounded-3xl shadow-lg p-8 space-y-6 animate-fadeIn">
-          {/* Logo / 标题区 */}
-          <div className="text-center">
-            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-primary to-orange-300 flex items-center justify-center shadow-lg shadow-primary/30">
-              <Heart size={32} className="text-white" fill="white" />
-            </div>
-            <h2 className="text-2xl font-bold text-foreground mb-3">配对家人</h2>
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              {user?.nickname ? `你好，${user.nickname}！` : '你好！'}
-              和家人配对后，就能收到TA的每日温暖播报啦
-            </p>
-          </div>
+    <div className="min-h-screen w-full max-w-[480px] mx-auto px-5 pt-10 pb-10 flex flex-col animate-fade-in-up">
+      {/* Logo / 标题区 */}
+      <div className="text-center mb-10">
+        <div className="w-16 h-16 mx-auto mb-5 rounded-full bg-gradient-to-br from-[#FF8C69] to-[#FF6B6B] flex items-center justify-center shadow-lg shadow-[#FF6B6B]/25">
+          <Heart size={32} className="text-white" fill="white" />
+        </div>
+        <h1 className="text-[28px] font-bold text-[#333] text-center mb-3">
+          配对家人
+        </h1>
+        <p className="text-base text-[#999] text-center leading-relaxed">
+          {user?.nickname ? `你好，${user.nickname}！` : '你好！'}
+          和家人配对后，就能收到TA的每日温暖播报啦
+        </p>
+      </div>
 
-          {/* Tab 切换 */}
-          <div className="flex bg-secondary rounded-2xl p-1 h-12">
-            <button
-              onClick={() => setPairTab('generate')}
-              className={cn(
-                'flex-1 rounded-xl text-base font-medium transition-all',
-                pairTab === 'generate'
-                  ? 'bg-card text-primary shadow-md shadow-primary/10'
-                  : 'text-muted-foreground'
-              )}
-            >
-              生成邀请码
-            </button>
-            <button
-              onClick={() => setPairTab('redeem')}
-              className={cn(
-                'flex-1 rounded-xl text-base font-medium transition-all',
-                pairTab === 'redeem'
-                  ? 'bg-card text-primary shadow-md shadow-primary/10'
-                  : 'text-muted-foreground'
-              )}
-            >
-              输入邀请码
-            </button>
-          </div>
-
-          {/* 生成邀请码 */}
-          {pairTab === 'generate' && (
-            <div>
-              <div className="space-y-2.5">
-                <label className="text-sm font-medium text-foreground">
-                  选择对方关系
-                </label>
-                <div className="grid grid-cols-2 gap-3">
-                  {RELATION_OPTIONS.map((opt) => (
-                    <button
-                      key={opt.value}
-                      onClick={() => setSelectedRelation(opt.value)}
-                      className={cn(
-                        'py-4 rounded-xl text-base font-medium transition-all active:scale-95',
-                        selectedRelation === opt.value
-                          ? 'bg-primary text-white shadow-md'
-                          : 'bg-secondary text-muted-foreground'
-                      )}
-                    >
-                      {opt.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {!inviteCode ? (
-                <button
-                  onClick={handleGenerateCode}
-                  disabled={generating}
-                  className="w-full h-12 bg-gradient-to-r from-primary to-orange-400 text-white rounded-xl text-lg font-semibold shadow-md shadow-primary/30 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-6"
-                >
-                  {generating ? (
-                    <>
-                      <Loader2 size={20} className="animate-spin" />
-                      生成中...
-                    </>
-                  ) : (
-                    <>
-                      <UserPlus size={20} />
-                      生成邀请码
-                    </>
-                  )}
-                </button>
-              ) : (
-                <div className="bg-gradient-to-br from-primary/10 via-orange-200/30 to-secondary/30 rounded-2xl p-6 text-center mt-6">
-                  <p className="text-sm text-muted-foreground mb-3">
-                    你的6位邀请码
-                  </p>
-                  <div className="text-4xl font-bold text-primary tracking-widest mb-4 tabular-nums">
-                    {inviteCode}
-                  </div>
-                  <p className="text-xs text-muted-foreground mb-4">
-                    有效期 {getTimeRemaining()}
-                  </p>
-                  <button
-                    onClick={handleCopyCode}
-                    className="px-6 py-2.5 bg-primary text-white rounded-full text-sm font-medium active:scale-95 transition-transform inline-flex items-center gap-1.5"
-                  >
-                    {codeCopied ? (
-                      <>
-                        <Check size={16} />
-                        已复制
-                      </>
-                    ) : (
-                      <>
-                        <Copy size={16} />
-                        复制邀请码
-                      </>
-                    )}
-                  </button>
-                </div>
-              )}
-
-              {inviteCode && (
-                <p className="text-center text-xs text-muted-foreground leading-relaxed mt-4">
-                  把邀请码发给家人，让TA在&ldquo;输入邀请码&rdquo;中输入即可配对
-                </p>
-              )}
-            </div>
+      {/* Tab 切换 */}
+      <div className="glass-card p-1.5 flex h-12 mb-6">
+        <button
+          onClick={() => setPairTab('generate')}
+          className={cn(
+            'flex-1 rounded-[14px] text-base font-medium transition-all duration-300',
+            pairTab === 'generate'
+              ? 'bg-gradient-to-r from-[#FF8C69] to-[#FF6B6B] text-white shadow-md shadow-[#FF6B6B]/20'
+              : 'text-[#999]'
           )}
+        >
+          生成邀请码
+        </button>
+        <button
+          onClick={() => setPairTab('redeem')}
+          className={cn(
+            'flex-1 rounded-[14px] text-base font-medium transition-all duration-300',
+            pairTab === 'redeem'
+              ? 'bg-gradient-to-r from-[#FF8C69] to-[#FF6B6B] text-white shadow-md shadow-[#FF6B6B]/20'
+              : 'text-[#999]'
+          )}
+        >
+          输入邀请码
+        </button>
+      </div>
 
-          {/* 输入邀请码 */}
-          {pairTab === 'redeem' && (
-            <div>
-              <div className="space-y-5">
-                <div className="space-y-2.5">
-                  <label className="text-sm font-medium text-foreground">
-                    输入6位邀请码
-                  </label>
-                  <input
-                    type="text"
-                    inputMode="text"
-                    autoComplete="off"
-                    autoCorrect="off"
-                    autoCapitalize="characters"
-                    spellCheck={false}
-                    maxLength={6}
-                    autoFocus
-                    value={redeemCode}
-                    onChange={(e) => handleRedeemCodeChange(e.target.value)}
-                    placeholder="请输入6位邀请码"
-                    className="w-full h-12 px-4 text-center text-base text-foreground rounded-xl bg-card border border-border placeholder:text-muted-foreground focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all uppercase"
-                  />
-                </div>
+      {/* 生成邀请码 */}
+      {pairTab === 'generate' && (
+        <div className="flex-1 flex flex-col">
+          <div className="mb-5">
+            <label className="text-base font-medium text-[#333] mb-3 block">
+              选择对方关系
+            </label>
+            <div className="grid grid-cols-2 gap-3">
+              {RELATION_OPTIONS.map((opt) => (
+                <button
+                  key={opt.value}
+                  onClick={() => setSelectedRelation(opt.value)}
+                  className={cn(
+                    'py-4 rounded-2xl text-base font-medium transition-all duration-200',
+                    'active:scale-[0.97]',
+                    selectedRelation === opt.value
+                      ? 'bg-gradient-to-r from-[#FF8C69] to-[#FF6B6B] text-white shadow-md shadow-[#FF6B6B]/20'
+                      : 'glass-card text-[#333]'
+                  )}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          </div>
 
-                <div className="space-y-2.5">
-                  <label className="text-sm font-medium text-foreground">
-                    对方和你的关系
-                  </label>
-                  <div className="grid grid-cols-2 gap-3">
-                    {RELATION_OPTIONS.map((opt) => (
-                      <button
-                        key={opt.value}
-                        onClick={() => setRedeemRelation(opt.value)}
-                        className={cn(
-                          'py-4 rounded-xl text-base font-medium transition-all active:scale-95',
-                          redeemRelation === opt.value
-                            ? 'bg-primary text-white shadow-md'
-                            : 'bg-secondary text-muted-foreground'
-                        )}
-                      >
-                        {opt.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
+          {!inviteCode ? (
+            <button
+              onClick={handleGenerateCode}
+              disabled={generating}
+              className="btn-gradient w-full mt-4 text-base flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {generating ? (
+                <>
+                  <Loader2 size={20} className="animate-spin" />
+                  生成中...
+                </>
+              ) : (
+                <>
+                  <UserPlus size={20} />
+                  生成邀请码
+                </>
+              )}
+            </button>
+          ) : (
+            <div className="glass-card p-6 text-center mt-2">
+              <p className="text-sm text-[#999] mb-3">
+                你的6位邀请码
+              </p>
+              <div className="text-[36px] font-bold tracking-[0.15em] mb-4 tabular-nums bg-gradient-to-r from-[#FF8C69] to-[#FF6B6B] bg-clip-text text-transparent">
+                {inviteCode}
               </div>
-
+              <p className="text-sm text-[#999] mb-5">
+                有效期 {getTimeRemaining()}
+              </p>
               <button
-                onClick={handleRedeem}
-                disabled={redeemCode.length !== 6 || redeeming}
-                className="w-full h-12 bg-gradient-to-r from-primary to-orange-400 text-white rounded-xl text-lg font-semibold shadow-md shadow-primary/30 active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-6"
+                onClick={handleCopyCode}
+                className="btn-gradient px-8 h-11 inline-flex items-center gap-1.5 text-sm"
               >
-                {redeeming ? (
+                {codeCopied ? (
                   <>
-                    <Loader2 size={20} className="animate-spin" />
-                    配对中...
+                    <Check size={16} />
+                    已复制
                   </>
                 ) : (
                   <>
-                    确认配对
-                    <Sparkles size={18} />
+                    <Copy size={16} />
+                    复制邀请码
                   </>
                 )}
               </button>
             </div>
           )}
+
+          {inviteCode && (
+            <p className="text-center text-sm text-[#999] leading-relaxed mt-5">
+              把邀请码发给家人，让TA在&ldquo;输入邀请码&rdquo;中输入即可配对
+            </p>
+          )}
         </div>
-      </div>
+      )}
+
+      {/* 输入邀请码 */}
+      {pairTab === 'redeem' && (
+        <div className="flex-1 flex flex-col">
+          <div className="space-y-6">
+            <div>
+              <label className="text-base font-medium text-[#333] mb-3 block">
+                输入6位邀请码
+              </label>
+              <input
+                type="text"
+                inputMode="text"
+                autoComplete="off"
+                autoCorrect="off"
+                autoCapitalize="characters"
+                spellCheck={false}
+                maxLength={6}
+                autoFocus
+                value={redeemCode}
+                onChange={(e) => handleRedeemCodeChange(e.target.value)}
+                placeholder="请输入6位邀请码"
+                className="glass-input h-13 w-full px-4 text-center text-[24px] font-bold tracking-[0.2em] text-[#333] placeholder:text-[#999] placeholder:font-normal placeholder:tracking-normal uppercase"
+              />
+            </div>
+
+            <div>
+              <label className="text-base font-medium text-[#333] mb-3 block">
+                对方和你的关系
+              </label>
+              <div className="grid grid-cols-2 gap-3">
+                {RELATION_OPTIONS.map((opt) => (
+                  <button
+                    key={opt.value}
+                    onClick={() => setRedeemRelation(opt.value)}
+                    className={cn(
+                      'py-4 rounded-2xl text-base font-medium transition-all duration-200',
+                      'active:scale-[0.97]',
+                      redeemRelation === opt.value
+                        ? 'bg-gradient-to-r from-[#FF8C69] to-[#FF6B6B] text-white shadow-md shadow-[#FF6B6B]/20'
+                        : 'glass-card text-[#333]'
+                    )}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <button
+            onClick={handleRedeem}
+            disabled={redeemCode.length !== 6 || redeeming}
+            className="btn-gradient w-full mt-8 text-base flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {redeeming ? (
+              <>
+                <Loader2 size={20} className="animate-spin" />
+                配对中...
+              </>
+            ) : (
+              <>
+                确认配对
+                <Sparkles size={18} />
+              </>
+            )}
+          </button>
+        </div>
+      )}
 
       {/* 底部跳过按钮 */}
-      <div className="px-5 pb-[120px]">
-        <button
-          onClick={handleSkip}
-          className="w-full py-3 text-muted-foreground text-sm font-medium active:scale-95 transition-transform"
-        >
-          先跳过，稍后再说
-        </button>
-      </div>
-
-      <style>{`
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(10px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-fadeIn { animation: fadeIn 0.3s ease-out; }
-      `}</style>
+      <button
+        onClick={handleSkip}
+        className="text-sm text-[#FF8C69] text-center mt-6 font-medium active:opacity-70 transition-opacity"
+      >
+        先跳过，稍后再说
+      </button>
     </div>
   );
 }
