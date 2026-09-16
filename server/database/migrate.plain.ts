@@ -175,9 +175,12 @@ END$$;`,
   _created_at TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
   _created_by user_profile,
   _updated_at TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  _updated_by user_profile,
-  UNIQUE ((user_id).user_id, data_date)
+  _updated_by user_profile
 );`,
+  },
+  {
+    name: 'xinyu_daily_data unique index',
+    sql: 'CREATE UNIQUE INDEX IF NOT EXISTS xinyu_daily_data_user_date_idx ON xinyu_daily_data (((user_id).user_id), data_date);',
   },
   {
     name: 'xinyu_privacy_settings table',
@@ -305,17 +308,24 @@ END$$;`,
     sql: `DO $$
 DECLARE
   col_type text;
+  has_user_id boolean;
 BEGIN
   SELECT data_type INTO col_type FROM information_schema.columns
   WHERE table_name = 'xinyu_broadcasts' AND column_name = 'target_user_id';
   IF col_type = 'character varying' THEN
     ALTER TABLE xinyu_broadcasts ALTER COLUMN target_user_id TYPE user_profile
     USING CASE WHEN target_user_id IS NULL THEN NULL ELSE ROW(target_user_id, '', '', '', '')::user_profile END;
-    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'xinyu_broadcasts' AND column_name = 'user_id') THEN
-      ALTER TABLE xinyu_broadcasts ADD COLUMN user_id user_profile;
-      UPDATE xinyu_broadcasts SET user_id = ROW('', '', '', '', '')::user_profile WHERE user_id IS NULL;
-      ALTER TABLE xinyu_broadcasts ALTER COLUMN user_id SET NOT NULL;
-    END IF;
+  END IF;
+
+  SELECT EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_name = 'xinyu_broadcasts' AND column_name = 'user_id'
+  ) INTO has_user_id;
+  IF NOT has_user_id THEN
+    ALTER TABLE xinyu_broadcasts ADD COLUMN user_id user_profile;
+    UPDATE xinyu_broadcasts SET user_id = ROW('', '', '', '', '')::user_profile WHERE user_id IS NULL;
+    ALTER TABLE xinyu_broadcasts ALTER COLUMN user_id SET NOT NULL;
+    ALTER TABLE xinyu_broadcasts ALTER COLUMN user_id SET DEFAULT ROW('', '', '', '', '')::user_profile;
   END IF;
 END$$;`,
   },
@@ -415,20 +425,39 @@ END$$;`,
     sql: `DO $$
 DECLARE
   rec record;
+  policy_name text;
 BEGIN
   FOR rec IN
     SELECT tablename FROM pg_tables
     WHERE schemaname = 'public' AND tablename LIKE 'xinyu_%'
   LOOP
     EXECUTE format('ALTER TABLE %I ENABLE ROW LEVEL SECURITY', rec.tablename);
-    EXECUTE format(
-      'CREATE POLICY IF NOT EXISTS %I ON %I AS PERMISSIVE FOR ALL TO anon USING (true) WITH CHECK (true)',
-      'anon_all_policy_' || rec.tablename, rec.tablename
-    );
-    EXECUTE format(
-      'CREATE POLICY IF NOT EXISTS %I ON %I AS PERMISSIVE FOR ALL TO authenticated USING (true) WITH CHECK (true)',
-      'authenticated_all_policy_' || rec.tablename, rec.tablename
-    );
+
+    policy_name := 'anon_all_policy_' || rec.tablename;
+    IF NOT EXISTS (
+      SELECT 1 FROM pg_policies
+      WHERE schemaname = 'public'
+        AND tablename = rec.tablename
+        AND policyname = policy_name
+    ) THEN
+      EXECUTE format(
+        'CREATE POLICY %I ON %I AS PERMISSIVE FOR ALL TO anon USING (true) WITH CHECK (true)',
+        policy_name, rec.tablename
+      );
+    END IF;
+
+    policy_name := 'authenticated_all_policy_' || rec.tablename;
+    IF NOT EXISTS (
+      SELECT 1 FROM pg_policies
+      WHERE schemaname = 'public'
+        AND tablename = rec.tablename
+        AND policyname = policy_name
+    ) THEN
+      EXECUTE format(
+        'CREATE POLICY %I ON %I AS PERMISSIVE FOR ALL TO authenticated USING (true) WITH CHECK (true)',
+        policy_name, rec.tablename
+      );
+    END IF;
   END LOOP;
 END$$;`,
   },
@@ -446,6 +475,7 @@ export async function runMigrations(databaseUrl: string): Promise<void> {
       } catch (err) {
         const error = err as Error;
         logger.error(`  [${i + 1}/${MIGRATION_STATEMENTS.length}] ${stmt.name} - FAILED: ${error.message}`);
+        logger.error(`  SQL was:\n${stmt.sql}`);
         throw err;
       }
     }
